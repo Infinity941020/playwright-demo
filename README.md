@@ -48,6 +48,7 @@ https://www.saucedemo.com/
 
 ## フォルダ構成
 
+```text
 pages/
  └ LoginPage.ts
 
@@ -55,7 +56,7 @@ tests/login/
  ├ Login-success.spec.ts
  └ Login-failure.spec.ts
 
----
+```
 
 ## 実行方法
 
