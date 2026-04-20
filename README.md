@@ -48,11 +48,6 @@ https://www.saucedemo.com/
 
 ## フォルダ構成
 
-
----
-
-## フォルダ構成
-
 pages/
  └ LoginPage.ts
 
