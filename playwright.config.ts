@@ -1,79 +1,43 @@
-import { defineConfig, devices } from '@playwright/test';
+// Playwrightの設定を定義するための関数をimport
+import { defineConfig } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+// Playwright全体の設定を定義
 export default defineConfig({
-  testDir: './tests',
-  /* Run tests in files in parallel */
-  fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+  // テスト全体の共通設定
+  use: {
+
+    // ここには共通設定を書く（今回は空）
+    // ※storageStateはここでは使わない（setupと分離するため）
   },
 
-  /* Configure projects for major browsers */
+  // テスト実行の単位（プロジェクト構成）
   projects: [
+
+    // setupプロジェクト（ログイン状態を作る専用）
+    {
+      name: 'setup',
+
+      // setupファイルだけを実行対象にする
+      testMatch: /.*\.setup\.ts/,
+
+      // setupではブラウザ状態を持たないので空設定
+      use: {},
+    },
+
+    // 通常のE2Eテスト実行用プロジェクト
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+
+      // Chromiumブラウザでテスト実行
+      use: {
+
+        // setupで作成したログイン状態を使う
+        storageState: 'auth.json',
+      },
+
+      // setupが完了してから実行される依存関係
+      dependencies: ['setup'],
     },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });

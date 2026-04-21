@@ -1,40 +1,88 @@
-import { Page } from '@playwright/test';
+// PlaywrightのPage型・Locator型・expectを使用するためのimport
+import { Page, Locator, expect } from '@playwright/test';
 
-// ログイン画面操作専用クラス
+// ログイン画面の操作をまとめたPage Objectクラス
 export class LoginPage {
 
-  // Playwrightのpage情報を受け取る
-  constructor(private page: Page) {}
+  // Playwrightのページインスタンスを保持
+  readonly page: Page;
 
-  // ログイン画面URLへアクセス
+  // ユーザー名入力欄
+  readonly usernameInput: Locator;
+
+  // パスワード入力欄
+  readonly passwordInput: Locator;
+
+  // ログインボタン
+  readonly loginButton: Locator;
+
+  // エラーメッセージ表示欄
+  readonly errorMessageLocator: Locator;
+
+  // コンストラクタ（page受け取り＋Locator初期化）
+  constructor(page: Page) {
+
+    // pageをクラス内で使えるよう保持
+    this.page = page;
+
+    // ユーザー名入力欄を取得
+    this.usernameInput = page.locator('#user-name');
+
+    // パスワード入力欄を取得
+    this.passwordInput = page.locator('#password');
+
+    // ログインボタンを取得
+    this.loginButton = page.locator('#login-button');
+
+    // エラーメッセージ欄を取得
+    this.errorMessageLocator = page.locator('[data-test="error"]');
+  }
+
+  // ログイン画面へ遷移
   async goto() {
     await this.page.goto('https://www.saucedemo.com/');
   }
 
-  // ユーザー名入力欄へ文字入力
+  // ユーザー名を入力
   async enterUsername(username: string) {
-    await this.page.fill('#user-name', username);
+    await this.usernameInput.fill(username);
   }
 
-  // パスワード入力欄へ文字入力
+  // パスワードを入力
   async enterPassword(password: string) {
-    await this.page.fill('#password', password);
+    await this.passwordInput.fill(password);
   }
 
-  // ログインボタン押下
+  // ログインボタンをクリック
   async clickLogin() {
-    await this.page.click('#login-button');
+    await this.loginButton.click();
   }
 
-  // ログイン操作をまとめて実行
+  // ログイン処理をまとめて実行
   async login(username: string, password: string) {
+
+    // ユーザー名入力
     await this.enterUsername(username);
+
+    // パスワード入力
     await this.enterPassword(password);
+
+    // ログインボタン押下
     await this.clickLogin();
   }
 
-  // エラーメッセージ要素を取得
-  errorMessage() {
-    return this.page.locator('[data-test="error"]');
+  // エラーメッセージLocatorを取得（新メソッド名）
+  getErrorMessage(): Locator {
+    return this.errorMessageLocator;
+  }
+
+  // 旧テストコード互換用メソッド（errorMessage()でも使えるようにする）
+  errorMessage(): Locator {
+    return this.errorMessageLocator;
+  }
+
+  // エラーメッセージが表示されていることを確認
+  async expectErrorVisible() {
+    await expect(this.errorMessageLocator).toBeVisible();
   }
 }

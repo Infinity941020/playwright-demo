@@ -1,31 +1,31 @@
 // Playwrightのテスト実行機能と検証機能を読み込み
 import { test, expect } from '@playwright/test';
 
-// ログイン画面操作クラスを読み込み
-import { LoginPage } from '../../pages/LoginPage';
+/*
+========================================
+ログアウト機能テスト
+（fixture対象：ログイン済み状態から開始）
+========================================
+*/
 
-// ログイン → ログアウトまでの一連の流れを確認するE2Eテスト
+// ログイン済み状態からログアウトできることを確認するテスト
 test('ログイン後にログアウトできること', async ({ page }) => {
 
-  // ログイン操作をまとめたPage Objectを生成
-  const loginPage = new LoginPage(page);
+  // 商品一覧ページへ遷移（ログイン済み前提）
+  await page.goto('https://www.saucedemo.com/inventory.html');
 
-  // ① ログイン画面へ遷移
-  await loginPage.goto();
-
-  // ② ログイン実行（正常ユーザー）
-  await loginPage.login('standard_user', 'secret_sauce');
-
-  // ③ ログイン成功確認（商品一覧が表示される）
+  // 商品一覧画面が表示されていることを確認
   await expect(page.locator('.inventory_list')).toBeVisible();
 
-  // ④ ハンバーガーメニューをクリックして開く
-  // （左上の三本線メニュー）
+  // 左上のハンバーガーメニューを開く
   await page.click('#react-burger-menu-btn');
 
-  // ⑤ ログアウトボタンをクリック
+  // ログアウトボタンをクリック
   await page.click('#logout_sidebar_link');
 
-  // ⑥ ログアウト後、ログイン画面に戻ったことを確認
+  // ログアウト後にログイン画面へ戻ることを確認
   await expect(page.locator('#login-button')).toBeVisible();
+
+  // URLもログイン画面になっていることを確認
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
 });
