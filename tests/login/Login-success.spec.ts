@@ -4,6 +4,9 @@ import { test, expect } from '@playwright/test';
 // ログイン画面操作をまとめたPage Objectを読み込み
 import { LoginPage } from '../../pages/LoginPage';
 
+// 共通テストデータを読み込み
+import { users } from '../../data/test-data';
+
 /*
 ========================================
 ログイン機能の正常系テスト
@@ -20,8 +23,11 @@ test('ログイン成功して商品一覧が表示されること', async ({ pa
   // ログイン画面へ遷移
   await loginPage.goto();
 
-  // 正しいユーザー情報でログイン実行
-  await loginPage.login('standard_user', 'secret_sauce');
+  // 正しいユーザー情報でログイン実行（test-data使用）
+  await loginPage.login(
+    users.standard.username,
+    users.standard.password
+  );
 
   // URLが商品一覧ページになっていることを確認
   await expect(page).toHaveURL(/inventory/);

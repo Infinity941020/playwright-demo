@@ -4,6 +4,9 @@ import { test, expect } from '@playwright/test';
 // ログイン画面操作クラスを読み込み
 import { LoginPage } from '../../pages/LoginPage';
 
+// 共通テストデータを読み込み
+import { users } from '../../data/test-data';
+
 // 異常系ログインテスト集
 test.describe('ログイン異常系確認', () => {
 
@@ -11,13 +14,14 @@ test.describe('ログイン異常系確認', () => {
   test('パターン① 誤ID・誤PW', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
-    // ログイン画面へアクセス
     await loginPage.goto();
 
-    // 誤情報でログイン
-    await loginPage.login('wrong_user', 'wrong_pass');
+    // 誤情報でログイン（test-data使用）
+    await loginPage.login(
+      users.invalid.username,
+      users.invalid.password
+    );
 
-    // エラー表示確認
     await expect(loginPage.errorMessage()).toBeVisible();
   });
 
@@ -27,8 +31,7 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // ID空欄、PWのみ入力
-    await loginPage.login('', 'secret_sauce');
+    await loginPage.login('', users.standard.password);
 
     await expect(loginPage.errorMessage()).toBeVisible();
   });
@@ -39,8 +42,7 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // IDのみ入力、PW空欄
-    await loginPage.login('standard_user', '');
+    await loginPage.login(users.standard.username, '');
 
     await expect(loginPage.errorMessage()).toBeVisible();
   });
@@ -51,7 +53,6 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // 両方空欄でログイン
     await loginPage.login('', '');
 
     await expect(loginPage.errorMessage()).toBeVisible();
@@ -63,8 +64,11 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // ログイン不可ユーザーで実行
-    await loginPage.login('locked_out_user', 'secret_sauce');
+    // ロックユーザー（test-data使用）
+    await loginPage.login(
+      users.locked.username,
+      users.locked.password
+    );
 
     await expect(loginPage.errorMessage()).toBeVisible();
   });

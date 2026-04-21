@@ -1,6 +1,9 @@
 // Playwrightのテスト実行機能と検証機能を読み込み
 import { test, expect } from '@playwright/test';
 
+// 共通テストデータ（URL）を読み込み
+import { urls } from '../../data/test-data';
+
 /*
 ========================================
 ログアウト機能テスト
@@ -12,7 +15,7 @@ import { test, expect } from '@playwright/test';
 test('ログイン後にログアウトできること', async ({ page }) => {
 
   // 商品一覧ページへ遷移（ログイン済み前提）
-  await page.goto('https://www.saucedemo.com/inventory.html');
+  await page.goto(urls.inventory);
 
   // 商品一覧画面が表示されていることを確認
   await expect(page.locator('.inventory_list')).toBeVisible();
@@ -27,5 +30,5 @@ test('ログイン後にログアウトできること', async ({ page }) => {
   await expect(page.locator('#login-button')).toBeVisible();
 
   // URLもログイン画面になっていることを確認
-  await expect(page).toHaveURL('https://www.saucedemo.com/');
+  await expect(page).toHaveURL(urls.login);
 });

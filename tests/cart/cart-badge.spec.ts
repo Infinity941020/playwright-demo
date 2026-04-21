@@ -4,10 +4,13 @@ import { test } from '@playwright/test';
 // カート操作・バッジ検証をまとめたPage Objectを使用するためのimport
 import { CartPage } from '../../pages/CartPage';
 
+// 共通テストデータ（URL）を読み込み
+import { urls } from '../../data/test-data';
+
 /*
 ================================
 カートバッジ検証テスト（①〜⑤）
-fixture対応版（ログイン削除済み）
+fixture対応版（ログイン済み前提）
 ================================
 */
 
@@ -22,8 +25,8 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cart = new CartPage(page);
 
-    // 商品一覧ページへ（ログイン済み前提）
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧ページへ（共通URL使用）
+    await page.goto(urls.inventory);
 
     await cart.addFirstItem();
 
@@ -39,7 +42,7 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cart = new CartPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    await page.goto(urls.inventory);
 
     const count = await cart.addAllItems();
 
@@ -55,7 +58,7 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cart = new CartPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    await page.goto(urls.inventory);
 
     const count = await cart.addAllItems();
 
@@ -75,7 +78,7 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cart = new CartPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    await page.goto(urls.inventory);
 
     const count = await cart.addAllItems();
 
@@ -96,7 +99,7 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cart = new CartPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    await page.goto(urls.inventory);
 
     await cart.addAllItems();
 
