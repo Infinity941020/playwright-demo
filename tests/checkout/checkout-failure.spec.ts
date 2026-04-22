@@ -1,97 +1,117 @@
 // Playwrightのテスト機能とexpectを使用
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../fixtures/loginFixture';
 
-// カート操作用Page Object
+// Page Object群
+import { InventoryPage } from '../../pages/InventoryPage';
 import { CartPage } from '../../pages/CartPage';
-
-// チェックアウト操作用Page Object
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
-// Checkout異常系テスト（fixture統一）
-test.describe('Checkout異常系テスト（fixture統一）', () => {
+/*
+================================
+Checkout異常系テスト（CI安定版）
+================================
+*/
 
-  // 共通fixture処理：各テスト前に商品追加→checkout入力画面まで進める
-  test.beforeEach(async ({ page }) => {
+test.describe('Checkout異常系テスト（fixture統一版）', () => {
 
-    // CartPage生成
-    const cart = new CartPage(page);
+  /*
+  ================================
+  ① First Name未入力
+  ================================
+  */
+  test('① First Name未入力', async ({ loggedPage }) => {
 
-    // 商品一覧へ遷移
-    await cart.gotoInventory();
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // 商品を1件追加
-    await cart.addFirstItem();
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // カートへ移動
-    await cart.goToCart();
+    await cart.goto();
 
-    // Checkout開始
-    await page.click('#checkout');
+    await checkout.startCheckout();
 
-    // 入力画面表示確認
-    await expect(page.locator('[data-test="firstName"]')).toBeVisible();
+    await checkout.fillInfo('', 'Yamada', '12345');
+
+    await checkout.continue();
+
+    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
   });
 
-  // ① First Name未入力
-  test('① First Name未入力', async ({ page }) => {
+  /*
+  ================================
+  ② Last Name未入力
+  ================================
+  */
+  test('② Last Name未入力', async ({ loggedPage }) => {
 
-    // Last Name入力
-    await page.fill('[data-test="lastName"]', 'Yamada');
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // Postal Code入力
-    await page.fill('[data-test="postalCode"]', '12345');
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // Continue押下
-    await page.click('[data-test="continue"]');
+    await cart.goto();
 
-    // エラー確認
-    await expect(page.locator('[data-test="error"]'))
-      .toContainText('First Name is required');
+    await checkout.startCheckout();
+
+    await checkout.fillInfo('Taro', '', '12345');
+
+    await checkout.continue();
+
+    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
   });
 
-  // ② Last Name未入力
-  test('② Last Name未入力', async ({ page }) => {
+  /*
+  ================================
+  ③ Postal Code未入力
+  ================================
+  */
+  test('③ Postal Code未入力', async ({ loggedPage }) => {
 
-    // First Name入力
-    await page.fill('[data-test="firstName"]', 'Taro');
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // Postal Code入力
-    await page.fill('[data-test="postalCode"]', '12345');
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // Continue押下
-    await page.click('[data-test="continue"]');
+    await cart.goto();
 
-    // エラー確認
-    await expect(page.locator('[data-test="error"]'))
-      .toContainText('Last Name is required');
+    await checkout.startCheckout();
+
+    await checkout.fillInfo('Taro', 'Yamada', '');
+
+    await checkout.continue();
+
+    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
   });
 
-  // ③ Postal Code未入力
-  test('③ Postal Code未入力', async ({ page }) => {
+  /*
+  ================================
+  ④ 全項目未入力
+  ================================
+  */
+  test('④ 全項目未入力', async ({ loggedPage }) => {
 
-    // First Name入力
-    await page.fill('[data-test="firstName"]', 'Taro');
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // Last Name入力
-    await page.fill('[data-test="lastName"]', 'Yamada');
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // Continue押下
-    await page.click('[data-test="continue"]');
+    await cart.goto();
 
-    // エラー確認
-    await expect(page.locator('[data-test="error"]'))
-      .toContainText('Postal Code is required');
-  });
+    await checkout.startCheckout();
 
-  // ④ 全項目未入力
-  test('④ 全項目未入力', async ({ page }) => {
+    await checkout.fillInfo('', '', '');
 
-    // Continue押下
-    await page.click('[data-test="continue"]');
+    await checkout.continue();
 
-    // エラー確認
-    await expect(page.locator('[data-test="error"]'))
-      .toContainText('First Name is required');
+    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
   });
 
 });

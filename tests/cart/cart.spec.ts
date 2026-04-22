@@ -1,93 +1,98 @@
-// Playwrightのテスト機能（test / expect）を使用するためimport
-import { test, expect } from '@playwright/test';
+// Playwrightのテスト機能とexpectを使用
+import { test, expect } from '../../fixtures/loginFixture';
 
-// カート操作・バッジ検証をまとめたPage Objectを使用するためimport
+// 商品一覧ページ（Page Object）
+import { InventoryPage } from '../../pages/InventoryPage';
+
+// カートページ（Page Object）
 import { CartPage } from '../../pages/CartPage';
 
-// ログイン共通処理を読み込み
-import { login } from '../../utils/loginHelper';
+// ヘッダーコンポーネント（バッジ管理）
+import { HeaderComponent } from '../../pages/HeaderComponent';
 
-// ================================
-// カート機能 E2Eテスト（PageObject統一版）
-// ================================
+/*
+================================
+カート機能 E2Eテスト（fixture統一版）
+================================
+InventoryPage：商品操作
+CartPage：カート操作
+HeaderComponent：バッジ表示管理
+================================
+*/
+
 test.describe('カート機能テスト', () => {
 
-  // 各テスト実行前にログインする
-  test.beforeEach(async ({ page }) => {
-    await login(page);
+  /*
+  ================================
+  パターン①：単一商品追加
+  ================================
+  */
+  test('パターン①：商品を1つカートに追加できること', async ({ loggedPage }) => {
+
+    const inventory = new InventoryPage(loggedPage);
+    const header = new HeaderComponent(loggedPage);
+
+    await inventory.goto();
+    await inventory.addFirstItem();
+
+    await header.expectBadgeCount(1);
   });
 
-  // ================================
-  // パターン①：単一商品追加
-  // ================================
-  test('パターン①：商品を1つカートに追加できること', async ({ page }) => {
+  /*
+  ================================
+  パターン②：複数商品追加
+  ================================
+  */
+  test('パターン②：複数商品をカートに追加できること', async ({ loggedPage }) => {
 
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const header = new HeaderComponent(loggedPage);
 
-    // 商品一覧画面へ遷移する
-    await cart.gotoInventory();
+    await inventory.goto();
 
-    // 先頭商品を追加する
-    await cart.addFirstItem();
+    const count = await inventory.addAllItems();
 
-    // バッジ件数確認
-    await cart.expectBadgeCount(1);
+    await header.expectBadgeCount(count);
   });
 
-  // ================================
-  // パターン②：複数商品追加
-  // ================================
-  test('パターン②：複数商品をカートに追加できること', async ({ page }) => {
+  /*
+  ================================
+  パターン③：カート内容確認
+  ================================
+  */
+  test('パターン③：カート内に商品が正しく入っていること', async ({ loggedPage }) => {
 
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
 
-    await cart.gotoInventory();
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // 全商品追加件数を取得する
-    const count = await cart.addAllItems();
+    await cart.goto();
 
-    // バッジ件数確認
-    await cart.expectBadgeCount(count);
+    await expect(loggedPage.locator('.cart_item')).toHaveCount(1);
   });
 
-  // ================================
-  // パターン③：カート内容確認
-  // ================================
-  test('パターン③：カート内に商品が正しく入っていること', async ({ page }) => {
+  /*
+  ================================
+  パターン④：カートから削除
+  ================================
+  */
+  test('パターン④：カートから商品を削除できること', async ({ loggedPage }) => {
 
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
 
-    await cart.gotoInventory();
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    await cart.addFirstItem();
+    await cart.goto();
 
-    await cart.goToCart();
+    await expect(loggedPage.locator('.cart_item')).toHaveCount(1);
 
-    // カート内商品件数確認
-    await expect(page.locator('.cart_item')).toHaveCount(1);
-  });
-
-  // ================================
-  // パターン④：カートから削除
-  // ================================
-  test('パターン④：カートから商品を削除できること', async ({ page }) => {
-
-    const cart = new CartPage(page);
-
-    await cart.gotoInventory();
-
-    await cart.addFirstItem();
-
-    await cart.goToCart();
-
-    // 商品が1件あることを確認する
-    await expect(page.locator('.cart_item')).toHaveCount(1);
-
-    // 商品を削除する
     await cart.removeFirstItem();
 
-    // カートが空であることを確認する
-    await expect(page.locator('.cart_item')).toHaveCount(0);
+    await expect(loggedPage.locator('.cart_item')).toHaveCount(0);
   });
 
 });

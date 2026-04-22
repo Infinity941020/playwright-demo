@@ -1,98 +1,97 @@
-// Playwright機能（Page / expect）を使用するためimport
+// Playwright Page型を使用
 import { Page, expect } from '@playwright/test';
 
-// URL定数を使用するためimport
-import { urls } from '../utils/urls';
+/*
+================================
+CartPage（最終確定版）
+================================
+責務：
+- カート画面の操作
+- カート状態の検証
+================================
+*/
 
-// カート画面操作用クラスを定義する
 export class CartPage {
-
-  // Pageオブジェクトを受け取る
   constructor(private page: Page) {}
 
-  // 商品一覧画面へ遷移する
-  async gotoInventory() {
-    await this.page.goto(urls.inventory);
+  /*
+  ================================
+  ① カート画面へ遷移
+  ================================
+  */
+  async goto() {
 
-    // 商品一覧が表示されるまで待機する
-    await expect(this.page.locator('.inventory_list')).toBeVisible();
+    const cartLink = this.page.locator('.shopping_cart_link');
+
+    await expect(cartLink).toBeVisible();
+    await cartLink.click();
+
+    await expect(this.page).toHaveURL(/cart/);
   }
 
-  // 先頭商品を1件追加する
-  async addFirstItem() {
-
-    // 追加ボタンが表示されるまで待機する
-    await expect(
-      this.page.locator('[data-test^="add-to-cart"]').first()
-    ).toBeVisible();
-
-    // 先頭商品の追加ボタンを押下する
-    await this.page.locator('[data-test^="add-to-cart"]').first().click();
-  }
-
-  // 全商品を追加する
-  async addAllItems() {
-
-    // 追加ボタン一覧を取得する
-    const buttons = this.page.locator('[data-test^="add-to-cart"]');
-
-    // 商品件数を取得する
-    const count = await buttons.count();
-
-    // 全件分追加ボタンを押下する
-    for (let i = 0; i < count; i++) {
-      await buttons.nth(0).click();
-    }
-
-    // 追加件数を返却する
-    return count;
-  }
-
-  // カート画面へ遷移する
-  async goToCart() {
-
-    // カートアイコンが表示されるまで待機する
-    await expect(this.page.locator('.shopping_cart_link')).toBeVisible();
-
-    // カートアイコンを押下する
-    await this.page.locator('.shopping_cart_link').click();
-  }
-
-  // カート内の先頭商品を削除する
+  /*
+  ================================
+  ② 商品削除（先頭1件）
+  ================================
+  */
   async removeFirstItem() {
 
-    // 削除ボタンが表示されるまで待機する
-    await expect(
-      this.page.locator('[data-test^="remove"]').first()
-    ).toBeVisible();
+    const removeBtn = this.page.locator('button', { hasText: 'Remove' }).first();
 
-    // 先頭商品の削除ボタンを押下する
-    await this.page.locator('[data-test^="remove"]').first().click();
+    await expect(removeBtn).toBeVisible();
+    await removeBtn.click();
   }
 
-  // カート内の商品を全件削除する
+  /*
+  ================================
+  ③ 商品全削除
+  ================================
+  */
   async removeAllItems() {
 
-    // 削除ボタン一覧を取得する
-    const buttons = this.page.locator('[data-test^="remove"]');
+    const buttons = this.page.locator('button', { hasText: 'Remove' });
 
-    // 削除ボタンが無くなるまで繰り返す
-    while (await buttons.count() > 0) {
-      await buttons.first().click();
+    const count = await buttons.count();
+
+    for (let i = 0; i < count; i++) {
+      const btn = buttons.first();
+      await expect(btn).toBeVisible();
+      await btn.click();
     }
   }
 
-  // バッジ件数を確認する
-  async expectBadgeCount(count: number) {
-    await expect(
-      this.page.locator('.shopping_cart_badge')
-    ).toHaveText(String(count));
+  /*
+  ================================
+  ④ カート件数確認
+  ================================
+  */
+  async expectItemCount(count: number) {
+    await expect(this.page.locator('.cart_item')).toHaveCount(count);
   }
 
-  // バッジが非表示であることを確認する
-  async expectNoBadge() {
-    await expect(
-      this.page.locator('.shopping_cart_badge')
-    ).toHaveCount(0);
+  /*
+  ================================
+  ⑤ カートが空であること確認
+  ================================
+  */
+  async expectEmpty() {
+    await expect(this.page.locator('.cart_item')).toHaveCount(0);
   }
+
+ /*
+ ================================
+ ⑥カート画面 → 商品一覧へ戻るボタン操作
+  ================================
+ */
+  async continueShopping() {
+
+  const button = this.page.locator('[data-test="continue-shopping"]');
+
+  // ボタン表示待ち（CI安定化）
+  await expect(button).toBeVisible();
+
+  // クリックして商品一覧へ戻る
+  await button.click();
+}
+
 }

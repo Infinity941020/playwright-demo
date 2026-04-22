@@ -1,39 +1,120 @@
-// PlaywrightのPage型を使用するためにインポート
+// Playwright Page型を使用
 import { Page, expect } from '@playwright/test';
 
-// Checkout画面の操作をまとめたPage Object
-export class CheckoutPage {
+/*
+================================
+Checkoutフロー管理Page Object（実務設計版）
+================================
+責務：
+- Checkoutフローの状態遷移を一元管理
+- specからDOM操作を排除
+================================
+*/
 
-  // Pageインスタンスを保持
+export class CheckoutPage {
   constructor(private page: Page) {}
 
-  // チェックアウト情報を入力する処理
+  /*
+  ================================
+  ① Checkout開始（Cart → Step1）
+  ================================
+  */
+  async startCheckout() {
+    const checkoutBtn = this.page.locator('#checkout');
+
+    await expect(checkoutBtn).toBeVisible();
+    await checkoutBtn.click();
+
+    // Step1遷移保証
+    await expect(this.page).toHaveURL(/checkout-step-one/);
+  }
+
+  /*
+  ================================
+  ② Checkout入力
+  ================================
+  */
   async fillInfo(firstName: string, lastName: string, postalCode: string) {
-
-    // First Name入力欄に値を入力
     await this.page.fill('[data-test="firstName"]', firstName);
-
-    // Last Name入力欄に値を入力
     await this.page.fill('[data-test="lastName"]', lastName);
-
-    // Postal Code入力欄に値を入力
     await this.page.fill('[data-test="postalCode"]', postalCode);
-
-    // Continueボタンをクリックして次へ進む
-    await this.page.click('[data-test="continue"]');
   }
 
-  // 購入完了まで進める処理（今回のmissingメソッド）
+  /*
+  ================================
+  ③ Step1 → Step2へ進む
+  ================================
+  */
+  async continue() {
+    const continueBtn = this.page.locator('[data-test="continue"]');
+
+    await expect(continueBtn).toBeVisible();
+    await continueBtn.click();
+
+    // Step2遷移保証
+    await expect(this.page).toHaveURL(/checkout-step-two/);
+  }
+
+  /*
+  ================================
+  ④ 購入確定
+  ================================
+  */
   async finish() {
+    const finishBtn = this.page.locator('[data-test="finish"]');
 
-    // Finishボタンが表示されるまで待機
-    const finishButton = this.page.locator('[data-test="finish"]');
+    await expect(finishBtn).toBeVisible();
+    await finishBtn.click();
 
-    // ボタン表示確認（安定化）
-    await expect(finishButton).toBeVisible();
-
-    // 購入完了ボタンをクリック
-    await finishButton.click();
+    // 完了画面確認
+    await expect(this.page).toHaveURL(/checkout-complete/);
   }
 
+  /*
+  ================================
+  ⑤ Cancel（Step1 / Step2共通）
+  ================================
+  */
+  async cancel() {
+    const cancelBtn = this.page.locator('[data-test="cancel"]');
+
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+
+    // カートへ戻る保証
+    await expect(this.page).toHaveURL(/cart/);
+  }
+
+  /*
+  ================================
+  ⑥ フル購入フロー（便利メソッド）
+  ================================
+  */
+  async completePurchase(data: {
+    firstName: string;
+    lastName: string;
+    postalCode: string;
+  }) {
+    await this.startCheckout();
+    await this.fillInfo(data.firstName, data.lastName, data.postalCode);
+    await this.continue();
+    await this.finish();
+  }
+
+  /*
+  ================================
+  ⑦ 状態確認系
+  ================================
+  */
+  async expectOnStepOne() {
+    await expect(this.page).toHaveURL(/checkout-step-one/);
+  }
+
+  async expectOnStepTwo() {
+    await expect(this.page).toHaveURL(/checkout-step-two/);
+  }
+
+  async expectComplete() {
+    await expect(this.page).toHaveURL(/checkout-complete/);
+  }
 }

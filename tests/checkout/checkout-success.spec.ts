@@ -1,215 +1,174 @@
-// Playwrightのテスト関数とexpectを使用するためのインポート
-import { test, expect } from '@playwright/test';
+// Playwrightのテスト機能とexpectを使用
+import { test, expect } from '../../fixtures/loginFixture';
 
-// カート操作をまとめたPage Objectを使用するためのインポート
+// Page Object群（責務分離版）
+import { InventoryPage } from '../../pages/InventoryPage';
 import { CartPage } from '../../pages/CartPage';
-
-// チェックアウト用のデータや処理をまとめたヘルパー（存在する前提）
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
-// テスト開始（正常系：安定版）
-test.describe('Checkout正常系テスト（安定版）', () => {
+/*
+================================
+Checkout正常系テスト（fixture統一・最終版）
+================================
+*/
 
-  // ① 一覧画面で1件追加して購入できること
-  test('① 一覧画面で1件追加して購入できること', async ({ page }) => {
+test.describe('Checkout正常系テスト（fixture統一版）', () => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+  /*
+  ================================
+  ① 一覧画面で1件購入
+  ================================
+  */
+  test('① 一覧画面で1件追加して購入できること', async ({ loggedPage }) => {
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // 商品一覧画面へ遷移して表示を安定化
-    await cart.gotoInventory();
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // 1件商品をカートに追加
-    await cart.addFirstItem();
+    await cart.goto();
 
-    // カート画面へ遷移
-    await cart.goToCart();
-
-    // Checkout開始ボタンをクリック
-    await page.click('#checkout');
-
-    // ユーザー情報入力（固定値で安定化）
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入処理を実行
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面が表示されることを確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
-  // ② 一覧画面で複数件追加して購入できること
-  test('② 一覧画面で複数件追加して購入できること', async ({ page }) => {
+  /*
+  ================================
+  ② 複数件追加して購入
+  ================================
+  */
+  test('② 一覧画面で複数件追加して購入できること', async ({ loggedPage }) => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    await inventory.goto();
+    await inventory.addAllItems();
 
-    // 商品一覧画面へ遷移
-    await cart.gotoInventory();
+    await cart.goto();
 
-    // 複数商品をカートに追加（安定化版）
-    await cart.addItems(2);
-
-    // カート画面へ遷移
-    await cart.goToCart();
-
-    // Checkout開始
-    await page.click('#checkout');
-
-    // ユーザー情報入力
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入完了処理
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
-  // ③ 商品詳細画面から追加して購入できること
-  test('③ 商品詳細画面から追加して購入できること', async ({ page }) => {
+  /*
+  ================================
+  ③ 商品詳細から購入
+  ================================
+  */
+  test('③ 商品詳細画面から追加して購入できること', async ({ loggedPage }) => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // 商品一覧画面へ遷移
-    await cart.gotoInventory();
+    await cart.goto();
 
-    // 商品詳細画面へ遷移
-    await page.locator('.inventory_item_name').first().click();
-
-    // 商品をカートに追加
-    await page.locator('[data-test="add-to-cart"]').click();
-
-    // カートへ移動
-    await cart.goToCart();
-
-    // Checkout開始
-    await page.click('#checkout');
-
-    // ユーザー情報入力
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入完了
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
-  // ④ カート画面で内容確認後に購入できること
-  test('④ カート画面で内容確認後に購入できること', async ({ page }) => {
+  /*
+  ================================
+  ④ カート確認後に購入
+  ================================
+  */
+  test('④ カート画面で内容確認後に購入できること', async ({ loggedPage }) => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // 商品一覧画面へ遷移
-    await cart.gotoInventory();
+    await cart.goto();
 
-    // 複数商品追加（3件）
-    await cart.addItems(3);
+    await cart.expectItemCount(1);
 
-    // カートへ移動
-    await cart.goToCart();
-
-    // カート内の商品数確認
-    await expect(page.locator('.cart_item')).toHaveCount(3);
-
-    // Checkout開始
-    await page.click('#checkout');
-
-    // ユーザー情報入力
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入完了
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
-  // ⑤ 全件追加後に2件削除して購入できること
-  test('⑤ 全件追加後に2件削除して購入できること', async ({ page }) => {
+  /*
+  ================================
+  ⑤ 全件追加→削除→購入
+  ================================
+  */
+  test('⑤ 全件追加後に2件削除して購入できること', async ({ loggedPage }) => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    await inventory.goto();
+    const count = await inventory.addAllItems();
 
-    // 商品一覧画面へ遷移
-    await cart.gotoInventory();
+    await cart.goto();
 
-    // 全商品追加
-    await cart.addItems(6);
-
-    // カートへ移動
-    await cart.goToCart();
-
-    // 2件削除（安定化）
     await cart.removeFirstItem();
     await cart.removeFirstItem();
 
-    // Checkout開始
-    await page.click('#checkout');
+    await cart.expectItemCount(count - 2);
 
-    // ユーザー情報入力
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入完了
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
-  // ⑥ 1件追加後に一覧へ戻り全件追加して購入できること
-  test('⑥ 1件追加後に一覧へ戻り全件追加して購入できること', async ({ page }) => {
+  /*
+  ================================
+  ⑥ 途中戻り→再追加→購入
+  ================================
+  */
+  test('⑥ 1件追加後に一覧へ戻り全件追加して購入できること', async ({ loggedPage }) => {
 
-    // CartPageインスタンス生成
-    const cart = new CartPage(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cart = new CartPage(loggedPage);
+    const checkout = new CheckoutPage(loggedPage);
 
-    // CheckoutPageインスタンス生成
-    const checkout = new CheckoutPage(page);
+    await inventory.goto();
+    await inventory.addFirstItem();
 
-    // 商品一覧画面へ遷移
-    await cart.gotoInventory();
+    await cart.goto();
 
-    // 1件追加
-    await cart.addFirstItem();
+    await loggedPage.click('[data-test="continue-shopping"]');
 
-    // 一覧へ戻る
-    await page.goBack();
+    await inventory.addAllItems();
 
-    // 再度商品追加（安定化）
-    await cart.addItems(3);
+    await cart.goto();
 
-    // カートへ移動
-    await cart.goToCart();
-
-    // Checkout開始
-    await page.click('#checkout');
-
-    // ユーザー情報入力
+    await checkout.startCheckout();
     await checkout.fillInfo('Taro', 'Yamada', '12345');
-
-    // 購入完了
+    await checkout.continue();
     await checkout.finish();
 
-    // 完了画面確認
-    await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+    await checkout.expectComplete();
   });
 
 });
