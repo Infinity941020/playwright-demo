@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
 
 // 共通テストデータを読み込み
-import { users } from '../../data/test-data';
+import { users } from '../../data/users';
 
 // 異常系ログインテスト集
 test.describe('ログイン異常系確認', () => {
@@ -16,7 +16,7 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // 誤情報でログイン（test-data使用）
+    // 誤情報でログイン（users.ts使用）
     await loginPage.login(
       users.invalid.username,
       users.invalid.password
@@ -64,7 +64,7 @@ test.describe('ログイン異常系確認', () => {
 
     await loginPage.goto();
 
-    // ロックユーザー（test-data使用）
+    // ロックユーザー（users.ts使用）
     await loginPage.login(
       users.locked.username,
       users.locked.password

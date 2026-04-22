@@ -4,13 +4,13 @@ import { test, expect } from '@playwright/test';
 // カート操作・バッジ検証をまとめたPage Objectを使用するためimport
 import { CartPage } from '../../pages/CartPage';
 
-// 共通テストデータ（URL）を読み込み
-import { urls } from '../../data/test-data';
+// ログイン共通処理を使用するためimport
+import { login } from '../../utils/loginHelper';
 
 /*
 ================================
 カートバッジ検証テスト（①〜⑤）
-ログイン処理追加版
+loginHelper統一版
 ================================
 */
 
@@ -18,21 +18,7 @@ test.describe('カートバッジ検証テスト', () => {
 
   // 各テスト実行前にログインする
   test.beforeEach(async ({ page }) => {
-
-    // ログイン画面へ遷移する
-    await page.goto(urls.login);
-
-    // ユーザー名を入力する
-    await page.locator('#user-name').fill('standard_user');
-
-    // パスワードを入力する
-    await page.locator('#password').fill('secret_sauce');
-
-    // ログインボタンを押下する
-    await page.locator('#login-button').click();
-
-    // 商品一覧画面が表示されることを確認する
-    await expect(page.locator('.inventory_list')).toBeVisible();
+    await login(page);
   });
 
   /*

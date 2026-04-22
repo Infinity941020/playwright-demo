@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
 
 // 共通テストデータを読み込み
-import { users } from '../../data/test-data';
+import { users } from '../../data/users';
 
 /*
 ========================================
@@ -23,7 +23,7 @@ test('ログイン成功して商品一覧が表示されること', async ({ pa
   // ログイン画面へ遷移
   await loginPage.goto();
 
-  // 正しいユーザー情報でログイン実行（test-data使用）
+  // 正しいユーザー情報でログイン実行（users.ts使用）
   await loginPage.login(
     users.standard.username,
     users.standard.password
