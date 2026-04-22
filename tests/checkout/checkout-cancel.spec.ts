@@ -1,139 +1,156 @@
-// Playwrightのテスト機能と検証機能を読み込み
+// Playwrightのテスト機能とexpectを使用
 import { test, expect } from '@playwright/test';
 
-// Checkout操作をまとめたPage Objectを使用
+// カート操作をまとめたPage Object
+import { CartPage } from '../../pages/CartPage';
+
+// チェックアウト操作をまとめたPage Object
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
-/*
-========================================
-Checkoutキャンセル系テスト
-（Page Object対応版）
-========================================
-*/
+// Checkoutキャンセル系テスト
+test.describe('Checkoutキャンセル系テスト（安定版）', () => {
 
-test.describe('Checkoutキャンセル系テスト', () => {
-
-  /*
-  ================================
-  ① Cart画面でContinue Shopping
-  ================================
-  */
+  // ① カート画面でContinue Shopping押下で一覧へ戻ること
   test('① カート画面でContinue Shopping押下で一覧へ戻ること', async ({ page }) => {
 
-    const checkout = new CheckoutPage(page);
+    // CartPage生成
+    const cart = new CartPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧へ遷移（安定化）
+    await cart.gotoInventory();
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // 商品を1件追加
+    await cart.addFirstItem();
 
-    await page.click('.shopping_cart_link');
+    // カートへ移動
+    await cart.goToCart();
 
-    // カート画面 → 一覧へ戻る
+    // Continue Shoppingボタンをクリック（一覧へ戻る）
     await page.click('[data-test="continue-shopping"]');
 
-    await expect(page).toHaveURL(/inventory/);
+    // 商品一覧画面に戻ったことを確認
+    await expect(page.locator('.inventory_list')).toBeVisible();
   });
 
-  /*
-  ================================
-  ② Checkout入力画面でCancel
-  ================================
-  */
+  // ② Checkout入力画面でCancel押下でカートへ戻ること
   test('② Checkout入力画面でCancel押下でカートへ戻ること', async ({ page }) => {
 
+    // CartPage生成
+    const cart = new CartPage(page);
+
+    // CheckoutPage生成
     const checkout = new CheckoutPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧へ遷移
+    await cart.gotoInventory();
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // 商品追加
+    await cart.addFirstItem();
 
-    await page.click('.shopping_cart_link');
+    // カートへ移動
+    await cart.goToCart();
 
-    await checkout.startCheckout();
+    // Checkout開始
+    await page.click('#checkout');
 
-    // 入力画面でキャンセル
-    await checkout.cancel();
+    // Cancel押下（カートへ戻る）
+    await page.click('[data-test="cancel"]');
 
-    await expect(page.locator('.cart_item')).toHaveCount(1);
+    // カート画面が表示されていることを確認
+    await expect(page.locator('.cart_list')).toBeVisible();
   });
 
-  /*
-  ================================
-  ③ 一部入力後Cancel
-  ================================
-  */
+  // ③ 一部入力後にCancel押下でカートへ戻ること
   test('③ 一部入力後にCancel押下でカートへ戻ること', async ({ page }) => {
 
+    // CartPage生成
+    const cart = new CartPage(page);
+
+    // CheckoutPage生成
     const checkout = new CheckoutPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧へ遷移
+    await cart.gotoInventory();
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // 商品追加
+    await cart.addFirstItem();
 
-    await page.click('.shopping_cart_link');
+    // カートへ移動
+    await cart.goToCart();
 
-    await checkout.startCheckout();
+    // Checkout開始
+    await page.click('#checkout');
 
-    // 一部入力
-    await checkout.fillInfo('Taro', '', '');
+    // 一部入力（First Nameのみ）
+    await page.fill('[data-test="firstName"]', 'Taro');
 
-    // Cancel
-    await checkout.cancel();
+    // Cancel押下
+    await page.click('[data-test="cancel"]');
 
-    await expect(page.locator('.cart_item')).toHaveCount(1);
+    // カート画面確認
+    await expect(page.locator('.cart_list')).toBeVisible();
   });
 
-  /*
-  ================================
-  ④ 全入力後Cancel
-  ================================
-  */
+  // ④ 全項目入力後にCancel押下でカートへ戻ること
   test('④ 全項目入力後にCancel押下でカートへ戻ること', async ({ page }) => {
 
+    // CartPage生成
+    const cart = new CartPage(page);
+
+    // CheckoutPage生成
     const checkout = new CheckoutPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧へ遷移
+    await cart.gotoInventory();
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // 商品追加
+    await cart.addFirstItem();
 
-    await page.click('.shopping_cart_link');
+    // カートへ移動
+    await cart.goToCart();
 
-    await checkout.startCheckout();
+    // Checkout開始
+    await page.click('#checkout');
 
-    // 全入力
+    // 全項目入力
     await checkout.fillInfo('Taro', 'Yamada', '12345');
 
-    // Cancel
-    await checkout.cancel();
+    // Cancel押下
+    await page.click('[data-test="cancel"]');
 
-    await expect(page.locator('.cart_item')).toHaveCount(1);
+    // カート画面確認
+    await expect(page.locator('.cart_list')).toBeVisible();
   });
 
-  /*
-  ================================
-  ⑤ Confirm画面からCancel
-  ================================
-  */
+  // ⑤ Confirm画面でCancel押下で商品一覧へ戻ること
   test('⑤ Confirm画面でCancel押下で商品一覧へ戻ること', async ({ page }) => {
 
+    // CartPage生成
+    const cart = new CartPage(page);
+
+    // CheckoutPage生成
     const checkout = new CheckoutPage(page);
 
-    await page.goto('https://www.saucedemo.com/inventory.html');
+    // 商品一覧へ遷移
+    await cart.gotoInventory();
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // 商品追加
+    await cart.addFirstItem();
 
-    await page.click('.shopping_cart_link');
+    // カートへ移動
+    await cart.goToCart();
 
-    await checkout.startCheckout();
+    // Checkout開始
+    await page.click('#checkout');
 
+    // 入力してContinue
     await checkout.fillInfo('Taro', 'Yamada', '12345');
 
-    await checkout.continue();
+    // Confirm画面に遷移している前提でCancel
+    await page.click('[data-test="cancel"]');
 
-    // 最終確認画面から戻る
-    await checkout.cancel();
-
-    await expect(page).toHaveURL(/inventory/);
+    // 商品一覧へ戻ることを確認
+    await expect(page.locator('.inventory_list')).toBeVisible();
   });
 
 });

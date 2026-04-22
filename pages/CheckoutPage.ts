@@ -1,74 +1,39 @@
+// PlaywrightのPage型を使用するためにインポート
 import { Page, expect } from '@playwright/test';
 
-/*
-========================================
-CheckoutPage（完全リファクタ版）
-========================================
-*/
-
+// Checkout画面の操作をまとめたPage Object
 export class CheckoutPage {
+
+  // Pageインスタンスを保持
   constructor(private page: Page) {}
 
-  // ================================
-  // 画面遷移
-  // ================================
-
-  async openCheckout() {
-    await this.page.click('#checkout');
-  }
-
-  async continueShopping() {
-    await this.page.click('#continue-shopping');
-  }
-
-  async cancelCheckout() {
-    await this.page.click('#cancel');
-  }
-
-  async finishCheckout() {
-    await this.page.click('#finish');
-  }
-
-  // ================================
-  // 入力操作
-  // ================================
-
+  // チェックアウト情報を入力する処理
   async fillInfo(firstName: string, lastName: string, postalCode: string) {
-    await this.page.fill('#first-name', firstName);
-    await this.page.fill('#last-name', lastName);
-    await this.page.fill('#postal-code', postalCode);
+
+    // First Name入力欄に値を入力
+    await this.page.fill('[data-test="firstName"]', firstName);
+
+    // Last Name入力欄に値を入力
+    await this.page.fill('[data-test="lastName"]', lastName);
+
+    // Postal Code入力欄に値を入力
+    await this.page.fill('[data-test="postalCode"]', postalCode);
+
+    // Continueボタンをクリックして次へ進む
+    await this.page.click('[data-test="continue"]');
   }
 
-  async continue() {
-    await this.page.click('#continue');
+  // 購入完了まで進める処理（今回のmissingメソッド）
+  async finish() {
+
+    // Finishボタンが表示されるまで待機
+    const finishButton = this.page.locator('[data-test="finish"]');
+
+    // ボタン表示確認（安定化）
+    await expect(finishButton).toBeVisible();
+
+    // 購入完了ボタンをクリック
+    await finishButton.click();
   }
 
-  // ================================
-  // エラー・状態確認
-  // ================================
-
-  async expectErrorVisible() {
-    await expect(this.page.locator('[data-test="error"]')).toBeVisible();
-  }
-
-  async expectOverviewVisible() {
-    await expect(this.page.locator('.checkout_summary_container')).toBeVisible();
-  }
-
-  async expectComplete() {
-    await expect(this.page.locator('.complete-header')).toBeVisible();
-  }
-
-  // ================================
-  // フルフロー（重要）
-  // ================================
-
-  async completeCheckout(first: string, last: string, zip: string) {
-    await this.openCheckout();
-    await this.fillInfo(first, last, zip);
-    await this.continue();
-    await this.expectOverviewVisible();
-    await this.finishCheckout();
-    await this.expectComplete();
-  }
 }
