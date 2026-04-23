@@ -1,27 +1,87 @@
 import { Page, expect } from '@playwright/test';
 
-export class InventoryPage {
+/*
+================================
+CartPage（CI安定版）
+================================
+*/
+export class CartPage {
   constructor(private page: Page) {}
 
+  /*
+  ================================
+  カート画面へ遷移
+  ================================
+  */
   async goto() {
-    await this.page.goto('https://www.saucedemo.com/inventory.html');
-    await expect(this.page.locator('.inventory_list')).toBeVisible();
+
+    // カート画面へ移動
+    await this.page.goto('https://www.saucedemo.com/cart.html');
+
+    // カート画面URLであることを確認
+    await expect(this.page).toHaveURL(/cart/);
+
+    // カート操作ボタンが表示されていることを確認
+    await expect(this.page.locator('[data-test="continue-shopping"]'))
+      .toBeVisible();
   }
 
-  async addFirstItem() {
-    const btn = this.page.locator('[data-test^="add-to-cart"]').first();
-    await expect(btn).toBeVisible();
-    await btn.click();
+  /*
+  ================================
+  カート画面表示保証
+  ================================
+  */
+  async expectOnCartPage() {
+
+    // カート画面URLであることを確認
+    await expect(this.page).toHaveURL(/cart/);
+
+    // Continue Shoppingボタン表示確認
+    await expect(this.page.locator('[data-test="continue-shopping"]'))
+      .toBeVisible();
   }
 
-  async addAllItems(): Promise<number> {
-    const buttons = this.page.locator('[data-test^="add-to-cart"]');
-    const count = await buttons.count();
+  /*
+  ================================
+  商品数確認
+  ================================
+  */
+  async expectItemCount(count: number) {
 
-    for (let i = 0; i < count; i++) {
-      await buttons.nth(i).click();
-    }
+    // カート内商品数確認
+    await expect(this.page.locator('.cart_item')).toHaveCount(count);
+  }
 
-    return count;
+  /*
+  ================================
+  商品削除
+  ================================
+  */
+  async removeFirstItem() {
+
+    // 削除ボタンが表示されていることを確認
+    await expect(this.page.locator('[data-test^="remove"]').first())
+      .toBeVisible();
+
+    // 1件目削除
+    await this.page.locator('[data-test^="remove"]').first().click();
+  }
+
+  /*
+  ================================
+  Continue Shopping（カート→一覧）
+  ================================
+  */
+  async continueShopping() {
+
+    // Continue Shoppingボタン表示確認
+    await expect(this.page.locator('[data-test="continue-shopping"]'))
+      .toBeVisible();
+
+    // ボタン押下
+    await this.page.locator('[data-test="continue-shopping"]').click();
+
+    // 一覧画面遷移確認
+    await expect(this.page).toHaveURL(/inventory/);
   }
 }

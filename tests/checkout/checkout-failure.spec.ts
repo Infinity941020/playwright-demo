@@ -1,117 +1,99 @@
-// Playwrightのテスト機能とexpectを使用
-import { test, expect } from '../../fixtures/loginFixture';
+// Playwrightのfixture化したtestを使用
+import { test } from '../../fixtures/loginFixture';
 
-// Page Object群
+// Page Objectを使用
 import { InventoryPage } from '../../pages/InventoryPage';
 import { CartPage } from '../../pages/CartPage';
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
 /*
 ================================
-Checkout異常系テスト（CI安定版）
+Checkout異常系テスト（data-driven版）
 ================================
 */
-
 test.describe('Checkout異常系テスト（fixture統一版）', () => {
 
+  let inventory: InventoryPage;
+  let cart: CartPage;
+  let checkout: CheckoutPage;
+
   /*
   ================================
-  ① First Name未入力
+  各テスト前処理
   ================================
   */
-  test('① First Name未入力', async ({ loggedPage }) => {
+  test.beforeEach(async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // 各Page Object生成
+    inventory = new InventoryPage(loggedPage);
+    cart = new CartPage(loggedPage);
+    checkout = new CheckoutPage(loggedPage);
 
+    // 商品一覧へ移動
     await inventory.goto();
+
+    // 商品1件追加
     await inventory.addFirstItem();
 
+    // カートへ移動
     await cart.goto();
 
+    // Checkout開始
     await checkout.startCheckout();
-
-    await checkout.fillInfo('', 'Yamada', '12345');
-
-    await checkout.continue();
-
-    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
   });
 
   /*
   ================================
-  ② Last Name未入力
+  テストデータ一覧
   ================================
   */
-  test('② Last Name未入力', async ({ loggedPage }) => {
-
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
-
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await checkout.startCheckout();
-
-    await checkout.fillInfo('Taro', '', '12345');
-
-    await checkout.continue();
-
-    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
-  });
+  const cases = [
+    {
+      title: '① First Name未入力',
+      first: '',
+      last: 'Yamada',
+      zip: '12345',
+    },
+    {
+      title: '② Last Name未入力',
+      first: 'Taro',
+      last: '',
+      zip: '12345',
+    },
+    {
+      title: '③ Postal Code未入力',
+      first: 'Taro',
+      last: 'Yamada',
+      zip: '',
+    },
+    {
+      title: '④ 全項目未入力',
+      first: '',
+      last: '',
+      zip: '',
+    },
+  ];
 
   /*
   ================================
-  ③ Postal Code未入力
+  data-driven実行
   ================================
   */
-  test('③ Postal Code未入力', async ({ loggedPage }) => {
+  for (const data of cases) {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // 各ケースをテスト生成
+    test(data.title, async () => {
 
-    await inventory.goto();
-    await inventory.addFirstItem();
+      // 入力実施
+      await checkout.fillInfo(
+        data.first,
+        data.last,
+        data.zip
+      );
 
-    await cart.goto();
-
-    await checkout.startCheckout();
-
-    await checkout.fillInfo('Taro', 'Yamada', '');
-
-    await checkout.continue();
-
-    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
-  });
-
-  /*
-  ================================
-  ④ 全項目未入力
-  ================================
-  */
-  test('④ 全項目未入力', async ({ loggedPage }) => {
-
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
-
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await checkout.startCheckout();
-
-    await checkout.fillInfo('', '', '');
-
-    await checkout.continue();
-
-    await expect(loggedPage.locator('[data-test="error"]')).toBeVisible();
-  });
+      // エラー確認付きContinue
+      await checkout.continueExpectError();
+    });
+  }
 
 });
