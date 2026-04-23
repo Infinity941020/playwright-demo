@@ -4,7 +4,7 @@
 SauceDemo（テスト用ECサイト）を対象に、ログイン機能・カート機能・Checkout（購入）機能・ログアウト機能などのE2Eテストを実装しています。
 
 **Page Object Model（POM）** を採用し、保守性・再利用性を意識した設計にしています。  
-さらに **Fixture によるログイン状態の共通化**、**data-drivenテスト設計**、**GitHub Actions による CI 自動実行** にも対応しています。
+さらに **Fixture によるログイン状態の共通化**、**Data-driven testingによるテスト設計**、**GitHub Actions による CI 自動実行** にも対応しています。
 
 ---
 
@@ -17,7 +17,7 @@ SauceDemo（テスト用ECサイト）を対象に、ログイン機能・カー
 - GitHub Actions（CI）
 - Page Object Model（POM）
 - Fixture（storageState）
-- Data Driven Testing
+- Data-driven testing
 
 ---
 
@@ -27,6 +27,76 @@ SauceDemo（テスト用ECサイト）を対象に、ログイン機能・カー
 https://www.saucedemo.com/
 
 ---
+
+## テスト設計方針（重要）
+
+本プロジェクトでは、単なる機能テストではなく、  
+E2E観点でのユーザー操作フローの再現性と保守性を重視した設計としています。
+
+---
+
+### 採用設計思想
+
+#### ① Page Object Model（POM）
+画面操作を以下の単位で分離しています：
+
+- InventoryPage：商品一覧操作
+- CartPage：カート操作
+- CheckoutPage：購入処理
+- HeaderComponent：共通UI（バッジなど）
+
+目的：
+- UI変更時の修正影響を局所化
+- テストコードの可読性向上
+- 再利用性の確保
+
+---
+
+#### ② Fixtureによる認証状態の共通化
+
+loginFixtureによりログイン状態を共有し、  
+各テストでログイン処理を省略しています。
+
+目的：
+- テスト実行速度の改善
+- 前処理の重複排除
+- 本質的な検証ロジックに集中
+
+---
+
+## テスト戦略（状態ベース設計）
+
+本プロジェクトでは「操作ベース」ではなく  
+状態変化ベースのテスト設計を採用しています。
+
+---
+
+### 例：カートテスト
+
+商品追加 → カート件数増加  
+商品削除 → カート件数減少  
+全削除 → バッジ非表示  
+
+---
+
+このように「操作」ではなく  
+状態遷移の正しさを検証しています。
+
+---
+
+#### ③ テスト観点の分離
+
+テストは以下の観点で分類しています：
+
+| 区分 | 内容 |
+|------|------|
+| Login | 認証成功・失敗パターン |
+| Cart | 商品追加・削除・状態確認 |
+| Checkout | 購入成功・入力エラー・キャンセル |
+| Logout | セッション終了 |
+
+---
+
 
 ## 実装したテスト内容
 
@@ -79,17 +149,17 @@ https://www.saucedemo.com/
 * 一覧へ戻り再追加して購入
 
 ### キャンセル系
-* Cart → Continue Shopping
-* Checkout入力画面でCancel
-* 一部入力後Cancel
-* 全項目入力後Cancel
-* Confirm画面でCancel
+* カート画面 → Continue Shopping（買い物を続ける）
+* Checkout入力画面でCancel（キャンセル）
+* 一部入力後にCancel（キャンセル）
+* 全項目入力後にCancel（キャンセル）
+* Confirm画面でCancel（キャンセル）
 
 ### 異常系
-* First Name未入力
-* Last Name未入力
-* Postal Code未入力
-* 全項目未入力
+* First Name未入力（名未入力）
+* Last Name未入力（姓未入力）
+* Postal Code未入力（郵便番号未入力）
+* 全項目未入力（入力なし）
 
 ---
 
@@ -110,7 +180,7 @@ https://www.saucedemo.com/
 - storageState による認証状態再利用
 - カート / Checkout / ログアウト系テスト高速化
 - テストコードの責務分離
-- checkoutテストでもログイン状態を再利用
+- Checkoutテストでもログイン状態を再利用
 - テスト実行の高速化（毎回ログイン不要）
 - UIテストの安定化
 
@@ -123,7 +193,7 @@ https://www.saucedemo.com/
 
 ### 対応内容
 
-- checkoutData.ts に購入パターン定義
+- CheckoutData.ts に購入パターン定義
 - forEach によるテスト生成
 - ケース追加時のコード修正最小化
 
@@ -151,10 +221,10 @@ tests/
  │   ├ cart.spec.ts
  │   └ cart-badge.spec.ts
  │
- ├ checkout/
- │   ├ checkout-success.spec.ts
- │   ├ checkout-failure.spec.ts
- │   └ checkout-cancel.spec.ts
+ ├ Checkout/
+ │   ├ Checkout-success.spec.ts
+ │   ├ Checkout-failure.spec.ts
+ │   └ Checkout-cancel.spec.ts
  │
  └ logout/
      └ logout.spec.ts
@@ -168,7 +238,7 @@ utils/
 
 data/
  ├ users.ts
- └ checkoutData.ts
+ └ CheckoutData.ts
 
 ```
 
@@ -191,7 +261,7 @@ npx playwright test --ui
 ### 特定ファイル実行
 
 ```bash
-npx playwright test tests/checkout/checkout-success.spec.ts
+npx playwright test tests/Checkout/Checkout-success.spec.ts
 
 ```
 
@@ -202,10 +272,10 @@ npx playwright test tests/setup/auth.setup.ts
 
 ```
 
-### checkoutのみ実行
+### Checkoutのみ実行
 
 ```bash
-npx playwright test tests/checkout --reporter=list
+npx playwright test tests/Checkout --reporter=list
 
 ```
 
@@ -218,60 +288,78 @@ npx playwright test tests/cart --reporter=list
 
 ## CI（GitHub Actions）
 
-このプロジェクトは GitHub Actions により、push時に自動でテストが実行されます。
+push時に自動で以下を実行：
 
-### 実行タイミング
-
-* mainブランチへのpush
-* Pull Request作成時
-
-### 自動実行内容
-
-* Node.js セットアップ
-* 依存関係インストール
-* Playwrightブラウザセットアップ
-* setupテスト実行（auth.json生成）
-* 全テスト実行
+- Node.jsセットアップ
+- 依存関係インストール
+- Playwright実行
+- 全テスト検証
 
 ---
 
-## 工夫した点
+### 実行タイミング
 
-* Page Object Model により画面操作を分離
-* 正常系 / 異常系 / キャンセル系で観点整理
-* Checkout機能まで含めたE2Eシナリオ構築
-* data-driven test による保守性向上
-* Fixture導入によるログイン共通化
-* 共通処理の utility 化
-* GitHub Actions によるCI自動化
-* GitHubでソース管理
-* Checkoutフロー（正常・異常・キャンセル）を網羅
-* Page Objectによる責務分離
-* Component（Header）再利用設計
-* テストの状態遷移（Cart → Checkout → Confirm）を再現
+- mainブランチへのpush
+- Pull Request作成時
+
+---
+
+### 自動実行内容
+
+- Node.jsセットアップ
+- 依存関係インストール
+- Playwrightブラウザセットアップ
+- 全テスト実行
+
+---
+
+## Checkout設計思想
+
+Checkoutは以下3段階で構成されています：
+
+① 商品選択（Inventory）  
+② 情報入力（Checkout Form）  
+③ 確認・完了（Complete）
+
+---
+
+### テスト分類
+
+- 正常系：購入完了までのフロー
+- 異常系：入力バリデーション
+- キャンセル系：途中離脱動作
+
+---
+
+## このプロジェクトで意識した点
+
+- UIテストの保守性（POM設計）
+- テスト実行速度（fixture化）
+- 状態ベースの検証設計
+- 正常系・異常系の網羅性
+- CIによる自動品質保証
 
 ---
 
 ## 改善予定
 
-* テストデータ外部化拡張（JSON / CSV）
-* APIテスト追加
-* Visual Regression Test追加
-* 並列実行最適化
-* レポート自動通知（Slack / Teams）
+- テストデータの外部化（JSON化）
+- APIテスト追加
+- Visual Regressionテスト導入
+- Page Objectのさらなる分割最適化
+- レポート自動通知（Slack / Teams）
 
 ---
 
-## ポートフォリオとしての位置付け
+## ポートフォリオとしての価値
 
-* Playwright実務レベル基礎理解
-* テスト設計（正常系 / 異常系 / 状態遷移）
-* Page Object設計
-* Fixture運用
-* data-driven test設計
-* Git / GitHub運用
-* CI/CDによる自動化
-* E2Eテスト構築経験
+本プロジェクトは以下を含みます：
+
+- E2Eテスト設計（実務レベル）
+- Page Object Model設計
+- Fixtureによる認証最適化
+- CI/CD連携（GitHub Actions）
+- テスト観点整理（正常/異常/状態遷移）
 
 ---
 
