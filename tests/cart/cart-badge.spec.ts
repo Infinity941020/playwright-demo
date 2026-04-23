@@ -143,7 +143,7 @@ test.describe('カートバッジ検証テスト', () => {
     await cart.removeAllItems();
 
     // バッジが非表示であることを確認する
-    await header.expectNoBadge();
+    await header.expectBadgeCount(0);
   });
 
 });

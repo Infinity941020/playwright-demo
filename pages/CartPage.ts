@@ -84,4 +84,23 @@ export class CartPage {
     // 一覧画面遷移確認
     await expect(this.page).toHaveURL(/inventory/);
   }
+
+  /*
+  ================================
+  全商品削除
+  ================================
+  */
+  async removeAllItems() {
+
+    // 削除ボタン取得
+    const buttons = this.page.locator('[data-test^="remove"]');
+
+    // 件数取得
+    const count = await buttons.count();
+
+    // 先頭から順番に削除
+    for (let i = 0; i < count; i++) {
+      await buttons.first().click();
+    }
+  }
 }

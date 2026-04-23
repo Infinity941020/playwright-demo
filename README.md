@@ -68,30 +68,28 @@ https://www.saucedemo.com/
 
 ---
 
-## Checkout（購入機能）
+## Checkout機能（購入機能）
 
 ### 正常系
-
-- 商品1件購入
-- 複数商品購入
-- カート確認後購入
-- 商品削除後購入
-- 戻り操作後購入
-
-### 異常系
-
-- First Name未入力
-- Last Name未入力
-- Postal Code未入力
-- 全項目未入力
+* 商品1件購入
+* 複数商品購入
+* 商品詳細から追加して購入
+* カート確認後に購入
+* 全件追加後に削除して購入
+* 一覧へ戻り再追加して購入
 
 ### キャンセル系
+* Cart → Continue Shopping
+* Checkout入力画面でCancel
+* 一部入力後Cancel
+* 全項目入力後Cancel
+* Confirm画面でCancel
 
-- Cart画面からContinue Shopping
-- Checkout Step1でCancel
-- 一部入力後Cancel
-- 全入力後Cancel
-- Confirm画面でCancel
+### 異常系
+* First Name未入力
+* Last Name未入力
+* Postal Code未入力
+* 全項目未入力
 
 ---
 
@@ -112,6 +110,9 @@ https://www.saucedemo.com/
 - storageState による認証状態再利用
 - カート / Checkout / ログアウト系テスト高速化
 - テストコードの責務分離
+- checkoutテストでもログイン状態を再利用
+- テスト実行の高速化（毎回ログイン不要）
+- UIテストの安定化
 
 ---
 
@@ -135,6 +136,7 @@ pages/
  ├ LoginPage.ts
  ├ InventoryPage.ts
  ├ CartPage.ts
+ ├ HeaderComponent.ts
  └ CheckoutPage.ts
 
 tests/
@@ -168,7 +170,7 @@ data/
  ├ users.ts
  └ checkoutData.ts
 
----
+```
 
 ## 実行方法
 
@@ -177,20 +179,42 @@ data/
 ```bash
 npx playwright test
 
+```
+
 ### UIモード
 
 ```bash
 npx playwright test --ui
+
+```
 
 ### 特定ファイル実行
 
 ```bash
 npx playwright test tests/checkout/checkout-success.spec.ts
 
+```
+
 ### setupのみ実行
 
 ```bash
 npx playwright test tests/setup/auth.setup.ts
+
+```
+
+### checkoutのみ実行
+
+```bash
+npx playwright test tests/checkout --reporter=list
+
+```
+
+### cartのみ実行
+
+```bash
+npx playwright test tests/cart --reporter=list
+
+```
 
 ## CI（GitHub Actions）
 
@@ -221,6 +245,10 @@ npx playwright test tests/setup/auth.setup.ts
 * 共通処理の utility 化
 * GitHub Actions によるCI自動化
 * GitHubでソース管理
+* Checkoutフロー（正常・異常・キャンセル）を網羅
+* Page Objectによる責務分離
+* Component（Header）再利用設計
+* テストの状態遷移（Cart → Checkout → Confirm）を再現
 
 ---
 
