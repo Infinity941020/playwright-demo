@@ -1,25 +1,25 @@
-// Playwrightのテスト機能とexpectを使用
+// Playwrightのテスト機能とexpectを使用（ログイン状態はfixtureで管理）
 import { test, expect } from '../../fixtures/loginFixture';
 
-// 各Page Object（責務分離版）
+// Page Object（画面操作の分離）
 import { InventoryPage } from '../../pages/InventoryPage';
 import { CartPage } from '../../pages/CartPage';
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
 /*
 ================================
-Checkoutキャンセル系テスト（fixture統一版）
+Checkoutキャンセル系テスト
+各画面での戻り動作を検証
 ================================
 */
-
 test.describe('Checkoutキャンセル系テスト（fixture統一版）', () => {
 
   /*
   ================================
-  ① Cart → Continue Shopping
+  ① カート → 商品一覧へ戻る
   ================================
   */
-  test('① カート画面でContinue Shopping押下で一覧へ戻ること', async ({ loggedPage }) => {
+  test('① カート画面から商品一覧へ戻る', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);
@@ -36,10 +36,10 @@ test.describe('Checkoutキャンセル系テスト（fixture統一版）', () =>
 
   /*
   ================================
-  ② Checkout → Cancel（空）
+  ② Checkout開始直後のキャンセル
   ================================
   */
-  test('② Checkout入力画面でCancel押下でカートへ戻ること', async ({ loggedPage }) => {
+  test('② Checkout開始直後にカートへ戻る', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);
@@ -59,10 +59,10 @@ test.describe('Checkoutキャンセル系テスト（fixture統一版）', () =>
 
   /*
   ================================
-  ③ 一部入力Cancel
+  ③ 入力途中でキャンセル
   ================================
   */
-  test('③ 一部入力後にCancel押下でカートへ戻ること', async ({ loggedPage }) => {
+  test('③ 入力途中でカートへ戻る', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);
@@ -84,10 +84,10 @@ test.describe('Checkoutキャンセル系テスト（fixture統一版）', () =>
 
   /*
   ================================
-  ④ 全入力Cancel
+  ④ 入力完了後のキャンセル
   ================================
   */
-  test('④ 全項目入力後にCancel押下でカートへ戻ること', async ({ loggedPage }) => {
+  test('④ 入力完了後にカートへ戻る', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);
@@ -109,10 +109,10 @@ test.describe('Checkoutキャンセル系テスト（fixture統一版）', () =>
 
   /*
   ================================
-  ⑤ Confirm Cancel
+  ⑤ 確認画面から商品一覧へ戻る
   ================================
   */
-  test('⑤ Confirm画面でCancel押下で商品一覧へ戻ること', async ({ loggedPage }) => {
+  test('⑤ 確認画面から商品一覧へ戻る', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);

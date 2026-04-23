@@ -55,12 +55,12 @@ test.describe('カート機能テスト', () => {
     await header.expectBadgeCount(count);
   });
 
-  /*
-  ================================
-  パターン③：カート内容確認
-  ================================
-  */
-  test('パターン③：カート内に商品が正しく入っていること', async ({ loggedPage }) => {
+/*
+===============================
+パターン③：カート内の商品件数確認
+===============================
+*/
+test('パターン③：カートに追加した商品が正しく表示されること', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);
@@ -73,12 +73,12 @@ test.describe('カート機能テスト', () => {
     await expect(loggedPage.locator('.cart_item')).toHaveCount(1);
   });
 
-  /*
-  ================================
-  パターン④：カートから削除
-  ================================
-  */
-  test('パターン④：カートから商品を削除できること', async ({ loggedPage }) => {
+/*
+===============================
+パターン③：カート内の商品件数確認
+===============================
+*/
+test('パターン③：カートに追加した商品が正しく表示されること', async ({ loggedPage }) => {
 
     const inventory = new InventoryPage(loggedPage);
     const cart = new CartPage(loggedPage);

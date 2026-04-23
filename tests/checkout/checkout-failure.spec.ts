@@ -1,18 +1,24 @@
-// Playwrightのfixture化したtestを使用
+// Playwrightのfixtureを使用（ログイン状態は共通化）
 import { test } from '../../fixtures/loginFixture';
 
-// Page Objectを使用
+// Page Object（画面操作を分離）
 import { InventoryPage } from '../../pages/InventoryPage';
 import { CartPage } from '../../pages/CartPage';
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
 /*
 ================================
-Checkout異常系テスト（data-driven版）
+Checkout異常系テスト（data-driven構成）
+入力バリデーションの検証
 ================================
 */
 test.describe('Checkout異常系テスト（fixture統一版）', () => {
 
+  /*
+  ================================
+  Page Object（共通利用）
+  ================================
+  */
   let inventory: InventoryPage;
   let cart: CartPage;
   let checkout: CheckoutPage;
@@ -24,27 +30,27 @@ test.describe('Checkout異常系テスト（fixture統一版）', () => {
   */
   test.beforeEach(async ({ loggedPage }) => {
 
-    // 各Page Object生成
+    // Page Object初期化
     inventory = new InventoryPage(loggedPage);
     cart = new CartPage(loggedPage);
     checkout = new CheckoutPage(loggedPage);
 
-    // 商品一覧へ移動
+    // 商品一覧画面へ遷移
     await inventory.goto();
 
-    // 商品1件追加
+    // テストデータ準備（商品を1件追加）
     await inventory.addFirstItem();
 
-    // カートへ移動
+    // カート画面へ移動
     await cart.goto();
 
-    // Checkout開始
+    // Checkout画面へ遷移
     await checkout.startCheckout();
   });
 
   /*
   ================================
-  テストデータ一覧
+  テストデータ（入力バリデーションパターン）
   ================================
   */
   const cases = [
@@ -76,22 +82,21 @@ test.describe('Checkout異常系テスト（fixture統一版）', () => {
 
   /*
   ================================
-  data-driven実行
+  data-driven実行（入力エラー検証）
   ================================
   */
   for (const data of cases) {
 
-    // 各ケースをテスト生成
     test(data.title, async () => {
 
-      // 入力実施
+      // フォーム入力
       await checkout.fillInfo(
         data.first,
         data.last,
         data.zip
       );
 
-      // エラー確認付きContinue
+      // エラー表示を伴う遷移を検証
       await checkout.continueExpectError();
     });
   }

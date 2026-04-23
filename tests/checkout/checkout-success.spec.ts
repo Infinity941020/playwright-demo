@@ -1,25 +1,21 @@
-// Playwrightのテスト機能とexpectをfixture経由で使用
+// Playwrightのテスト機能を使用（ログイン状態はfixtureで管理）
 import { test } from '../../fixtures/loginFixture';
 
-// Inventoryページ操作クラスを使用
+// 各画面操作用Page Object
 import { InventoryPage } from '../../pages/InventoryPage';
-
-// Cartページ操作クラスを使用
 import { CartPage } from '../../pages/CartPage';
-
-// Checkoutページ操作クラスを使用
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
 /*
 ================================
-Checkout正常系テスト（data-driven版）
+Checkout正常系テスト（data-driven構成）
 ================================
 */
 test.describe('Checkout正常系テスト（fixture統一版）', () => {
 
   /*
   ================================
-  共通変数
+  Page Object（各テスト共通）
   ================================
   */
   let inventory: InventoryPage;
@@ -33,41 +29,41 @@ test.describe('Checkout正常系テスト（fixture統一版）', () => {
   */
   test.beforeEach(async ({ loggedPage }) => {
 
-    // 各Page Object生成
+    // Page Object初期化
     inventory = new InventoryPage(loggedPage);
     cart = new CartPage(loggedPage);
     checkout = new CheckoutPage(loggedPage);
 
-    // 商品一覧へ遷移
+    // 商品一覧画面から開始
     await inventory.goto();
   });
 
   /*
   ================================
-  テストケース定義
+  テストケース定義（data-driven）
   ================================
   */
   const cases = [
     {
-      title: '① 一覧画面で1件追加して購入できること',
+      title: '① 商品一覧から1件追加して購入フローへ進む',
       action: async () => {
         await inventory.addFirstItem();
       }
     },
     {
-      title: '② 一覧画面で複数件追加して購入できること',
+      title: '② 商品一覧から複数件追加して購入フローへ進む',
       action: async () => {
         await inventory.addAllItems();
       }
     },
     {
-      title: '③ 商品詳細画面から追加して購入できること',
+      title: '③ 商品詳細から追加して購入フローへ進む',
       action: async () => {
         await inventory.addFirstItem();
       }
     },
     {
-      title: '④ カート画面で内容確認後に購入できること',
+      title: '④ カートで内容確認後に購入フローへ進む',
       action: async () => {
         await inventory.addFirstItem();
         await cart.goto();
@@ -75,37 +71,37 @@ test.describe('Checkout正常系テスト（fixture統一版）', () => {
       }
     },
     {
-      title: '⑤ 全件追加後に2件削除して購入できること',
+      title: '⑤ 複数追加後に一部削除して購入フローへ進む',
       action: async () => {
 
-        // 全件追加
+        // 商品を全件追加
         const count = await inventory.addAllItems();
 
-        // カートへ移動
+        // カート画面へ移動
         await cart.goto();
 
-        // 2件削除
+        // 一部商品を削除
         await cart.removeFirstItem();
         await cart.removeFirstItem();
 
-        // 件数確認
+        // カート内件数を検証
         await cart.expectItemCount(count - 2);
       }
     },
     {
-      title: '⑥ 1件追加後に一覧へ戻り全件追加して購入できること',
+      title: '⑥ 一部追加後に戻って再追加して購入フローへ進む',
       action: async () => {
 
-        // 1件追加
+        // 商品を1件追加
         await inventory.addFirstItem();
 
-        // カートへ移動
+        // カート画面へ移動
         await cart.goto();
 
-        // 一覧へ戻る
+        // 商品一覧へ戻る
         await cart.continueShopping();
 
-        // 全件追加
+        // 再度すべて追加
         await inventory.addAllItems();
       }
     }
@@ -113,27 +109,27 @@ test.describe('Checkout正常系テスト（fixture統一版）', () => {
 
   /*
   ================================
-  data-driven実行
+  data-drivenテスト実行
   ================================
   */
   for (const item of cases) {
 
     test(item.title, async () => {
 
-      // ケース固有処理実行
+      // ケースごとの操作を実行
       await item.action();
 
-      // カートへ移動
+      // カート画面へ遷移
       await cart.goto();
 
-      // 購入一括実行
+      // 購入処理実行
       await checkout.completePurchase(
         'Taro',
         'Yamada',
         '12345'
       );
 
-      // 完了確認
+      // 完了画面の表示確認
       await checkout.expectComplete();
     });
   }
