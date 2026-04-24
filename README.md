@@ -240,6 +240,9 @@ data/
  ├ users.ts
  └ checkoutData.ts
 
+docs/
+ ├ interview-script.md
+ └ interview-qa.md
 ```
 
 ## 実行方法
@@ -368,6 +371,13 @@ Checkoutは以下3段階で構成されています：
 - Visual Regressionテスト導入
 - Page Objectのさらなる分割最適化
 - レポート自動通知（Slack / Teams）
+
+---
+
+## ドキュメント
+
+- 面談用プロジェクト説明資料
+- 想定質問と回答集
 
 ---
 
