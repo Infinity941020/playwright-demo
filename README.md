@@ -193,7 +193,7 @@ loginFixtureによりログイン状態を共有し、
 
 ### 対応内容
 
-- CheckoutData.ts に購入パターン定義
+- checkoutData.ts に購入パターン定義
 - forEach によるテスト生成
 - ケース追加時のコード修正最小化
 
@@ -221,10 +221,10 @@ tests/
  │   ├ cart.spec.ts
  │   └ cart-badge.spec.ts
  │
- ├ Checkout/
- │   ├ Checkout-success.spec.ts
- │   ├ Checkout-failure.spec.ts
- │   └ Checkout-cancel.spec.ts
+ ├ checkout/
+ │   ├ checkout-success.spec.ts
+ │   ├ checkout-failure.spec.ts
+ │   └ checkout-cancel.spec.ts
  │
  └ logout/
      └ logout.spec.ts
@@ -238,7 +238,7 @@ utils/
 
 data/
  ├ users.ts
- └ CheckoutData.ts
+ └ checkoutData.ts
 
 ```
 
@@ -333,11 +333,31 @@ Checkoutは以下3段階で構成されています：
 
 ## このプロジェクトで意識した点
 
+本プロジェクトは以下を重視しています：
+
+- E2Eテスト設計（実務レベル）
+- Page Object Model設計
+- Fixtureによる認証最適化
+- CI/CD連携（GitHub Actions）
+- テスト観点整理（正常/異常/状態遷移）
 - UIテストの保守性（POM設計）
 - テスト実行速度（fixture化）
 - 状態ベースの検証設計
-- 正常系・異常系の網羅性
-- CIによる自動品質保証
+
+---
+
+## 更新履歴
+
+※本履歴は「設計変更・テスト観点の変化」を中心に記載しています
+
+| 日付 | 区分 | 内容 | 対応ファイル | 目的 |
+|------|------|------|--------------|------|
+| 2026/04/23 | 改善 | README構成整理 | README.md | ドキュメント可読性改善 |
+| 2026/04/23 | 修正 | コメント統一（英日混在解消） | 各 .ts ファイル | 可読性向上 |
+| 2026/04/23 | 修正 | HeaderComponentのバッジ判定統一 | HeaderComponent.ts | API統一・保守性向上 |
+| 2026/04/23 | 修正 | duplicate test title修正 | cart.spec.ts | CIエラー解消 |
+| 2026/04/23 | 確認 | CI（GitHub Actions）成功確認 | .github/workflows | 自動実行の安定化 |
+| 2026/04/24 | 追加 | フェーズ整理（ロードマップ定義） | README.md | 全体構造の明確化 |
 
 ---
 
@@ -348,18 +368,6 @@ Checkoutは以下3段階で構成されています：
 - Visual Regressionテスト導入
 - Page Objectのさらなる分割最適化
 - レポート自動通知（Slack / Teams）
-
----
-
-## ポートフォリオとしての価値
-
-本プロジェクトは以下を含みます：
-
-- E2Eテスト設計（実務レベル）
-- Page Object Model設計
-- Fixtureによる認証最適化
-- CI/CD連携（GitHub Actions）
-- テスト観点整理（正常/異常/状態遷移）
 
 ---
 
