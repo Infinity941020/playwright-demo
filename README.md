@@ -1,10 +1,21 @@
-# Playwright 自動テストデモ（ECサイト自動化テスト）
+# Playwright 自動テストデモ（ECサイトE2Eテスト）
 
-このプロジェクトは、**Playwright + TypeScript** を使用した自動テストの学習・実践用プロジェクトです。  
-SauceDemo（テスト用ECサイト）を対象に、ログイン機能・カート機能・Checkout（購入）機能・ログアウト機能などのE2Eテストを実装しています。
+このプロジェクトは、**Playwright + TypeScript** を使用して構築した  
+ECサイト向けE2E自動テストのポートフォリオです。
 
-**Page Object Model（POM）** を採用し、保守性・再利用性を意識した設計にしています。  
-さらに **Fixture によるログイン状態の共通化**、**Data-driven testingによるテスト設計**、**GitHub Actions による CI 自動実行** にも対応しています。
+テスト対象には SauceDemo を使用し、以下の機能を自動化しています。
+
+- ログイン機能
+- カート機能
+- Checkout（購入）機能
+- ログアウト機能
+
+また、保守性と運用性を意識し、以下の構成を採用しています。
+
+- Page Object Model（POM）
+- fixtureによるログイン共通化
+- Data-driven testing
+- GitHub Actions による CI 自動実行
 
 ---
 
@@ -100,14 +111,14 @@ loginFixtureによりログイン状態を共有し、
 
 ## 実装したテスト内容
 
-## ログイン正常系
+### ログイン正常系
 
 - 正しいID / パスワードでログイン
 - 商品一覧画面（inventory）への遷移確認
 
 ---
 
-## ログイン異常系（5パターン）
+### ログイン異常系（5パターン）
 
 ログイン失敗ケースを網羅的に確認しています。
 
@@ -119,7 +130,7 @@ loginFixtureによりログイン状態を共有し、
 
 ---
 
-## カート機能
+### カート機能
 
 - 商品1件追加
 - 複数商品追加
@@ -128,7 +139,7 @@ loginFixtureによりログイン状態を共有し、
 
 ---
 
-## カートバッジ検証
+### カートバッジ検証
 
 - 1件追加時の件数表示確認
 - 全件追加時の件数表示確認
@@ -138,7 +149,7 @@ loginFixtureによりログイン状態を共有し、
 
 ---
 
-## Checkout機能（購入機能）
+### Checkout機能（購入機能）
 
 ### 正常系
 * 商品1件購入
@@ -163,7 +174,7 @@ loginFixtureによりログイン状態を共有し、
 
 ---
 
-## ログアウト機能
+### ログアウト機能
 
 - ログイン済み状態からログアウトできること
 
@@ -186,7 +197,7 @@ loginFixtureによりログイン状態を共有し、
 
 ---
 
-## Data Driven対応
+## Data-driven testing対応
 
 繰り返しパターンの多いCheckoutテストでは、  
 テストデータを外部ファイル化し、保守性を向上させています。
@@ -264,7 +275,7 @@ npx playwright test --ui
 ### 特定ファイル実行
 
 ```bash
-npx playwright test tests/Checkout/Checkout-success.spec.ts
+npx playwright test tests/checkout/checkout-success.spec.ts
 
 ```
 
@@ -278,7 +289,7 @@ npx playwright test tests/setup/auth.setup.ts
 ### Checkoutのみ実行
 
 ```bash
-npx playwright test tests/Checkout --reporter=list
+npx playwright test tests/checkout --reporter=list
 
 ```
 
@@ -334,7 +345,7 @@ Checkoutは以下3段階で構成されています：
 
 ---
 
-## このプロジェクトで意識した点
+## プロジェクトの強み
 
 本プロジェクトは以下を重視しています：
 
