@@ -14,24 +14,24 @@ import { users } from '../../data/users';
 ========================================
 */
 
-// ログイン成功後に商品一覧へ遷移できるか確認するテスト
 test('ログイン成功して商品一覧が表示されること', async ({ page }) => {
 
-  // ログイン操作用Page Objectを生成
+  // ログイン操作用Page Object生成
   const loginPage = new LoginPage(page);
 
   // ログイン画面へ遷移
   await loginPage.goto();
 
-  // 正しいユーザー情報でログイン実行（users.ts使用）
+  // 正常ログイン
   await loginPage.login(
     users.standard.username,
     users.standard.password
   );
 
-  // URLが商品一覧ページになっていることを確認
+  // 商品一覧ページへ遷移確認
   await expect(page).toHaveURL(/inventory/);
 
-  // 商品一覧が表示されていることを確認
+  // 商品一覧表示確認
   await expect(page.locator('.inventory_list')).toBeVisible();
+
 });
