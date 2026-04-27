@@ -1,153 +1,113 @@
-// Playwrightのテスト機能（test / expect）を使用
-import { test, expect } from '@playwright/test';
+// Playwrightテスト機能（fixture版）を使用
+import { test } from '../../fixtures/loginFixture';
 
-// Page Object
+// Inventory操作（商品追加）
 import { InventoryPage } from '../../pages/InventoryPage';
-import { HeaderComponent } from '../../pages/HeaderComponent';
-import { CartPage } from '../../pages/CartPage';
 
-// ログイン処理（共通化）
-import { login } from '../../utils/loginHelper';
+// CartFlow（業務フロー）
+import { CartFlow } from '../../flows/CartFlow';
 
 /*
 ================================
-カートバッジ検証テスト
-商品追加・削除時のバッジ表示を検証
+カートバッジ検証テスト（完全統一版）
 ================================
 */
+
 test.describe('カートバッジ検証テスト', () => {
 
   /*
   ================================
-  共通前処理（ログイン）
+  ① 1件追加
   ================================
   */
-  test.beforeEach(async ({ page }) => {
+  test('① 1件追加時のバッジ表示確認', async ({ loggedPage }) => {
 
-    // ログイン実行
-    await login(page);
-  });
+    const inventory = new InventoryPage(loggedPage);
+    const cartFlow = new CartFlow(loggedPage);
 
-  /*
-  ================================
-  ① 商品を1件追加
-  ================================
-  */
-  test('① 1件追加時のバッジ表示確認', async ({ page }) => {
-
-    const inventory = new InventoryPage(page);
-    const header = new HeaderComponent(page);
-
-    // 商品一覧へ遷移
     await inventory.goto();
-
-    // 商品を1件追加
     await inventory.addFirstItem();
 
-    // バッジが1件であることを確認
-    await header.expectBadgeCount(1);
+    await cartFlow.expectBadgeCount(1);
   });
 
   /*
   ================================
-  ② 全商品追加
+  ② 全件追加
   ================================
   */
-  test('② 全件追加時のバッジ件数確認', async ({ page }) => {
+  test('② 全件追加時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(page);
-    const header = new HeaderComponent(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cartFlow = new CartFlow(loggedPage);
 
-    // 商品一覧へ遷移
     await inventory.goto();
 
-    // 全商品を追加
     const count = await inventory.addAllItems();
 
-    // バッジ件数が商品数と一致することを確認
-    await header.expectBadgeCount(count);
+    await cartFlow.expectBadgeCount(count);
   });
 
   /*
   ================================
-  ③ 商品を1件削除
+  ③ 1件削除
   ================================
   */
-  test('③ 1件削除時のバッジ件数確認', async ({ page }) => {
+  test('③ 1件削除時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(page);
-    const cart = new CartPage(page);
-    const header = new HeaderComponent(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cartFlow = new CartFlow(loggedPage);
 
-    // 商品一覧へ遷移
     await inventory.goto();
 
-    // 全商品を追加
     const count = await inventory.addAllItems();
 
-    // カートへ遷移
-    await cart.goto();
+    await cartFlow.openCart();
+    await cartFlow.removeFirstItem();
 
-    // 商品を1件削除
-    await cart.removeFirstItem();
-
-    // バッジが1件減っていることを確認
-    await header.expectBadgeCount(count - 1);
+    await cartFlow.expectBadgeCount(count - 1);
   });
 
   /*
   ================================
-  ④ 商品を2件削除
+  ④ 2件削除
   ================================
   */
-  test('④ 2件削除時のバッジ件数確認', async ({ page }) => {
+  test('④ 2件削除時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(page);
-    const cart = new CartPage(page);
-    const header = new HeaderComponent(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cartFlow = new CartFlow(loggedPage);
 
-    // 商品一覧へ遷移
     await inventory.goto();
 
-    // 全商品を追加
     const count = await inventory.addAllItems();
 
-    // カートへ遷移
-    await cart.goto();
+    await cartFlow.openCart();
 
-    // 商品を2件削除
-    await cart.removeFirstItem();
-    await cart.removeFirstItem();
+    await cartFlow.removeFirstItem();
+    await cartFlow.removeFirstItem();
 
-    // バッジが2件減っていることを確認
-    await header.expectBadgeCount(count - 2);
+    await cartFlow.expectBadgeCount(count - 2);
   });
 
   /*
   ================================
-  ⑤ 全件削除
+  ⑤ 全削除
   ================================
   */
-  test('⑤ 全件削除時はバッジが非表示になる', async ({ page }) => {
+  test('⑤ 全件削除時はバッジが非表示になる', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(page);
-    const cart = new CartPage(page);
-    const header = new HeaderComponent(page);
+    const inventory = new InventoryPage(loggedPage);
+    const cartFlow = new CartFlow(loggedPage);
 
-    // 商品一覧へ遷移
     await inventory.goto();
 
-    // 全商品を追加
     await inventory.addAllItems();
 
-    // カートへ遷移
-    await cart.goto();
+    await cartFlow.openCart();
+    await cartFlow.clearCart();
 
-    // 全商品を削除
-    await cart.removeAllItems();
-
-    // バッジが0件（非表示）であることを確認
-    await header.expectBadgeCount(0);
+    await cartFlow.expectBadgeCount(0);
   });
 
 });

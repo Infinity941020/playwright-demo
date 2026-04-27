@@ -1,76 +1,82 @@
-// Playwrightのテスト実行機能と検証機能を読み込み
+// Playwrightのテスト機能と検証機能をインポート
 import { test, expect } from '@playwright/test';
 
-// ログイン画面操作クラスを読み込み
-import { LoginPage } from '../../pages/LoginPage';
+// ログイン業務フローをインポート
+import { LoginFlow } from '../../flows/login.flow';
 
-// 共通テストデータを読み込み
+// テストデータをインポート
 import { users } from '../../data/users';
 
-// 異常系ログインテスト集
+/*
+========================================
+ログイン異常系テスト
+========================================
+*/
+
 test.describe('ログイン異常系確認', () => {
 
   // パターン①：誤ったID・PW
-  test('パターン① 誤ID・誤PW', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test('誤ID・誤PW', async ({ page }) => {
 
-    await loginPage.goto();
+    // ログインフロー生成
+    const loginFlow = new LoginFlow(page);
 
-    // 誤情報でログイン（users.ts使用）
-    await loginPage.login(
+    // ログイン実行
+    await loginFlow.login(
       users.invalid.username,
       users.invalid.password
     );
 
-    await expect(loginPage.errorMessage()).toBeVisible();
+    // エラー表示確認
+    const loginPage = loginFlow.getPage();
+    await expect(loginPage.getErrorMessage()).toBeVisible();
   });
 
   // パターン②：ID未入力
-  test('パターン② ID未入力', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test('ID未入力', async ({ page }) => {
 
-    await loginPage.goto();
+    const loginFlow = new LoginFlow(page);
 
-    await loginPage.login('', users.standard.password);
+    await loginFlow.login('', users.standard.password);
 
-    await expect(loginPage.errorMessage()).toBeVisible();
+    const loginPage = loginFlow.getPage();
+    await expect(loginPage.getErrorMessage()).toBeVisible();
   });
 
   // パターン③：PW未入力
-  test('パターン③ PW未入力', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test('PW未入力', async ({ page }) => {
 
-    await loginPage.goto();
+    const loginFlow = new LoginFlow(page);
 
-    await loginPage.login(users.standard.username, '');
+    await loginFlow.login(users.standard.username, '');
 
-    await expect(loginPage.errorMessage()).toBeVisible();
+    const loginPage = loginFlow.getPage();
+    await expect(loginPage.getErrorMessage()).toBeVisible();
   });
 
-  // パターン④：ID・PW両方未入力
-  test('パターン④ ID・PW未入力', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  // パターン④：両方未入力
+  test('ID・PW未入力', async ({ page }) => {
 
-    await loginPage.goto();
+    const loginFlow = new LoginFlow(page);
 
-    await loginPage.login('', '');
+    await loginFlow.login('', '');
 
-    await expect(loginPage.errorMessage()).toBeVisible();
+    const loginPage = loginFlow.getPage();
+    await expect(loginPage.getErrorMessage()).toBeVisible();
   });
 
-  // パターン⑤：ログイン不可ユーザー
-  test('パターン⑤ locked_out_user', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  // パターン⑤：ロックユーザー
+  test('locked_out_user', async ({ page }) => {
 
-    await loginPage.goto();
+    const loginFlow = new LoginFlow(page);
 
-    // ロックユーザー（users.ts使用）
-    await loginPage.login(
+    await loginFlow.login(
       users.locked.username,
       users.locked.password
     );
 
-    await expect(loginPage.errorMessage()).toBeVisible();
+    const loginPage = loginFlow.getPage();
+    await expect(loginPage.getErrorMessage()).toBeVisible();
   });
 
 });

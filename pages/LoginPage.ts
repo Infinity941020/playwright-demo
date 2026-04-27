@@ -1,88 +1,88 @@
-// PlaywrightのPage型・Locator型・expectを使用するためのimport
-import { Page, Locator, expect } from '@playwright/test';
+// PlaywrightのPage型・Locator型を使用するためのインポート
+import { Page, Locator } from '@playwright/test';
 
-// ログイン画面の操作をまとめたPage Objectクラス
+// ログイン画面のUI操作（要素取得と単体操作）をまとめたPage Object
 export class LoginPage {
 
-  // Playwrightのページインスタンスを保持
+  // Playwrightのページインスタンスを保持するプロパティ
   readonly page: Page;
 
-  // ユーザー名入力欄
+  // ユーザー名入力欄のLocator
   readonly usernameInput: Locator;
 
-  // パスワード入力欄
+  // パスワード入力欄のLocator
   readonly passwordInput: Locator;
 
-  // ログインボタン
+  // ログインボタンのLocator
   readonly loginButton: Locator;
 
-  // エラーメッセージ表示欄
+  // エラーメッセージ表示エリアのLocator
   readonly errorMessageLocator: Locator;
 
-  // コンストラクタ（page受け取り＋Locator初期化）
+  // コンストラクタ（pageを受け取りLocatorを初期化）
   constructor(page: Page) {
 
-    // pageをクラス内で使えるよう保持
+    // pageインスタンスをクラス内で使用できるよう保持
     this.page = page;
 
-    // ユーザー名入力欄を取得
+    // ユーザー名入力欄の要素を取得（id指定）
     this.usernameInput = page.locator('#user-name');
 
-    // パスワード入力欄を取得
+    // パスワード入力欄の要素を取得（id指定）
     this.passwordInput = page.locator('#password');
 
-    // ログインボタンを取得
+    // ログインボタンの要素を取得（id指定）
     this.loginButton = page.locator('#login-button');
 
-    // エラーメッセージ欄を取得
+    // エラーメッセージ要素を取得（data-test属性指定）
     this.errorMessageLocator = page.locator('[data-test="error"]');
   }
 
-  // ログイン画面へ遷移
+  // ログイン画面へ遷移する処理
   async goto() {
+
+    // ログインページURLへアクセス
     await this.page.goto('https://www.saucedemo.com/');
   }
 
-  // ユーザー名を入力
+  // ユーザー名を入力する処理
   async enterUsername(username: string) {
+
+    // ユーザー名入力欄へ文字を入力
     await this.usernameInput.fill(username);
   }
 
-  // パスワードを入力
+  // パスワードを入力する処理
   async enterPassword(password: string) {
+
+    // パスワード入力欄へ文字を入力
     await this.passwordInput.fill(password);
   }
 
-  // ログインボタンをクリック
+  // ログインボタンをクリックする処理
   async clickLogin() {
+
+    // ログインボタンをクリック
     await this.loginButton.click();
   }
 
-  // ログイン処理をまとめて実行
+  // ログイン操作（入力＋クリックの操作のみをまとめた処理）
   async login(username: string, password: string) {
 
-    // ユーザー名入力
+    // ユーザー名を入力
     await this.enterUsername(username);
 
-    // パスワード入力
+    // パスワードを入力
     await this.enterPassword(password);
 
-    // ログインボタン押下
+    // ログインボタンをクリック
     await this.clickLogin();
   }
 
-  // エラーメッセージLocatorを取得（新メソッド名）
+  // エラーメッセージLocatorを取得する処理（テスト側でassertするため）
   getErrorMessage(): Locator {
-    return this.errorMessageLocator;
-  }
 
-  // 旧テストコード互換用メソッド（errorMessage()でも使えるようにする）
-  errorMessage(): Locator {
+    // エラーメッセージ要素を返す
     return this.errorMessageLocator;
-  }
-
-  // エラーメッセージが表示されていることを確認
-  async expectErrorVisible() {
-    await expect(this.errorMessageLocator).toBeVisible();
   }
 }

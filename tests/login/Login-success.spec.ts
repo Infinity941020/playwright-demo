@@ -1,37 +1,33 @@
-// Playwrightのテスト実行機能と検証機能を読み込み
+// Playwrightのテスト機能とアサーション機能をインポート
 import { test, expect } from '@playwright/test';
 
-// ログイン画面操作をまとめたPage Objectを読み込み
-import { LoginPage } from '../../pages/LoginPage';
+// ログイン業務フローをまとめたFlowクラスをインポート
+import { LoginFlow } from '../../flows/login.flow';
 
-// 共通テストデータを読み込み
+// テスト用ユーザーデータをインポート
 import { users } from '../../data/users';
 
 /*
 ========================================
 ログイン機能の正常系テスト
-（fixture対象外：認証機能そのものの検証）
+（業務フロー単位でのE2Eテスト）
 ========================================
 */
 
 test('ログイン成功して商品一覧が表示されること', async ({ page }) => {
 
-  // ログイン操作用Page Object生成
-  const loginPage = new LoginPage(page);
+  // ログインフローを生成
+  const loginFlow = new LoginFlow(page);
 
-  // ログイン画面へ遷移
-  await loginPage.goto();
-
-  // 正常ログイン
-  await loginPage.login(
+  // ログイン処理を実行（業務単位）
+  await loginFlow.login(
     users.standard.username,
     users.standard.password
   );
 
-  // 商品一覧ページへ遷移確認
+  // 商品一覧ページへ遷移していることを確認
   await expect(page).toHaveURL(/inventory/);
 
-  // 商品一覧表示確認
+  // 商品一覧が表示されていることを確認
   await expect(page.locator('.inventory_list')).toBeVisible();
-
 });

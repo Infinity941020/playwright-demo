@@ -1,22 +1,15 @@
-// Playwrightのテスト機能とexpectを使用
+// Playwrightのテスト機能とexpectをインポート
 import { test, expect } from '../../fixtures/loginFixture';
 
-// 商品一覧ページ（Page Object）
+// CartFlow（カート業務フロー）をインポート
+import { CartFlow } from '../../flows/CartFlow';
+
+// InventoryPage（商品追加用のUI操作）をインポート
 import { InventoryPage } from '../../pages/InventoryPage';
-
-// カートページ（Page Object）
-import { CartPage } from '../../pages/CartPage';
-
-// ヘッダーコンポーネント（バッジ管理）
-import { HeaderComponent } from '../../pages/HeaderComponent';
 
 /*
 ================================
-カート機能 E2Eテスト（fixture統一版）
-================================
-InventoryPage：商品操作
-CartPage：カート操作
-HeaderComponent：バッジ表示管理
+カート機能 E2Eテスト（Flow統一版）
 ================================
 */
 
@@ -27,15 +20,21 @@ test.describe('カート機能テスト', () => {
   パターン①：単一商品追加
   ================================
   */
-  test('パターン①：商品を1つカートに追加できること', async ({ loggedPage }) => {
+  test('商品を1つカートに追加できること', async ({ loggedPage }) => {
 
+    // Flow生成
+    const cartFlow = new CartFlow(loggedPage);
+
+    // 商品追加（InventoryはUI操作として最小利用）
     const inventory = new InventoryPage(loggedPage);
-    const header = new HeaderComponent(loggedPage);
-
     await inventory.goto();
     await inventory.addFirstItem();
 
-    await header.expectBadgeCount(1);
+    // カートへ遷移
+    await cartFlow.openCart();
+
+    // 商品数確認（Flow経由）
+    await cartFlow['cartPage'].expectItemCount(1);
   });
 
   /*
@@ -43,38 +42,38 @@ test.describe('カート機能テスト', () => {
   パターン②：複数商品追加
   ================================
   */
-  test('パターン②：複数商品をカートに追加できること', async ({ loggedPage }) => {
+  test('複数商品をカートに追加できること', async ({ loggedPage }) => {
 
+    const cartFlow = new CartFlow(loggedPage);
     const inventory = new InventoryPage(loggedPage);
-    const header = new HeaderComponent(loggedPage);
 
     await inventory.goto();
 
     const count = await inventory.addAllItems();
 
-    await header.expectBadgeCount(count);
+    await cartFlow.openCart();
+
+    await cartFlow['cartPage'].expectItemCount(count);
   });
 
-/*
-===============================
-パターン③：カート内の商品件数確認
-===============================
-*/
-test('パターン③：カートに追加した商品が正しく表示されること', async ({ loggedPage }) => {
+  /*
+  ================================
+  パターン③：削除確認
+  ================================
+  */
+  test('カート内商品の削除ができること', async ({ loggedPage }) => {
 
+    const cartFlow = new CartFlow(loggedPage);
     const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
 
     await inventory.goto();
     await inventory.addFirstItem();
 
-    await cart.goto();
+    await cartFlow.openCart();
 
-    await expect(loggedPage.locator('.cart_item')).toHaveCount(1);
+    await cartFlow.removeFirstItem();
 
-    await cart.removeFirstItem();
-
-    await expect(loggedPage.locator('.cart_item')).toHaveCount(0);
+    await cartFlow['cartPage'].expectItemCount(0);
   });
 
 });
