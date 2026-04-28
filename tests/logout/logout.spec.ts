@@ -1,46 +1,38 @@
-// Playwrightのテスト機能とexpectを使用
-import { test, expect } from '@playwright/test';
+// Playwright fixture（ログイン状態共通）
+import { test } from '../../fixtures/loginFixture';
 
-// URL定義を読み込み
-import { urls } from '../../utils/urls';
+// LogoutFlow
+import { LogoutFlow } from '../../flows/LogoutFlow';
 
-// ログアウト機能テスト
-test('ログイン後にログアウトできること', async ({ page }) => {
+/*
+================================
+Logoutテスト（Flow版）
+================================
+*/
+test.describe('Logout機能テスト（Flow版）', () => {
 
-  // ログイン画面へアクセス
-  await page.goto(urls.login);
+  let flow: LogoutFlow;
 
-  // ユーザーID入力
-  await page.fill('#user-name', 'standard_user');
+  /*
+  ================================
+  前処理
+  ================================
+  */
+  test.beforeEach(async ({ loggedPage }) => {
 
-  // パスワード入力
-  await page.fill('#password', 'secret_sauce');
+    // Flow初期化
+    flow = new LogoutFlow(loggedPage);
+  });
 
-  // ログインボタン押下
-  await page.click('#login-button');
+  /*
+  ================================
+  ログイン後にログアウトできること
+  ================================
+  */
+  test('ログイン後にログアウトできること', async () => {
 
-  // 商品一覧画面へ遷移完了まで待機
-  await page.waitForURL('**/inventory.html');
-
-  // 商品一覧表示確認
-  await expect(page.locator('.inventory_list')).toBeVisible();
-
-  // ハンバーガーメニュー表示確認
-  await expect(page.locator('#react-burger-menu-btn')).toBeVisible();
-
-  // メニューを開く
-  await page.click('#react-burger-menu-btn');
-
-  // Logoutリンク表示待機
-  await expect(page.locator('#logout_sidebar_link')).toBeVisible();
-
-  // Logout押下
-  await page.click('#logout_sidebar_link');
-
-  // ログイン画面へ戻ったことを確認
-  await page.waitForURL('**/');
-
-  // ログインボタン表示確認
-  await expect(page.locator('#login-button')).toBeVisible();
+    // ログアウト実行
+    await flow.logout();
+  });
 
 });
