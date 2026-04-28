@@ -6,7 +6,7 @@ import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
 ================================
-Checkout異常系テスト（Flow統一版）
+Checkout異常系テスト（Flow版）
 入力バリデーション検証
 ================================
 */
@@ -14,20 +14,13 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
-  /*
-  ================================
-  前処理（最小化）
-  ================================
-  */
   test.beforeEach(async ({ loggedPage }) => {
-
-    // Flow初期化
     flow = new CheckoutFlow(loggedPage);
   });
 
   /*
   ================================
-  テストデータ
+  テストケース
   ================================
   */
   const cases = [
@@ -66,15 +59,21 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
     test(data.title, async () => {
 
-      // 前提構築（商品追加〜Checkout開始まで全部）
-      await flow.prepareCheckoutWithItem('single');
+      // ================================
+      // Flow（今の粒度に統一）
+      // ================================
 
-      // 入力バリデーション検証
-      await flow.expectValidationError(
+      await flow.addItems('single');
+      await flow.goToCart();
+      await flow.goToCheckoutStepOne();
+
+      await flow.fillCheckoutInfo(
         data.first,
         data.last,
         data.zip
       );
+
+      await flow.continueExpectError();
     });
   }
 

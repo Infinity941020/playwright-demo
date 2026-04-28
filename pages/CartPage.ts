@@ -103,4 +103,14 @@ export class CartPage {
       await buttons.first().click();
     }
   }
+
+  async backToInventory() {
+  const btn = this.page.locator('[data-test="continue-shopping"], #continue-shopping');
+
+  await btn.waitFor({ state: 'visible' });
+  await btn.click();
+
+  await this.page.waitForURL(/inventory/);
+  }
+
 }

@@ -7,17 +7,24 @@
 ### ■ Before
 - Checkout / Login / Cart / Logout のテスト構造が画面単位で分断されていた
 - cancel処理や遷移系テストがPage依存で不安定
+- Checkoutテストにおいて状態前提の不足により一部ケースがタイムアウト発生
 
 ### ■ Action（実施内容）
-- Logout機能のFlow化（LogoutFlow導入）
-- Login / Cart機能のFlow層導入
-- Checkoutキャンセル系のリファクタリング
-- Page ObjectとFlow層の責務分離
+- CheckoutFlowの構造整理（責務の明確化）
+  - Setup / Action / Assertの分離整理
+- CheckoutPageの待機処理・遷移処理の安定化
+  - `waitForURL` ベースへ統一
+- Checkoutキャンセル系テストの前提状態修正
+  - カート遷移 → 操作の明示化
+- 異常系・正常系・キャンセル系のFlow統一適用
+- 不要な状態依存（Flow内の状態生成ロジック）を削除しテスト側へ移譲
 
 ### ■ Result（成果）
-- 全30件テストが安定稼働（ローカル / CI）
-- テストシナリオの再利用性向上
-- E2Eフローの構造統一（操作ベース → フロー設計）
+- Checkout含む全15件テストが安定稼働（ローカル）
+- cancel系テストのtimeout問題を解消
+- Flowの責務が「操作レイヤー」に統一
+- テストの前提状態が明確化され再現性向上
+- E2E構造が「状態生成 → 操作 → 検証」に整理された
 
 ---
 
