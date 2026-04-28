@@ -4,8 +4,6 @@
 
 ## 2026-04-28
 
-## 2026-04-28
-
 ### ■ Before
 - Checkout / Login / Cart / Logout のテスト構造が画面単位で分断されていた
 - cancel処理や遷移系テストがPage依存で不安定
