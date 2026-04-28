@@ -1,110 +1,93 @@
-// Playwrightのテスト機能とexpectを使用（ログイン状態はfixtureで管理）
-import { test, expect } from '../../fixtures/loginFixture';
+// Playwright fixture（ログイン状態共通）
+import { test } from '../../fixtures/loginFixture';
 
-// Page Object（画面操作の分離）
-import { InventoryPage } from '../../pages/InventoryPage';
-import { CartPage } from '../../pages/CartPage';
-import { CheckoutPage } from '../../pages/CheckoutPage';
+// CheckoutFlow（統一レイヤー）
+import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
 ================================
-Checkoutキャンセル系テスト
-各画面での戻り動作を検証
+Checkoutキャンセル系テスト（Flow版）
 ================================
 */
-test.describe('Checkoutキャンセル系テスト（fixture統一版）', () => {
+test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
+
+  let flow: CheckoutFlow;
 
   /*
   ================================
-  ① カート → 商品一覧へ戻る
+  前処理
   ================================
   */
-  test('① カート画面から商品一覧へ戻る', async ({ loggedPage }) => {
+  test.beforeEach(async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await cart.continueShopping();
-
-    await expect(loggedPage.locator('.inventory_list')).toBeVisible();
+    // Flow初期化
+    flow = new CheckoutFlow(loggedPage);
   });
 
   /*
   ================================
-  ② Checkout開始直後のキャンセル
+  ① カート画面から商品一覧へ戻る
   ================================
   */
-  test('② Checkout開始直後にカートへ戻る', async ({ loggedPage }) => {
+  test('① カート画面から商品一覧へ戻る', async () => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // カート画面まで準備
+    await flow.prepareCartWithItem('single');
 
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await checkout.startCheckout();
-
-    await checkout.cancel();
-
-    await expect(loggedPage.locator('.cart_list')).toBeVisible();
+    // 一覧へ戻る
+    await flow.cancelFromCart();
   });
 
   /*
   ================================
-  ③ 入力途中でキャンセル
+  ② Checkout開始直後にカートへ戻る
   ================================
   */
-  test('③ 入力途中でカートへ戻る', async ({ loggedPage }) => {
+  test('② Checkout開始直後にカートへ戻る', async () => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // Step1まで準備
+    await flow.prepareCheckoutWithItem('single');
 
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await checkout.startCheckout();
-
-    await checkout.fillInfo('Taro', '', '');
-
-    await checkout.cancel();
-
-    await expect(loggedPage.locator('.cart_list')).toBeVisible();
+    // カートへ戻る
+    await flow.cancelFromStepOne();
   });
 
   /*
   ================================
-  ④ 入力完了後のキャンセル
+  ③ 入力途中でカートへ戻る
   ================================
   */
-  test('④ 入力完了後にカートへ戻る', async ({ loggedPage }) => {
+  test('③ 入力途中でカートへ戻る', async () => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // Step1まで準備
+    await flow.prepareCheckoutWithItem('single');
 
-    await inventory.goto();
-    await inventory.addFirstItem();
+    // 一部入力
+    await flow.fillCheckoutInfo('Taro', '', '');
 
-    await cart.goto();
+    // カートへ戻る
+    await flow.cancelFromStepOne();
+  });
 
-    await checkout.startCheckout();
+  /*
+  ================================
+  ④ 入力完了後にカートへ戻る
+  ================================
+  */
+  test('④ 入力完了後にカートへ戻る', async () => {
 
-    await checkout.fillInfo('Taro', 'Yamada', '12345');
+    // Step1まで準備
+    await flow.prepareCheckoutWithItem('single');
 
-    await checkout.cancel();
+    // 全入力
+    await flow.fillCheckoutInfo(
+      'Taro',
+      'Yamada',
+      '12345'
+    );
 
-    await expect(loggedPage.locator('.cart_list')).toBeVisible();
+    // カートへ戻る
+    await flow.cancelFromStepOne();
   });
 
   /*
@@ -112,24 +95,13 @@ test.describe('Checkoutキャンセル系テスト（fixture統一版）', () =>
   ⑤ 確認画面から商品一覧へ戻る
   ================================
   */
-  test('⑤ 確認画面から商品一覧へ戻る', async ({ loggedPage }) => {
+  test('⑤ 確認画面から商品一覧へ戻る', async () => {
 
-    const inventory = new InventoryPage(loggedPage);
-    const cart = new CartPage(loggedPage);
-    const checkout = new CheckoutPage(loggedPage);
+    // Step2まで準備
+    await flow.prepareCheckoutStepTwo('single');
 
-    await inventory.goto();
-    await inventory.addFirstItem();
-
-    await cart.goto();
-
-    await checkout.startCheckout();
-    await checkout.fillInfo('Taro', 'Yamada', '12345');
-    await checkout.continue();
-
-    await checkout.cancel();
-
-    await expect(loggedPage.locator('.inventory_list')).toBeVisible();
+    // 一覧へ戻る
+    await flow.cancelFromStepTwo();
   });
 
 });

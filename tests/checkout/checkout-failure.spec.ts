@@ -1,56 +1,33 @@
-// Playwrightのfixtureを使用（ログイン状態は共通化）
+// Playwrightのfixture（ログイン状態共通）
 import { test } from '../../fixtures/loginFixture';
 
-// Page Object（画面操作を分離）
-import { InventoryPage } from '../../pages/InventoryPage';
-import { CartPage } from '../../pages/CartPage';
-import { CheckoutPage } from '../../pages/CheckoutPage';
+// CheckoutFlow（統一レイヤー）
+import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
 ================================
-Checkout異常系テスト（data-driven構成）
-入力バリデーションの検証
+Checkout異常系テスト（Flow統一版）
+入力バリデーション検証
 ================================
 */
-test.describe('Checkout異常系テスト（fixture統一版）', () => {
+test.describe('Checkout異常系テスト（Flow版）', () => {
+
+  let flow: CheckoutFlow;
 
   /*
   ================================
-  Page Object（共通利用）
-  ================================
-  */
-  let inventory: InventoryPage;
-  let cart: CartPage;
-  let checkout: CheckoutPage;
-
-  /*
-  ================================
-  各テスト前処理
+  前処理（最小化）
   ================================
   */
   test.beforeEach(async ({ loggedPage }) => {
 
-    // Page Object初期化
-    inventory = new InventoryPage(loggedPage);
-    cart = new CartPage(loggedPage);
-    checkout = new CheckoutPage(loggedPage);
-
-    // 商品一覧画面へ遷移
-    await inventory.goto();
-
-    // テストデータ準備（商品を1件追加）
-    await inventory.addFirstItem();
-
-    // カート画面へ移動
-    await cart.goto();
-
-    // Checkout画面へ遷移
-    await checkout.startCheckout();
+    // Flow初期化
+    flow = new CheckoutFlow(loggedPage);
   });
 
   /*
   ================================
-  テストデータ（入力バリデーションパターン）
+  テストデータ
   ================================
   */
   const cases = [
@@ -82,22 +59,22 @@ test.describe('Checkout異常系テスト（fixture統一版）', () => {
 
   /*
   ================================
-  data-driven実行（入力エラー検証）
+  data-driven実行
   ================================
   */
   for (const data of cases) {
 
     test(data.title, async () => {
 
-      // フォーム入力
-      await checkout.fillInfo(
+      // 前提構築（商品追加〜Checkout開始まで全部）
+      await flow.prepareCheckoutWithItem('single');
+
+      // 入力バリデーション検証
+      await flow.expectValidationError(
         data.first,
         data.last,
         data.zip
       );
-
-      // エラー表示を伴う遷移を検証
-      await checkout.continueExpectError();
     });
   }
 
