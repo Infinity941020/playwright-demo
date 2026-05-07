@@ -1,70 +1,91 @@
-// Playwrightのページコンテキスト（各画面操作の起点となるブラウザページ）
+// PlaywrightのPage
 import { Page } from '@playwright/test';
 
-// カート画面のUI操作を担当するPage Object
+// Page Object
 import { CartPage } from '../pages/CartPage';
-
-// ヘッダー領域（カートバッジなど）のUI検証用コンポーネント
+import { InventoryPage } from '../pages/InventoryPage';
 import { HeaderComponent } from '../pages/HeaderComponent';
 
-/**
- * CartFlow（業務フロー層）
- *
- * カート操作を単なるUI操作ではなく、
- * 「業務シナリオ単位」で扱うための抽象レイヤー
- *
- * 例：
- * - 商品削除 → バッジ状態確認
- * - カート全削除 → 空状態確認
- */
+/*
+================================
+CartFlow（最終完成版）
+責務：
+- 業務シナリオのみ提供
+- Page Objectの隠蔽
+- specからUI詳細を排除
+================================
+*/
 export class CartFlow {
 
   private cartPage: CartPage;
+  private inventory: InventoryPage;
   private header: HeaderComponent;
 
   constructor(page: Page) {
     this.cartPage = new CartPage(page);
+    this.inventory = new InventoryPage(page);
     this.header = new HeaderComponent(page);
   }
 
-  // カート画面へ遷移
+  // ================================
+  // ■ 状態作成（Arrange）
+  // ================================
+
+  async addItems(type: 'single' | 'multi' = 'single'): Promise<number> {
+
+    await this.inventory.goto();
+
+    if (type === 'single') {
+      await this.inventory.addFirstItem();
+      return 1;
+    }
+
+    const count = await this.inventory.addAllItems();
+    return count;
+  }
+
+  // ================================
+  // ■ 画面遷移
+  // ================================
+
   async openCart() {
     await this.cartPage.goto();
   }
 
   // ================================
-  // 互換メソッド（spec互換維持）
+  // ■ 操作（Act）
   // ================================
 
-  // バッジ件数確認
-  async expectBadgeCount(expectedCount: number) {
-    await this.header.expectBadgeCount(expectedCount);
-  }
-
-  // 先頭商品削除
   async removeFirstItem() {
     await this.cartPage.removeFirstItem();
   }
 
-  // 全商品削除
   async clearCart() {
     await this.cartPage.removeAllItems();
   }
 
-  // 商品削除 → バッジが0になることを確認
-  async removeItemAndVerifyBadge() {
-    await this.cartPage.removeFirstItem();
-    await this.header.expectBadgeCount(0);
+  async continueShopping() {
+    await this.cartPage.continueShopping();
   }
 
-  // 全削除 → カート空状態（バッジ非表示）を確認
-  async clearCartAndVerifyEmpty() {
+  // ================================
+  // ■ 検証（Assert）
+  // ================================
+
+  async expectBadgeCount(expected: number) {
+    await this.header.expectBadgeCount(expected);
+  }
+
+  async expectItemCount(expected: number) {
+    await this.cartPage.expectItemCount(expected);
+  }
+
+  // ================================
+  // ■ シナリオ系（必要最小限）
+  // ================================
+
+  async removeAllAndVerifyEmpty() {
     await this.cartPage.removeAllItems();
     await this.header.expectBadgeCount(0);
-  }
-
-  // カート件数の状態確認（汎用チェック）
-  async verifyCartState(expectedCount: number) {
-    await this.header.expectBadgeCount(expectedCount);
   }
 }

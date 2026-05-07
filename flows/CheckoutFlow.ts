@@ -8,11 +8,12 @@ import { CheckoutPage } from '../pages/CheckoutPage';
 
 /*
 ================================
-CheckoutFlow（安定版）
+CheckoutFlow（完全統一版・最終安定）
+================================
 責務：
-- 状態を作らない
-- シナリオを持たない
-- 操作のみ提供
+- 業務単位の操作のみ提供
+- 状態生成・遷移・入力・完了操作に統一
+- spec互換をFlow側で完全吸収
 ================================
 */
 export class CheckoutFlow {
@@ -28,45 +29,70 @@ export class CheckoutFlow {
   }
 
   // =================================================
-  // ■ Setup系（状態を作るだけ）
+  // ■ 状態生成（商品準備）
   // =================================================
 
-  async addItems(count: 'single' | 'multi' = 'single') {
+  async addSingleItem() {
     await this.inventory.goto();
+    await this.inventory.addFirstItem();
+  }
 
-    if (count === 'single') {
-      await this.inventory.addFirstItem();
+  async addMultipleItems() {
+    await this.inventory.goto();
+    await this.inventory.addAllItems();
+  }
+
+  // =================================================
+  // ■ 旧仕様互換（既存spec対応）
+  // =================================================
+
+  async addItems(type: 'single' | 'multi' = 'single') {
+    if (type === 'single') {
+      await this.addSingleItem();
     } else {
-      await this.inventory.addAllItems();
+      await this.addMultipleItems();
     }
   }
+
+  async addItemsLegacy(type: 'single' | 'multi' = 'single') {
+    return this.addItems(type);
+  }
+
+  // Checkout spec互換
+  async goToCheckoutStepOne() {
+    await this.checkout.startCheckout();
+  }
+
+  async goToCheckoutStepTwo() {
+    await this.checkout.continue();
+  }
+
+  // =================================================
+  // ■ 遷移（業務フロー）
+  // =================================================
 
   async goToCart() {
     await this.cart.goto();
   }
 
-  async startCheckoutFromCart() {
+  async startCheckout() {
     await this.checkout.startCheckout();
   }
 
-  async proceedToCheckoutStepTwo() {
-    await this.checkout.continue();
-  }
-
   // =================================================
-  // ■ Action系（操作のみ）
+  // ■ 入力操作
   // =================================================
 
   async fillCheckoutInfo(first: string, last: string, zip: string) {
     await this.checkout.fillInfo(first, last, zip);
   }
 
+  // =================================================
+  // ■ 実行操作
+  // =================================================
+
   async continueCheckout() {
     await this.checkout.continue();
-  }
-
-  async continueExpectError() {
-    await this.checkout.continueExpectError();
   }
 
   async finishCheckout() {
@@ -74,7 +100,15 @@ export class CheckoutFlow {
   }
 
   // =================================================
-  // ■ Cancel系（状態依存しない単体操作）
+  // ■ エラー系操作
+  // =================================================
+
+  async continueExpectError() {
+    await this.checkout.continueExpectError();
+  }
+
+  // =================================================
+  // ■ キャンセル系
   // =================================================
 
   async cancelFromStepOne() {
@@ -85,26 +119,15 @@ export class CheckoutFlow {
     await this.checkout.cancelFromStepTwo();
   }
 
+  async cancelFromCart() {
+    await this.cart.backToInventory();
+  }
+
   // =================================================
-  // ■ Assert系（必要時のみ）
+  // ■ 検証（最小限）
   // =================================================
 
   async expectComplete() {
     await this.checkout.expectComplete();
-  }
-
-  async goToCheckoutStepOne() {
-  await this.checkout.startCheckout();
-  }
-
-  async goToCheckoutStepTwo() {
-  await this.checkout.continue();
-  }
-
-// =================================================
-// ■ カート → 商品一覧へ戻る（状態前提版）
-// =================================================
-  async cancelFromCart() {
-  await this.cart.backToInventory();
   }
 }

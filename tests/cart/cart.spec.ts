@@ -1,10 +1,10 @@
 // Playwrightのテスト機能とexpectをインポート
-import { test, expect } from '../../fixtures/loginFixture';
+import { test } from '../../fixtures/loginFixture';
 
 // CartFlow（カート業務フロー）をインポート
 import { CartFlow } from '../../flows/CartFlow';
 
-// InventoryPage（商品追加用のUI操作）をインポート
+// InventoryPage（商品追加用のUI操作）
 import { InventoryPage } from '../../pages/InventoryPage';
 
 /*
@@ -22,19 +22,15 @@ test.describe('カート機能テスト', () => {
   */
   test('商品を1つカートに追加できること', async ({ loggedPage }) => {
 
-    // Flow生成
     const cartFlow = new CartFlow(loggedPage);
-
-    // 商品追加（InventoryはUI操作として最小利用）
     const inventory = new InventoryPage(loggedPage);
+
     await inventory.goto();
     await inventory.addFirstItem();
 
-    // カートへ遷移
     await cartFlow.openCart();
 
-    // 商品数確認（Flow経由）
-    await cartFlow['cartPage'].expectItemCount(1);
+    await cartFlow.expectItemCount(1);
   });
 
   /*
@@ -53,7 +49,7 @@ test.describe('カート機能テスト', () => {
 
     await cartFlow.openCart();
 
-    await cartFlow['cartPage'].expectItemCount(count);
+    await cartFlow.expectItemCount(count);
   });
 
   /*
@@ -73,7 +69,7 @@ test.describe('カート機能テスト', () => {
 
     await cartFlow.removeFirstItem();
 
-    await cartFlow['cartPage'].expectItemCount(0);
+    await cartFlow.expectItemCount(0);
   });
 
 });

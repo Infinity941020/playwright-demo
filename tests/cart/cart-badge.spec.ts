@@ -1,9 +1,6 @@
 // Playwrightテスト機能（fixture版）を使用
 import { test } from '../../fixtures/loginFixture';
 
-// Inventory操作（商品追加）
-import { InventoryPage } from '../../pages/InventoryPage';
-
 // CartFlow（業務フロー）
 import { CartFlow } from '../../flows/CartFlow';
 
@@ -22,11 +19,9 @@ test.describe('カートバッジ検証テスト', () => {
   */
   test('① 1件追加時のバッジ表示確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    await inventory.goto();
-    await inventory.addFirstItem();
+    await cartFlow.addItems('single');
 
     await cartFlow.expectBadgeCount(1);
   });
@@ -38,12 +33,9 @@ test.describe('カートバッジ検証テスト', () => {
   */
   test('② 全件追加時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    await inventory.goto();
-
-    const count = await inventory.addAllItems();
+    const count = await cartFlow.addItems('multi');
 
     await cartFlow.expectBadgeCount(count);
   });
@@ -55,14 +47,12 @@ test.describe('カートバッジ検証テスト', () => {
   */
   test('③ 1件削除時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    await inventory.goto();
-
-    const count = await inventory.addAllItems();
+    const count = await cartFlow.addItems('multi');
 
     await cartFlow.openCart();
+
     await cartFlow.removeFirstItem();
 
     await cartFlow.expectBadgeCount(count - 1);
@@ -75,12 +65,9 @@ test.describe('カートバッジ検証テスト', () => {
   */
   test('④ 2件削除時のバッジ件数確認', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    await inventory.goto();
-
-    const count = await inventory.addAllItems();
+    const count = await cartFlow.addItems('multi');
 
     await cartFlow.openCart();
 
@@ -97,14 +84,12 @@ test.describe('カートバッジ検証テスト', () => {
   */
   test('⑤ 全件削除時はバッジが非表示になる', async ({ loggedPage }) => {
 
-    const inventory = new InventoryPage(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    await inventory.goto();
-
-    await inventory.addAllItems();
+    await cartFlow.addItems('multi');
 
     await cartFlow.openCart();
+
     await cartFlow.clearCart();
 
     await cartFlow.expectBadgeCount(0);
