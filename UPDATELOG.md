@@ -1,5 +1,32 @@
 # UPDATE LOG
+---
 
+## 2026-05-07
+
+### ■ Before
+- CartFlowとspec間で責務不整合が発生していた
+- Cart系テストで未実装メソッド呼び出しエラーが発生していた
+- addAllItems() 実行時に並列実行環境でタイムアウトが発生していた
+- LoginFlowのファイル命名が他Flowと不統一だった
+
+### ■ Action（実施内容）
+- CartFlowへ不足メソッドを追加
+  - expectBadgeCount
+  - removeFirstItem
+  - clearCart
+- InventoryPage.addAllItems() をlocator再取得型へ修正
+- Cart系テストの安定化対応
+- login.flow.ts を LoginFlow.ts へリネーム
+- Login系specのimport修正
+- 全体影響範囲調査を実施
+- 全体回帰テスト実施（30件）
+
+### ■ Result（成果）
+- Cart系テスト全8件が安定稼働
+- LoginFlow命名規則を統一
+- 全30件テスト成功（ローカル / CI）
+- Flow層とspec間の整合性向上
+- 並列実行時の安定性改善
 ---
 
 ## 2026-04-28
