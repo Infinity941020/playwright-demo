@@ -1,20 +1,28 @@
-// PlaywrightのPage型を使用
-import { Page, expect } from '@playwright/test';
+// Playwrightのページコンテキスト（各画面操作の起点となるブラウザページ）
+import { Page } from '@playwright/test';
 
-// CartPage（UI操作）
+// カート画面のUI操作を担当するPage Object
 import { CartPage } from '../pages/CartPage';
 
-// HeaderComponent（バッジ確認用）
+// ヘッダー領域（カートバッジなど）のUI検証用コンポーネント
 import { HeaderComponent } from '../pages/HeaderComponent';
 
-// カート業務フロー
+/**
+ * CartFlow（業務フロー層）
+ *
+ * カート操作を単なるUI操作ではなく、
+ * 「業務シナリオ単位」で扱うための抽象レイヤー
+ *
+ * 例：
+ * - 商品削除 → バッジ状態確認
+ * - カート全削除 → 空状態確認
+ */
 export class CartFlow {
 
   private cartPage: CartPage;
   private header: HeaderComponent;
 
   constructor(page: Page) {
-
     this.cartPage = new CartPage(page);
     this.header = new HeaderComponent(page);
   }
@@ -24,23 +32,39 @@ export class CartFlow {
     await this.cartPage.goto();
   }
 
-  // 商品1件削除
+  // ================================
+  // 互換メソッド（spec互換維持）
+  // ================================
+
+  // バッジ件数確認
+  async expectBadgeCount(expectedCount: number) {
+    await this.header.expectBadgeCount(expectedCount);
+  }
+
+  // 先頭商品削除
   async removeFirstItem() {
     await this.cartPage.removeFirstItem();
   }
 
-  // 全削除
+  // 全商品削除
   async clearCart() {
     await this.cartPage.removeAllItems();
   }
 
-  // バッジ件数確認（Flowに統一）
-  async expectBadgeCount(count: number) {
-    await this.header.expectBadgeCount(count);
+  // 商品削除 → バッジが0になることを確認
+  async removeItemAndVerifyBadge() {
+    await this.cartPage.removeFirstItem();
+    await this.header.expectBadgeCount(0);
   }
 
-  // 商品追加後のバッジ確認（任意ラップ）
-  async expectBadgeAfterAdd(count: number) {
-    await this.header.expectBadgeCount(count);
+  // 全削除 → カート空状態（バッジ非表示）を確認
+  async clearCartAndVerifyEmpty() {
+    await this.cartPage.removeAllItems();
+    await this.header.expectBadgeCount(0);
+  }
+
+  // カート件数の状態確認（汎用チェック）
+  async verifyCartState(expectedCount: number) {
+    await this.header.expectBadgeCount(expectedCount);
   }
 }

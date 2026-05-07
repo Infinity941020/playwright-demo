@@ -9,13 +9,11 @@ export class InventoryPage {
   ================================
   */
   async goto() {
-    // 商品一覧ページへ遷移
-    await this.page.goto('https://www.saucedemo.com/inventory.html');
 
-    // ページ表示保証（URLチェック）
+    // URL確認のみ
     await expect(this.page).toHaveURL(/inventory/);
 
-    // 商品ボタンが描画されていることを保証
+    // 商品ボタン表示確認
     await expect(this.page.locator('[data-test^="add-to-cart"]').first())
       .toBeVisible();
   }
