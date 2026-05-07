@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 
 // ログイン業務フローをインポート
-import { LoginFlow } from '../../flows/login.flow';
+import { LoginFlow } from '../../flows/LoginFlow';
 
 // テストデータをインポート
 import { users } from '../../data/users';
