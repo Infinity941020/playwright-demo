@@ -59,12 +59,13 @@ export class CartPage {
   */
   async removeFirstItem() {
 
+    const removeButtons = this.page.locator('[data-test^="remove"]');
+
     // 削除ボタンが表示されていることを確認
-    await expect(this.page.locator('[data-test^="remove"]').first())
-      .toBeVisible();
+    await expect(removeButtons.first()).toBeVisible();
 
     // 1件目削除
-    await this.page.locator('[data-test^="remove"]').first().click();
+    await removeButtons.first().click();
   }
 
   /*
@@ -74,12 +75,13 @@ export class CartPage {
   */
   async continueShopping() {
 
-    // Continue Shoppingボタン表示確認
-    await expect(this.page.locator('[data-test="continue-shopping"]'))
-      .toBeVisible();
+    const btn = this.page.locator('[data-test="continue-shopping"]');
+
+    // ボタン表示確認
+    await expect(btn).toBeVisible();
 
     // ボタン押下
-    await this.page.locator('[data-test="continue-shopping"]').click();
+    await btn.click();
 
     // 一覧画面遷移確認
     await expect(this.page).toHaveURL(/inventory/);
@@ -92,25 +94,29 @@ export class CartPage {
   */
   async removeAllItems() {
 
-    // 削除ボタン取得
     const buttons = this.page.locator('[data-test^="remove"]');
 
-    // 件数取得
     const count = await buttons.count();
 
-    // 先頭から順番に削除
     for (let i = 0; i < count; i++) {
       await buttons.first().click();
     }
   }
 
+  /*
+  ================================
+  カート→一覧戻り（旧互換）
+  ================================
+  */
   async backToInventory() {
-  const btn = this.page.locator('[data-test="continue-shopping"], #continue-shopping');
 
-  await btn.waitFor({ state: 'visible' });
-  await btn.click();
+    const btn = this.page.locator(
+      '[data-test="continue-shopping"], #continue-shopping'
+    );
 
-  await this.page.waitForURL(/inventory/);
+    await btn.waitFor({ state: 'visible' });
+    await btn.click();
+
+    await this.page.waitForURL(/inventory/);
   }
-
 }

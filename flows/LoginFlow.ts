@@ -16,7 +16,14 @@ LoginFlow（最終統一版）
 
 export class LoginFlow {
 
+  // LoginPageインスタンス（UI操作担当）
   private loginPage: LoginPage;
+
+  /*
+  ================================
+  コンストラクタ
+  ================================
+  */
 
   constructor(page: Page) {
 
@@ -28,6 +35,8 @@ export class LoginFlow {
   ■ 業務操作
   ================================
   */
+
+  // ログイン実行（業務操作）
   async login(username: string, password: string) {
 
     await this.loginPage.goto();
@@ -36,32 +45,25 @@ export class LoginFlow {
 
   /*
   ================================
-  ■ 検証
+  ■ 検証（業務レベル）
   ================================
   */
 
+  // ログイン失敗検証
   async expectLoginError() {
 
     await this.loginPage.expectErrorVisible();
   }
 
+  // ログイン成功検証
   async expectLoginSuccess() {
 
     await this.loginPage.expectOnInventoryPage();
   }
 
+  // ログイン画面表示確認
   async expectOnLoginPage() {
 
     await this.loginPage.expectOnLoginPage();
-  }
-
-  /*
-  ================================
-  ■ 互換用（旧spec対応）
-  ================================
-  */
-  getPage(): LoginPage {
-
-    return this.loginPage;
   }
 }
