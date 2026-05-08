@@ -36,12 +36,17 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
     test(item.title, async () => {
 
       // =========================
-      // Flow分解型（新粒度）
+      // Flow分解型（正式API統一）
       // =========================
 
-      await flow.addItems(item.type);
+      if (item.type === 'single') {
+        await flow.addSingleItem();
+      } else {
+        await flow.addMultipleItems();
+      }
+
       await flow.goToCart();
-      await flow.goToCheckoutStepOne();
+      await flow.startCheckout();
 
       await flow.fillCheckoutInfo(
         'Taro',

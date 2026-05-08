@@ -1,15 +1,12 @@
-// Playwrightのテスト機能とexpectをインポート
+// Playwrightのテスト機能（fixture版）
 import { test } from '../../fixtures/loginFixture';
 
-// CartFlow（カート業務フロー）をインポート
+// CartFlow（カート業務フロー）
 import { CartFlow } from '../../flows/CartFlow';
-
-// InventoryPage（商品追加用のUI操作）
-import { InventoryPage } from '../../pages/InventoryPage';
 
 /*
 ================================
-カート機能 E2Eテスト（Flow統一版）
+カート機能 E2Eテスト（Flow完全統一版）
 ================================
 */
 
@@ -23,10 +20,8 @@ test.describe('カート機能テスト', () => {
   test('商品を1つカートに追加できること', async ({ loggedPage }) => {
 
     const cartFlow = new CartFlow(loggedPage);
-    const inventory = new InventoryPage(loggedPage);
 
-    await inventory.goto();
-    await inventory.addFirstItem();
+    await cartFlow.addItems('single');
 
     await cartFlow.openCart();
 
@@ -41,11 +36,8 @@ test.describe('カート機能テスト', () => {
   test('複数商品をカートに追加できること', async ({ loggedPage }) => {
 
     const cartFlow = new CartFlow(loggedPage);
-    const inventory = new InventoryPage(loggedPage);
 
-    await inventory.goto();
-
-    const count = await inventory.addAllItems();
+    const count = await cartFlow.addItems('multi');
 
     await cartFlow.openCart();
 
@@ -60,10 +52,8 @@ test.describe('カート機能テスト', () => {
   test('カート内商品の削除ができること', async ({ loggedPage }) => {
 
     const cartFlow = new CartFlow(loggedPage);
-    const inventory = new InventoryPage(loggedPage);
 
-    await inventory.goto();
-    await inventory.addFirstItem();
+    await cartFlow.addItems('single');
 
     await cartFlow.openCart();
 

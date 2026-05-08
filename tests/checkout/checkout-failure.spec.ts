@@ -60,12 +60,12 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
     test(data.title, async () => {
 
       // ================================
-      // Flow（今の粒度に統一）
+      // Flow（正式API統一）
       // ================================
 
-      await flow.addItems('single');
+      await flow.addSingleItem();
       await flow.goToCart();
-      await flow.goToCheckoutStepOne();
+      await flow.startCheckout();
 
       await flow.fillCheckoutInfo(
         data.first,
