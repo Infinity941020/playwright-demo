@@ -1,5 +1,5 @@
 // Playwrightのテスト機能とアサーション機能をインポート
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 // ログイン業務フローをまとめたFlowクラスをインポート
 import { LoginFlow } from '../../flows/LoginFlow';
@@ -19,15 +19,16 @@ test('ログイン成功して商品一覧が表示されること', async ({ pa
   // ログインフローを生成
   const loginFlow = new LoginFlow(page);
 
-  // ログイン処理を実行（業務単位）
+  // ================================
+  // ■ 業務操作（ログイン実行）
+  // ================================
   await loginFlow.login(
     users.standard.username,
     users.standard.password
   );
 
-  // 商品一覧ページへ遷移していることを確認
-  await expect(page).toHaveURL(/inventory/);
-
-  // 商品一覧が表示されていることを確認
-  await expect(page.locator('.inventory_list')).toBeVisible();
+  // ================================
+  // ■ 検証（業務レベル）
+  // ================================
+  await loginFlow.expectLoginSuccess();
 });
