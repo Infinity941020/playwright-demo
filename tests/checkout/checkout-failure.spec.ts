@@ -14,7 +14,9 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
+  // Flow初期化（ログイン済みページ）
   test.beforeEach(async ({ loggedPage }) => {
+
     flow = new CheckoutFlow(loggedPage);
   });
 
@@ -60,19 +62,32 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
     test(data.title, async () => {
 
       // ================================
-      // Flow（正式API統一）
+      // ■ 商品追加（業務操作）
       // ================================
+      await flow.addItems('single');
 
-      await flow.addSingleItem();
+      // ================================
+      // ■ カート遷移
+      // ================================
       await flow.goToCart();
+
+      // ================================
+      // ■ チェックアウト開始
+      // ================================
       await flow.startCheckout();
 
+      // ================================
+      // ■ 入力
+      // ================================
       await flow.fillCheckoutInfo(
         data.first,
         data.last,
         data.zip
       );
 
+      // ================================
+      // ■ エラー検証
+      // ================================
       await flow.continueExpectError();
     });
   }

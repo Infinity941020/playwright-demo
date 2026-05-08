@@ -13,7 +13,9 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
+  // Flow初期化（ログイン済みページを利用）
   test.beforeEach(async ({ loggedPage }) => {
+
     flow = new CheckoutFlow(loggedPage);
   });
 
@@ -35,28 +37,43 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
 
     test(item.title, async () => {
 
-      // =========================
-      // Flow分解型（正式API統一）
-      // =========================
+      // ================================
+      // ■ 商品追加（業務操作）
+      // ================================
+      await flow.addItems(item.type);
 
-      if (item.type === 'single') {
-        await flow.addSingleItem();
-      } else {
-        await flow.addMultipleItems();
-      }
-
+      // ================================
+      // ■ カート遷移
+      // ================================
       await flow.goToCart();
+
+      // ================================
+      // ■ チェックアウト開始
+      // ================================
       await flow.startCheckout();
 
+      // ================================
+      // ■ 情報入力
+      // ================================
       await flow.fillCheckoutInfo(
         'Taro',
         'Yamada',
         '12345'
       );
 
+      // ================================
+      // ■ 次へ
+      // ================================
       await flow.continueCheckout();
+
+      // ================================
+      // ■ 完了
+      // ================================
       await flow.finishCheckout();
 
+      // ================================
+      // ■ 検証
+      // ================================
       await flow.expectComplete();
     });
   }

@@ -13,7 +13,9 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
+  // Flow初期化（ログイン済みページ）
   test.beforeEach(async ({ loggedPage }) => {
+
     flow = new CheckoutFlow(loggedPage);
   });
 
@@ -22,13 +24,13 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   ① カート画面から商品一覧へ戻る
   ================================
   */
- test('① カート画面から商品一覧へ戻る', async () => {
+  test('① カート画面から商品一覧へ戻る', async () => {
 
-  await flow.addItems('single');
-  await flow.goToCart();
+    await flow.addItems('single');
+    await flow.goToCart();
 
-  await flow.cancelFromCart();
-});
+    await flow.cancelFromCart();
+  });
 
   /*
   ================================
@@ -39,7 +41,8 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
     await flow.addItems('single');
     await flow.goToCart();
-    await flow.goToCheckoutStepOne();
+
+    await flow.startCheckout();
 
     await flow.cancelFromStepOne();
   });
@@ -53,7 +56,8 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
     await flow.addItems('single');
     await flow.goToCart();
-    await flow.goToCheckoutStepOne();
+
+    await flow.startCheckout();
 
     await flow.fillCheckoutInfo(
       'Taro',
@@ -73,7 +77,8 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
     await flow.addItems('single');
     await flow.goToCart();
-    await flow.goToCheckoutStepOne();
+
+    await flow.startCheckout();
 
     await flow.fillCheckoutInfo(
       'Taro',
@@ -93,7 +98,8 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
     await flow.addItems('single');
     await flow.goToCart();
-    await flow.goToCheckoutStepOne();
+
+    await flow.startCheckout();
 
     await flow.fillCheckoutInfo(
       'Taro',
@@ -101,7 +107,7 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
       '12345'
     );
 
-    await flow.goToCheckoutStepTwo();
+    await flow.continueCheckout();
 
     await flow.cancelFromStepTwo();
   });
