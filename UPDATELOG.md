@@ -1,4 +1,76 @@
 # UPDATE LOG
+
+---
+
+## 2026-05-11
+
+### ■ Before
+- CheckoutFlowにおいて業務用語ベースへの命名統一を進行中
+- proceedToOverviewStep / completePurchase など新メソッド体系への移行途中状態
+- checkout-cancel.spec.ts においてFlowメソッド不整合による実行エラーが発生
+- READMEおよびFlow定義間で命名差分が一部残存している状態
+- CI実行自体は安定しているが、Flow層のリファクタ途中段階
+
+---
+
+### ■ Action（実施内容）
+
+#### ■ CheckoutFlow（業務レイヤー統一）
+- Flowメソッド命名の業務用語化を実施
+  - continueCheckout → proceedToOverviewStep
+  - finishCheckout → completePurchase
+- テスト側との整合性を優先し、段階的移行方式を採用
+- cancel系メソッドとの命名体系を整理（Stepベース→業務ステップベースへ移行）
+- Flowの責務を「UI操作隠蔽＋業務フロー統一」に再定義
+
+---
+
+#### ■ Checkoutテスト層
+- checkout-success.spec.ts をFlow新命名へ追従
+- checkout-cancel.spec.ts のFlow呼び出し不整合を修正
+- checkout-failure.spec.ts は既存構造維持のまま動作安定化
+- data-drivenテスト（Checkout成功系）の完全動作を維持
+
+---
+
+#### ■ データ・共通化層
+- checkoutData.ts を利用した入力データの統一を維持
+- テストコード内のハードコード値を削減し、可読性を向上
+
+---
+
+#### ■ CI / 実行安定化
+- ローカル実行：全30テスト PASS確認
+- CI（GitHub Actions）：全テスト PASS確認
+- cancel系テストのフレーク要因を解消（Flowメソッド不整合修正）
+- 並列実行環境下での安定動作を維持
+
+---
+
+### ■ Result（成果）
+
+- CheckoutFlowの業務用語ベース設計への移行を継続し安定化
+- checkout-success / failure / cancel 全テスト正常動作
+- Flowとspec間のメソッド不整合を解消
+- CI / ローカルともに全30テスト安定PASS
+- テスト基盤としての再現性・保守性を維持したままリファクタ継続可能状態へ移行
+
+---
+
+### ■ Overall Status
+
+- E2E基盤：安定運用状態維持
+- Flow設計：業務用語化フェーズ（移行途中）
+- spec構造：Flow依存で安定
+- CI実行：全グリーン維持
+
+---
+
+### ■ Conclusion
+
+本対応により、CheckoutFlowの命名統一およびspecとの整合性調整を実施し、
+E2Eテスト全体は安定稼働状態を維持したままリファクタリングを継続可能な状態となった。
+
 ---
 
 ## 2026-05-08
