@@ -1,60 +1,81 @@
 /*
 ================================
 Playwright設定ファイル
-CI時は安定実行、ローカル時は動画証跡取得
+CI時は安定実行
+ローカル時は証跡取得を強化
 ================================
 */
 
+// Playwright設定定義
 import { defineConfig } from '@playwright/test';
 
+// CI実行判定
 const isCI = !!process.env.CI;
 
 /*
 ================================
 CI安定化 + ローカル証跡強化設定
 ================================
-CI:
-- リトライあり
-- 並列実行
-- 失敗時のみ証跡取得
 
-Local:
-- 成功時も動画取得
-- slowMoで見やすく実行
+■ CI
+- retry有効
+- worker数制御
+- 失敗時のみ証跡保存
+
+■ Local
+- trace常時取得
+- video常時取得
+- slowMo有効
 ================================
 */
-
 export default defineConfig({
 
-  // CIでは失敗リトライ
+  /*
+  ================================
+  テスト実行設定
+  ================================
+  */
+
+  // CI時のみretry有効化
   retries: isCI ? 2 : 0,
 
-  // CIでは並列制御
+  // CI時のみworker数制御
   workers: isCI ? 2 : undefined,
 
-  // タイムアウト
+  // テスト全体タイムアウト
   timeout: 30 * 1000,
 
+  /*
+  ================================
+  ブラウザ実行設定
+  ================================
+  */
   use: {
 
-    // トレース
-    // CI: 初回失敗後の再実行時のみ
+    // trace設定
+    // CI: 初回失敗後のみ取得
     // Local: 常時取得
     trace: isCI ? 'on-first-retry' : 'on',
 
-    // スクリーンショット
+    // スクリーンショット設定
     // CI: 失敗時のみ
-    // Local: 不要のためOFF
-    screenshot: isCI ? 'only-on-failure' : 'off',
+    // Local: OFF
+    screenshot: isCI
+      ? 'only-on-failure'
+      : 'off',
 
-    // 動画
-    // CI: 失敗時のみ保存
-    // Local: 成功時も保存
-    video: isCI ? 'retain-on-failure' : 'on',
+    // 動画設定
+    // CI: 失敗時のみ保持
+    // Local: 常時保存
+    video: isCI
+      ? 'retain-on-failure'
+      : 'on',
 
-    // ローカル実行時のみ速度調整
+    // 起動設定
     launchOptions: {
-      slowMo: isCI ? 0 : 500
-    }
-  }
+
+      // Local時のみslowMo適用
+      slowMo: isCI ? 0 : 500,
+    },
+  },
 });

@@ -23,15 +23,17 @@ export class MenuPage {
   コンストラクタ
   ================================
   */
+
+  // Pageインスタンスを受け取りLocatorを初期化
   constructor(page: Page) {
 
-    // page保持
+    // Playwright Page保持
     this.page = page;
 
-    // メニューボタン
+    // ハンバーガーメニューボタン取得
     this.menuButton = page.locator('#react-burger-menu-btn');
 
-    // Logoutリンク
+    // Logoutリンク取得
     this.logoutLink = page.locator('#logout_sidebar_link');
   }
 
@@ -59,13 +61,19 @@ export class MenuPage {
   */
   async logout() {
 
-    // メニュー開いていなければ開く
+    // メニュー未展開時は開く
     if (!(await this.logoutLink.isVisible())) {
+
       await this.openMenu();
     }
 
     // Logoutリンク押下
     await this.logoutLink.click();
+
+    // ログイン画面へ戻ったこと確認
+    await expect(this.page).toHaveURL(
+      'https://www.saucedemo.com/'
+    );
   }
 
   /*
@@ -75,6 +83,7 @@ export class MenuPage {
   */
   async expectMenuOpened() {
 
+    // Logoutリンク表示確認
     await expect(this.logoutLink).toBeVisible();
   }
 }

@@ -13,10 +13,10 @@ LogoutFlow
 */
 export class LogoutFlow {
 
-  // ログイン画面
+  // LoginPageインスタンス（ログイン画面操作を担当）
   private login: LoginPage;
 
-  // サイドメニュー
+  // MenuPageインスタンス（サイドメニュー操作を担当）
   private menu: MenuPage;
 
   /*
@@ -24,10 +24,14 @@ export class LogoutFlow {
   コンストラクタ
   ================================
   */
+
+  // Pageインスタンスを受け取り各PageObjectを初期化
   constructor(page: Page) {
 
-    // 各Page Object初期化
+    // LoginPage初期化
     this.login = new LoginPage(page);
+
+    // MenuPage初期化
     this.menu = new MenuPage(page);
   }
 
@@ -55,6 +59,7 @@ export class LogoutFlow {
   */
   async expectOnLoginPage() {
 
+    // ログイン画面表示確認
     await this.login.expectOnLoginPage();
   }
 }

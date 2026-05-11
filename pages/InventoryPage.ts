@@ -1,21 +1,44 @@
+// PlaywrightのPage型・expectを使用
 import { Page, expect } from '@playwright/test';
 
+/*
+================================
+InventoryPage
+商品一覧画面操作用 Page Object
+================================
+*/
 export class InventoryPage {
-  constructor(private page: Page) {}
+
+  // Playwright Page保持
+  private page: Page;
 
   /*
   ================================
-  商品一覧画面へ遷移
+  コンストラクタ
+  ================================
+  */
+
+  // Pageインスタンスを受け取り保持
+  constructor(page: Page) {
+
+    // Playwright Page保持
+    this.page = page;
+  }
+
+  /*
+  ================================
+  商品一覧画面表示確認
   ================================
   */
   async goto() {
 
-    // URL確認のみ
+    // inventory画面URL確認
     await expect(this.page).toHaveURL(/inventory/);
 
-    // 商品ボタン表示確認
-    await expect(this.page.locator('[data-test^="add-to-cart"]').first())
-      .toBeVisible();
+    // 商品追加ボタン表示確認
+    await expect(
+      this.page.locator('[data-test^="add-to-cart"]').first()
+    ).toBeVisible();
   }
 
   /*
@@ -25,32 +48,45 @@ export class InventoryPage {
   */
   async addAllItems() {
 
-  // addボタン一覧取得
-  const buttons = this.page.locator('[data-test^="add-to-cart"]');
+    // add-to-cartボタン一覧取得
+    const buttons = this.page.locator(
+      '[data-test^="add-to-cart"]'
+    );
 
-  // 表示待機
-  await expect(buttons.first()).toBeVisible();
+    // ボタン表示待機
+    await expect(buttons.first()).toBeVisible();
 
-  // 件数取得
-  const count = await buttons.count();
+    // ボタン件数取得
+    const count = await buttons.count();
 
-  // 毎回先頭を押す（押した要素はremove化して消える）
-  for (let i = 0; i < count; i++) {
+    // 先頭ボタンを順番に押下
+    // 押下後はremoveへ変化するためfirst固定
+    for (let i = 0; i < count; i++) {
 
-    // 先頭ボタン押下
-    await buttons.first().click();
+      // 先頭ボタン押下
+      await buttons.first().click();
+    }
+
+    // 追加件数返却
+    return count;
   }
-
-  return count;
-}
 
   /*
   ================================
-  1件追加
+  商品を1件追加
   ================================
   */
   async addFirstItem() {
-    // 最初の追加ボタンをクリック
-    await this.page.locator('[data-test^="add-to-cart"]').first().click();
+
+    // 最初の商品追加ボタン表示確認
+    await expect(
+      this.page.locator('[data-test^="add-to-cart"]').first()
+    ).toBeVisible();
+
+    // 最初の商品追加ボタン押下
+    await this.page
+      .locator('[data-test^="add-to-cart"]')
+      .first()
+      .click();
   }
 }

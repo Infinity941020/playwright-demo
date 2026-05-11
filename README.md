@@ -81,14 +81,63 @@ loginFixtureによりログイン状態を共有し、
 
 ### Flow Layer（業務フロー）
 
-ユーザー操作の一連の業務シナリオをFlowとして抽象化しています。
+各Page Objectを組み合わせて、
+業務単位の操作として再構成したテスト実行レイヤーです。
 
-- login.flow.ts：ログイン操作のシナリオ化
-- cart.flow.ts：商品追加・削除の操作フロー
-- checkout.flow.ts：購入フロー全体のシナリオ化
-- logout.flow.ts：ログアウト操作のシナリオ化
+specからUI操作（セレクタ・DOM構造）を完全に排除し、
+テストコードは「業務シナリオのみ」を記述する構造にしています。
 
-→ Page Objectを組み合わせた業務フロー再利用レイヤー
+Flow Layerの役割は以下の通りです：
+
+- 業務シナリオの抽象化（login / cart / checkout / logout）
+- Page Objectの統合制御
+- UI詳細（セレクタ・DOM操作）の隠蔽
+- テストコードの可読性向上
+- 再利用可能な業務API化
+
+---
+
+## テストアーキテクチャ構造（3層モデル）
+
+本プロジェクトは以下の3層構造でテストを設計しています。
+
+### ■ Spec層（業務シナリオ層）
+- テストケースの定義
+- 業務フローの組み立て
+- Flow Layerのみを呼び出す
+- UI操作は一切記述しない
+
+例：
+- 「商品を購入できること」
+- 「ログイン失敗時にエラーが出ること」
+
+---
+
+### ■ Flow層（業務API層）
+- 業務単位の操作を提供
+- Page Objectを組み合わせてフロー化
+- UI詳細（セレクタ・DOM構造）を完全に隠蔽
+- specからUI依存を排除
+
+例：
+- login()
+- addItems()
+- startCheckout()
+- finishCheckout()
+
+---
+
+### ■ Page層（UI実装層）
+- 画面単位の操作を定義
+- セレクタ・DOM操作を集約
+- UI変更時の影響をこの層に閉じ込める
+- Flow / SpecにはUI詳細を漏らさない
+
+例：
+- LoginPage
+- CartPage
+- CheckoutPage
+- InventoryPage
 
 ---
 
@@ -158,31 +207,36 @@ https://github.com/Infinity941020/playwright-demo/wiki
 
 ## Fixture対応（ログイン共通化）
 
-ログイン済み状態（auth.json）を事前生成し、  
-各E2Eテストではログイン処理を省略して実行できる構成にしています。
+本プロジェクトでは、
+ログイン状態共通化のために fixture と storageState を併用しています。
 
 ### 対応内容
 
-- setupテストでログイン状態保存
-- storageState による認証状態再利用
-- カート / Checkout / ログアウト系テスト高速化
-- テストコードの責務分離
-- Checkoutテストでもログイン状態を再利用
-- テスト実行の高速化（毎回ログイン不要）
-- UIテストの安定化
+- loginFixture.ts によるログイン済みPage配布
+- loggedPage の型安全な共通利用
+- setup/auth.setup.ts による認証状態保存
+- storageState（auth.json）対応
+- 前処理重複排除
+- Cart / Checkout / Logoutテスト高速化
+- テストコード可読性向上
+- UIテスト保守性向上
 
 ---
 
 ## Data-driven testing対応
 
-繰り返しパターンの多いCheckoutテストでは、  
-テストデータを外部ファイル化し、保守性を向上させています。
+繰り返しパターンの多いCheckoutテストでは、
+テストケース配列を利用したdata-driven形式を採用しています。
+
+また、購入者情報は checkoutData.ts に共通化し、
+入力データ管理を分離しています。
 
 ### 対応内容
 
-- checkoutData.ts に購入パターン定義
-- forEach によるテスト生成
-- ケース追加時のコード修正最小化
+- テストケース配列によるパターン管理
+- for ... of によるテスト生成
+- checkoutData.ts による入力データ共通化
+- ケース追加時の修正影響最小化
 
 ---
 
@@ -194,13 +248,14 @@ pages/
  ├ InventoryPage.ts
  ├ CartPage.ts
  ├ HeaderComponent.ts
+ ├ MenuPage.ts
  └ CheckoutPage.ts
 
 flows/
- ├ login.flow.ts
- ├ cart.flow.ts
- ├ checkout.flow.ts
- └ logout.flow.ts
+ ├ LoginFlow.ts
+ ├ CartFlow.ts
+ ├ CheckoutFlow.ts
+ └ LogoutFlow.ts
 
 tests/
  ├ setup/
