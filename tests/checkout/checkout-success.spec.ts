@@ -1,8 +1,11 @@
 // Playwrightのテスト機能（ログイン状態はfixtureで管理）
 import { test } from '../../fixtures/loginFixture';
 
-// CheckoutFlow（新統一レイヤー）
+// CheckoutFlow（新統一レイヤー・業務フロー操作）
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
+
+// チェックアウト入力データ（テストデータ集約）
+import { checkoutData } from '../../data/checkoutData';
 
 /*
 ================================
@@ -53,23 +56,23 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
       await flow.startCheckout();
 
       // ================================
-      // ■ 情報入力
+      // ■ 情報入力（テストデータ使用）
       // ================================
       await flow.fillCheckoutInfo(
-        'Taro',
-        'Yamada',
-        '12345'
+        checkoutData.firstName,   // 名（テストデータから取得）
+        checkoutData.lastName,    // 姓（テストデータから取得）
+        checkoutData.postalCode   // 郵便番号（テストデータから取得）
       );
 
       // ================================
-      // ■ 次へ
+      // ■ 次へ（業務ステップ）
       // ================================
-      await flow.continueCheckout();
+      await flow.proceedToOverviewStep();
 
       // ================================
-      // ■ 完了
+      // ■ 完了（購入完了）
       // ================================
-      await flow.finishCheckout();
+      await flow.completePurchase();
 
       // ================================
       // ■ 検証

@@ -1,7 +1,7 @@
 // Playwright fixture（ログイン状態共通）
 import { test } from '../../fixtures/loginFixture';
 
-// CheckoutFlow（統一レイヤー）
+// CheckoutFlow（統一レイヤー・業務フロー操作）
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
@@ -13,7 +13,7 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
-  // Flow初期化（ログイン済みページ）
+  // Flow初期化（ログイン済みページを利用）
   test.beforeEach(async ({ loggedPage }) => {
 
     flow = new CheckoutFlow(loggedPage);
@@ -107,8 +107,14 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
       '12345'
     );
 
-    await flow.continueCheckout();
+    // ================================
+    // ■ 確認画面へ進む（業務ステップ）
+    // ================================
+    await flow.proceedToOverviewStep();
 
+    // ================================
+    // ■ 確認画面から商品一覧へ戻る
+    // ================================
     await flow.cancelFromStepTwo();
   });
 

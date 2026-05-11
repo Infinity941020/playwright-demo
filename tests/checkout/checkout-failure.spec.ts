@@ -1,7 +1,7 @@
 // Playwrightのfixture（ログイン状態共通）
 import { test } from '../../fixtures/loginFixture';
 
-// CheckoutFlow（統一レイヤー）
+// CheckoutFlow（統一レイヤー・業務フロー操作）
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
@@ -14,7 +14,7 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
-  // Flow初期化（ログイン済みページ）
+  // Flow初期化（ログイン済みページを利用）
   test.beforeEach(async ({ loggedPage }) => {
 
     flow = new CheckoutFlow(loggedPage);
@@ -22,7 +22,7 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
   /*
   ================================
-  テストケース
+  テストケース（入力バリエーション）
   ================================
   */
   const cases = [
@@ -67,7 +67,7 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
       await flow.addItems('single');
 
       // ================================
-      // ■ カート遷移
+      // ■ カート画面へ遷移
       // ================================
       await flow.goToCart();
 
@@ -77,7 +77,7 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
       await flow.startCheckout();
 
       // ================================
-      // ■ 入力
+      // ■ 入力（バリデーション対象）
       // ================================
       await flow.fillCheckoutInfo(
         data.first,
