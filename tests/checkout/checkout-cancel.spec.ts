@@ -4,6 +4,9 @@ import { test } from '../../fixtures/loginFixture';
 // CheckoutFlow（統一レイヤー・業務フロー操作）
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
+// checkoutHelper（Checkout前準備共通化）
+import { prepareCheckout } from '../../utils/checkoutHelper';
+
 /*
 ================================
 Checkoutキャンセル系テスト（Flow版）
@@ -39,10 +42,10 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   */
   test('② Checkout開始直後にカートへ戻る', async () => {
 
-    await flow.addItems('single');
-    await flow.goToCart();
-
-    await flow.startCheckout();
+    // ================================
+    // ■ Checkout開始前準備
+    // ================================
+    await prepareCheckout(flow);
 
     await flow.cancelFromStepOne();
   });
@@ -54,10 +57,10 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   */
   test('③ 入力途中でカートへ戻る', async () => {
 
-    await flow.addItems('single');
-    await flow.goToCart();
-
-    await flow.startCheckout();
+    // ================================
+    // ■ Checkout開始前準備
+    // ================================
+    await prepareCheckout(flow);
 
     await flow.fillCheckoutInfo(
       'Taro',
@@ -75,10 +78,10 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   */
   test('④ 入力完了後にカートへ戻る', async () => {
 
-    await flow.addItems('single');
-    await flow.goToCart();
-
-    await flow.startCheckout();
+    // ================================
+    // ■ Checkout開始前準備
+    // ================================
+    await prepareCheckout(flow);
 
     await flow.fillCheckoutInfo(
       'Taro',
@@ -96,10 +99,10 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   */
   test('⑤ 確認画面から商品一覧へ戻る', async () => {
 
-    await flow.addItems('single');
-    await flow.goToCart();
-
-    await flow.startCheckout();
+    // ================================
+    // ■ Checkout開始前準備
+    // ================================
+    await prepareCheckout(flow);
 
     await flow.fillCheckoutInfo(
       'Taro',

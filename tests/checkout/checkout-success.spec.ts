@@ -4,6 +4,9 @@ import { test } from '../../fixtures/loginFixture';
 // CheckoutFlow（新統一レイヤー・業務フロー操作）
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
+// checkoutHelper（Checkout前準備共通化）
+import { prepareCheckout } from '../../utils/checkoutHelper';
+
 // チェックアウト入力データ（テストデータ集約）
 import { checkoutData } from '../../data/checkoutData';
 
@@ -41,19 +44,9 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
     test(item.title, async () => {
 
       // ================================
-      // ■ 商品追加（業務操作）
+      // ■ Checkout開始前準備
       // ================================
-      await flow.addItems(item.type);
-
-      // ================================
-      // ■ カート遷移
-      // ================================
-      await flow.goToCart();
-
-      // ================================
-      // ■ チェックアウト開始
-      // ================================
-      await flow.startCheckout();
+      await prepareCheckout(flow, item.type);
 
       // ================================
       // ■ 情報入力（テストデータ使用）
