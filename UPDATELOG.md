@@ -1,4 +1,82 @@
 # UPDATE LOG
+---
+
+## 2026-05-12
+
+### ■ Before
+- CheckoutFlowの業務用語統一リファクタを継続中
+- Flow層とspec層で一部旧命名が混在
+- continueCheckout / finishCheckout / expectComplete 系命名が残存
+- checkout-success / cancel 系specで新旧命名混在状態
+- Flow層の責務は安定していたが、業務フロー表現としては改善余地が残っていた
+
+---
+
+### ■ Action（実施内容）
+
+#### ■ CheckoutFlow（業務用語統一）
+- Flowメソッド命名を業務フロー基準へ統一
+  - continueCheckout → proceedToOverviewStep
+  - finishCheckout → completePurchase
+  - expectComplete → verifyOrderComplete
+- UI操作ベース命名から業務ステップベース命名へ移行
+- Flow責務を「業務シナリオ抽象化レイヤー」として整理
+
+---
+
+#### ■ Checkout spec整合対応
+- checkout-success.spec.ts を新Flow命名へ統一
+- checkout-cancel.spec.ts の旧メソッド呼び出しを修正
+- checkout-failure.spec.ts は既存責務を維持しつつ整合確認
+- spec層からUI操作概念をさらに排除
+
+---
+
+#### ■ データ駆動設計維持
+- checkoutData.ts による入力データ共通化を維持
+- テストコード内ハードコード値の抑制継続
+- data-driven構造の保守性確認
+
+---
+
+#### ■ 回帰確認・CI確認
+- checkout系全テスト回帰確認
+- ローカル実行：全30テスト PASS
+- GitHub Actions：CI PASS確認
+- 並列実行環境での安定動作維持
+
+---
+
+### ■ Result（成果）
+
+- CheckoutFlowの業務用語ベース統一が完了
+- Flow / spec 間の命名不整合を完全解消
+- spec可読性が向上
+- Flow責務が「UI操作」から「業務シナリオ」へ明確化
+- Checkout成功・異常・キャンセル全テスト安定PASS
+- CI含め全30テスト安定稼働を維持
+
+---
+
+### ■ Overall Status
+
+- CheckoutFlow命名統一：完了
+- Flow / spec整合性：安定化完了
+- E2E回帰確認：完了
+- CI安定性：維持
+
+---
+
+### ■ Conclusion
+
+本対応により、CheckoutFlowはUI操作ベース設計から
+業務フロー中心設計へ移行完了した。
+
+spec層は業務シナリオ記述へ統一され、
+Flow / Page / spec の責務分離がさらに明確化された。
+
+また、全30テストおよびCI実行において
+安定稼働状態を維持したままリファクタリングを完了した。
 
 ---
 

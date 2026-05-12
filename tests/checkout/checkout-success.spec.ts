@@ -75,9 +75,9 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
       await flow.completePurchase();
 
       // ================================
-      // ■ 検証
+      // ■ 検証（完了状態確認）
       // ================================
-      await flow.expectComplete();
+      await flow.verifyOrderComplete();
     });
   }
 

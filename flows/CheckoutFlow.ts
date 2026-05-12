@@ -66,11 +66,6 @@ export class CheckoutFlow {
     }
   }
 
-  async addItemsLegacy(type: 'single' | 'multi' = 'single') {
-
-    return this.addItems(type);
-  }
-
   // =================================================
   // ■ 画面遷移（業務フロー）
   // =================================================
@@ -98,13 +93,11 @@ export class CheckoutFlow {
   // ■ 購入フロー（業務用語化）
   // =================================================
 
-  // 旧: continueCheckout → 業務用語化
   async proceedToOverviewStep() {
 
     await this.checkout.continue();
   }
 
-  // 旧: finishCheckout → 業務用語化
   async completePurchase() {
 
     await this.checkout.finish();
@@ -138,12 +131,13 @@ export class CheckoutFlow {
     await this.cart.backToInventory();
   }
 
-  // =================================================
-  // ■ 検証
-  // =================================================
+ // =================================================
+ // ■ 検証
+ // =================================================
 
-  async expectComplete() {
+ // 購入完了状態を検証
+  async verifyOrderComplete() {
 
-    await this.checkout.expectComplete();
+   await this.checkout.expectComplete();
   }
 }
