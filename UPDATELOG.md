@@ -1,6 +1,123 @@
 # UPDATE LOG
 ---
 
+## 2026-05-13
+
+### ■ Before
+
+- CheckoutFlowの業務用語統一は前日までに完了済み
+- cart/logout領域は旧Helper構成や冗長記述が一部残存
+- READMEは情報量が多く、重複説明・冗長表現が散在
+- Utility Layerの責務境界（Helper / Flow / Fixture）がやや曖昧
+- Flow・spec・helper間の説明が重複し可読性に課題あり
+- cart / logout / checkout 全体として構造は安定しているが整理余地あり
+
+---
+
+### ■ Action（実施内容）
+
+#### ■ Cart / Logout構成整理
+
+##### ■ cartHelper導入・整理
+- cartHelper.ts を新規導入しArrange処理を共通化
+- CartFlowとの責務分離を明確化
+- specから準備処理の冗長コードを削減
+- addItems / openCart などの事前準備をHelperへ集約
+
+##### ■ cart specリファクタ
+- cart.spec.ts / cart-badge.spec.ts の構成整理
+- prepareCart導入によりテスト前準備を統一
+- Flow直呼び出しとHelper経由の使い分け整理
+- specの可読性改善（Arrange削減）
+
+##### ■ logout構成整理
+- logoutHelperを削除しFlow統一へ移行
+- LogoutFlow単体で責務完結する構造へ修正
+- Helperレイヤーの過剰分離を解消
+- シンプルなFlow構成へ最適化
+
+---
+
+### ■ README構造最適化
+
+#### ■ Utility Layer整理
+- loginHelper / checkoutHelper / cartHelper の役割整理
+- 重複していた「目的」「補足（設計意図）」を統合
+- Helperの責務を「Flowより軽い準備レイヤー」に統一
+- Arrange最適化レイヤーとして定義を明確化
+
+#### ■ Flow Layer説明圧縮
+- Flowの役割説明を重複排除し簡潔化
+- 「業務API層」としての役割を明確化
+- UI操作排除・業務シナリオ抽象化の説明を統合
+
+#### ■ Fixtureセクション整理
+- loginFixture説明の重複構造を削除
+- 現在構成と拡張設計（storageState）のみに整理
+- 不要な「対応内容」重複説明を削除
+
+---
+
+### ■ 全体リファクタリング方針統一
+
+- Helper：Arrange（準備処理）専用レイヤー
+- Flow：業務シナリオ実行レイヤー
+- Page：UI操作レイヤー
+- spec：業務シナリオ記述レイヤー
+
+→ 各レイヤーの責務境界を再整理
+
+---
+
+### ■ 回帰確認・CI確認
+
+- cart / checkout / logout 全テスト回帰確認
+- ローカル実行：全テスト PASS（30件維持）
+- GitHub Actions：CI PASS確認
+- 並列実行環境でも安定動作を維持
+
+---
+
+### ■ Result（成果）
+
+- cartHelper導入によりArrange処理の共通化完了
+- cart specの可読性および保守性向上
+- logout構成のシンプル化（Flow統一）完了
+- READMEの冗長構造を削除しドキュメント品質向上
+- Flow / Helper / spec の責務境界を明確化
+- E2E全30テストの安定PASSを維持
+- CI含めた実行安定性を維持したままリファクタ完了
+- E2E基盤の構造整理フェーズが完了段階へ移行
+
+---
+
+### ■ Overall Status
+
+- cart構成整理：完了
+- logout構成整理：完了
+- README最適化：完了
+- Utility Layer整理：完了
+- Flow / spec / helper責務整理：完了
+- CI安定性：維持
+- E2E回帰：全PASS（30件）
+
+---
+
+### ■ Conclusion
+
+本対応により、E2Eテスト基盤における
+cart / logout / utility / README の構造整理が完了した。
+
+Helper・Flow・specの責務境界が明確化され、
+テスト設計は「業務シナリオ中心の構造」に完全に統一された。
+
+また、全30テストおよびCI実行において安定稼働を維持しつつ、
+ドキュメントと実装の両面で保守性を向上させた。
+
+E2E基盤は「拡張可能かつリファクタ安全な構造」として完成度がさらに向上した。
+
+---
+
 ## 2026-05-12
 
 ### ■ Before

@@ -376,6 +376,7 @@ fixtures/
 
 utils/
  ├ loginHelper.ts
+ ├ cartHelper.ts
  ├ checkoutHelper.ts
  └ urls.ts
 
