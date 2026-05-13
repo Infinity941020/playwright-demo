@@ -4,6 +4,9 @@ import { test } from '../../fixtures/loginFixture';
 // CartFlow（業務フロー）
 import { CartFlow } from '../../flows/CartFlow';
 
+// cartHelper（Cart前準備共通化）
+import { prepareCart } from '../../utils/cartHelper';
+
 /*
 ================================
 カートバッジ検証テスト（完全統一版）
@@ -21,9 +24,13 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    await cartFlow.addItems('single');
+    await test.step('商品を1件追加', async () => {
+      await cartFlow.addItems('single');
+    });
 
-    await cartFlow.expectBadgeCount(1);
+    await test.step('バッジ件数確認', async () => {
+      await cartFlow.expectBadgeCount(1);
+    });
   });
 
   /*
@@ -35,9 +42,15 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    const count = await cartFlow.addItems('multi');
+    let count: number;
 
-    await cartFlow.expectBadgeCount(count);
+    await test.step('商品を全件追加', async () => {
+      count = await cartFlow.addItems('multi');
+    });
+
+    await test.step('バッジ件数確認', async () => {
+      await cartFlow.expectBadgeCount(count);
+    });
   });
 
   /*
@@ -49,13 +62,19 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    const count = await cartFlow.addItems('multi');
+    let count: number;
 
-    await cartFlow.openCart();
+    await test.step('初期状態（複数商品追加）', async () => {
+      count = await prepareCart(cartFlow, 'multi');
+    });
 
-    await cartFlow.removeFirstItem();
+    await test.step('1件削除', async () => {
+      await cartFlow.removeFirstItem();
+    });
 
-    await cartFlow.expectBadgeCount(count - 1);
+    await test.step('バッジ件数確認', async () => {
+      await cartFlow.expectBadgeCount(count - 1);
+    });
   });
 
   /*
@@ -67,14 +86,20 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    const count = await cartFlow.addItems('multi');
+    let count: number;
 
-    await cartFlow.openCart();
+    await test.step('初期状態（複数商品追加）', async () => {
+      count = await prepareCart(cartFlow, 'multi');
+    });
 
-    await cartFlow.removeFirstItem();
-    await cartFlow.removeFirstItem();
+    await test.step('2件削除', async () => {
+      await cartFlow.removeFirstItem();
+      await cartFlow.removeFirstItem();
+    });
 
-    await cartFlow.expectBadgeCount(count - 2);
+    await test.step('バッジ件数確認', async () => {
+      await cartFlow.expectBadgeCount(count - 2);
+    });
   });
 
   /*
@@ -86,13 +111,17 @@ test.describe('カートバッジ検証テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    await cartFlow.addItems('multi');
+    await test.step('初期状態（複数商品追加）', async () => {
+      await prepareCart(cartFlow, 'multi');
+    });
 
-    await cartFlow.openCart();
+    await test.step('全削除', async () => {
+      await cartFlow.clearCart();
+    });
 
-    await cartFlow.clearCart();
-
-    await cartFlow.expectBadgeCount(0);
+    await test.step('バッジ非表示確認', async () => {
+      await cartFlow.expectBadgeCount(0);
+    });
   });
 
 });

@@ -9,6 +9,7 @@ import { LogoutFlow } from '../../flows/LogoutFlow';
 Logout機能テスト（Flow版）
 ================================
 */
+
 test.describe('Logout機能テスト（Flow版）', () => {
 
   let flow: LogoutFlow;
@@ -20,7 +21,6 @@ test.describe('Logout機能テスト（Flow版）', () => {
   */
   test.beforeEach(async ({ loggedPage }) => {
 
-    // Flow初期化
     flow = new LogoutFlow(loggedPage);
   });
 
@@ -31,15 +31,14 @@ test.describe('Logout機能テスト（Flow版）', () => {
   */
   test('ログイン後にログアウトできること', async () => {
 
-    // ================================
-    // ■ 業務操作（ログアウト実行）
-    // ================================
-    await flow.logout();
+    await test.step('ログアウト実行', async () => {
+      await flow.logout();
+    });
 
-    // ================================
-    // ■ 検証（ログイン画面表示確認）
-    // ================================
-    await flow.expectOnLoginPage();
+    await test.step('ログイン画面表示確認', async () => {
+      await flow.expectOnLoginPage();
+    });
+
   });
 
 });

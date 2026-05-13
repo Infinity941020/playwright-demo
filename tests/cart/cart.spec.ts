@@ -4,6 +4,9 @@ import { test } from '../../fixtures/loginFixture';
 // CartFlow（カート業務フロー）
 import { CartFlow } from '../../flows/CartFlow';
 
+// cartHelper（Cart前準備共通化）
+import { prepareCart } from '../../utils/cartHelper';
+
 /*
 ================================
 カート機能 E2Eテスト（Flow完全統一版）
@@ -21,11 +24,13 @@ test.describe('カート機能テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    await cartFlow.addItems('single');
+    await test.step('カート初期化（単一商品追加）', async () => {
+      await prepareCart(cartFlow, 'single');
+    });
 
-    await cartFlow.openCart();
-
-    await cartFlow.expectItemCount(1);
+    await test.step('カート件数確認', async () => {
+      await cartFlow.expectItemCount(1);
+    });
   });
 
   /*
@@ -37,11 +42,15 @@ test.describe('カート機能テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    const count = await cartFlow.addItems('multi');
+    let count: number;
 
-    await cartFlow.openCart();
+    await test.step('カート初期化（複数商品追加）', async () => {
+      count = await prepareCart(cartFlow, 'multi');
+    });
 
-    await cartFlow.expectItemCount(count);
+    await test.step('カート件数確認', async () => {
+      await cartFlow.expectItemCount(count);
+    });
   });
 
   /*
@@ -53,13 +62,17 @@ test.describe('カート機能テスト', () => {
 
     const cartFlow = new CartFlow(loggedPage);
 
-    await cartFlow.addItems('single');
+    await test.step('カート初期化（単一商品追加）', async () => {
+      await prepareCart(cartFlow, 'single');
+    });
 
-    await cartFlow.openCart();
+    await test.step('商品削除', async () => {
+      await cartFlow.removeFirstItem();
+    });
 
-    await cartFlow.removeFirstItem();
-
-    await cartFlow.expectItemCount(0);
+    await test.step('カート件数確認', async () => {
+      await cartFlow.expectItemCount(0);
+    });
   });
 
 });
