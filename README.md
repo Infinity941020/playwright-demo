@@ -89,9 +89,10 @@ specからUI操作（セレクタ・DOM構造）を完全に排除し、
 
 Flow Layerの役割は以下の通りです：
 
-- 業務シナリオの抽象化（login / cart / checkout / logout）
+- 業務シナリオ単位の操作抽象化（login / cart / checkout / logout）
 - Page Objectの統合制御
 - UI詳細（セレクタ・DOM操作）の隠蔽
+- spec層からUI依存を排除
 - テストコードの可読性向上
 - 再利用可能な業務API化
 
@@ -123,7 +124,9 @@ Flow Layerの役割は以下の通りです：
 - login()
 - addItems()
 - startCheckout()
-- finishCheckout()
+- proceedToOverviewStep()
+- completePurchase()
+- verifyOrderComplete()
 
 ---
 
@@ -208,14 +211,18 @@ https://github.com/Infinity941020/playwright-demo/wiki
 ## Fixture対応（ログイン共通化）
 
 本プロジェクトでは、
-ログイン状態共通化のために fixture と storageState を併用しています。
+Playwright Fixture を利用してログイン状態を共通化しています。
+
+また、認証状態永続化を見据え、
+storageState構成にも対応可能な設計としています。
 
 ### 対応内容
 
 - loginFixture.ts によるログイン済みPage配布
 - loggedPage の型安全な共通利用
-- setup/auth.setup.ts による認証状態保存
-- storageState（auth.json）対応
+- fixtureによる前処理共通化
+- setup/auth.setup.ts による認証準備構成
+- storageState導入を見据えた拡張可能構成
 - 前処理重複排除
 - Cart / Checkout / Logoutテスト高速化
 - テストコード可読性向上
@@ -237,6 +244,29 @@ https://github.com/Infinity941020/playwright-demo/wiki
 - for ... of によるテスト生成
 - checkoutData.ts による入力データ共通化
 - ケース追加時の修正影響最小化
+
+---
+
+## Utility Layer（共通処理）
+
+繰り返し利用される前準備処理や共通操作は
+utils配下へ分離しています。
+
+### 対応内容
+
+- loginHelper.ts
+  - ログイン共通処理
+
+- checkoutHelper.ts
+  - Checkout開始前準備共通化
+  - Arrange処理簡略化
+
+目的：
+
+- 前準備コード重複排除
+- spec可読性向上
+- Flow責務の整理
+- 共通処理の再利用性向上
 
 ---
 
@@ -282,6 +312,7 @@ fixtures/
 
 utils/
  ├ loginHelper.ts
+ ├ checkoutHelper.ts
  └ urls.ts
 
 data/
@@ -289,6 +320,14 @@ data/
  └ checkoutData.ts
 
 ```
+### ディレクトリ責務
+
+- pages/：UI操作実装層（Page Object）
+- flows/：業務フロー抽象化層
+- fixtures/：共通前処理・ログイン状態管理
+- utils/：テスト補助処理・共通Helper
+- data/：テストデータ管理
+- tests/：テストケース本体
 
 ## 実行方法
 
@@ -393,18 +432,25 @@ Checkoutは以下3段階で構成されています：
 
 ## 最近の改善実績
 
-- Checkout / Logout機能のFlow化
-- CI安定化対応
-- E2Eテスト全30件の安定動作
+- CheckoutFlowの業務用語ベース命名へ統一
+- Flow Layer責務整理（UI操作抽象化）
+- checkoutHelper導入による前準備共通化
+- utility層整理開始（loginHelper分離）
+- Checkout成功 / 異常 / キャンセル系の整合性強化
+- data-driven構成の保守性改善
+- GitHub Actions CI安定化
+- E2Eテスト全30件の安定PASS維持
+- test.step導入によるレポート改善フェーズ着手
 
 ---
 
 ## 改善予定
 
-- テストデータの外部化（JSON化）
+- テストデータ管理のさらなる外部化（JSON / Fixture連携）
 - APIテスト追加
 - Visual Regressionテスト導入
 - Page Objectのさらなる分割最適化
+- test.step導入によるレポート可読性向上
 - レポート自動通知（Slack / Teams）
 
 ---

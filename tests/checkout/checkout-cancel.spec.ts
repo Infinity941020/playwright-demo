@@ -29,10 +29,16 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
   */
   test('① カート画面から商品一覧へ戻る', async () => {
 
-    await flow.addItems('single');
-    await flow.goToCart();
+    await test.step('商品を追加してカート画面へ遷移', async () => {
 
-    await flow.cancelFromCart();
+      await flow.addItems('single');
+      await flow.goToCart();
+    });
+
+    await test.step('商品一覧へ戻る', async () => {
+
+      await flow.cancelFromCart();
+    });
   });
 
   /*
@@ -45,9 +51,15 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
     // ================================
     // ■ Checkout開始前準備
     // ================================
-    await prepareCheckout(flow);
+    await test.step('Checkout開始前準備', async () => {
 
-    await flow.cancelFromStepOne();
+      await prepareCheckout(flow);
+    });
+
+    await test.step('Checkout開始画面からカートへ戻る', async () => {
+
+      await flow.cancelFromStepOne();
+    });
   });
 
   /*
@@ -60,15 +72,24 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
     // ================================
     // ■ Checkout開始前準備
     // ================================
-    await prepareCheckout(flow);
+    await test.step('Checkout開始前準備', async () => {
 
-    await flow.fillCheckoutInfo(
-      'Taro',
-      '',
-      ''
-    );
+      await prepareCheckout(flow);
+    });
 
-    await flow.cancelFromStepOne();
+    await test.step('購入者情報を途中まで入力', async () => {
+
+      await flow.fillCheckoutInfo(
+        'Taro',
+        '',
+        ''
+      );
+    });
+
+    await test.step('入力途中でカートへ戻る', async () => {
+
+      await flow.cancelFromStepOne();
+    });
   });
 
   /*
@@ -81,15 +102,24 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
     // ================================
     // ■ Checkout開始前準備
     // ================================
-    await prepareCheckout(flow);
+    await test.step('Checkout開始前準備', async () => {
 
-    await flow.fillCheckoutInfo(
-      'Taro',
-      'Yamada',
-      '12345'
-    );
+      await prepareCheckout(flow);
+    });
 
-    await flow.cancelFromStepOne();
+    await test.step('購入者情報を入力', async () => {
+
+      await flow.fillCheckoutInfo(
+        'Taro',
+        'Yamada',
+        '12345'
+      );
+    });
+
+    await test.step('入力完了後にカートへ戻る', async () => {
+
+      await flow.cancelFromStepOne();
+    });
   });
 
   /*
@@ -102,23 +132,35 @@ test.describe('Checkoutキャンセル系テスト（Flow版）', () => {
     // ================================
     // ■ Checkout開始前準備
     // ================================
-    await prepareCheckout(flow);
+    await test.step('Checkout開始前準備', async () => {
 
-    await flow.fillCheckoutInfo(
-      'Taro',
-      'Yamada',
-      '12345'
-    );
+      await prepareCheckout(flow);
+    });
+
+    await test.step('購入者情報を入力', async () => {
+
+      await flow.fillCheckoutInfo(
+        'Taro',
+        'Yamada',
+        '12345'
+      );
+    });
 
     // ================================
     // ■ 確認画面へ進む（業務ステップ）
     // ================================
-    await flow.proceedToOverviewStep();
+    await test.step('確認画面へ進む', async () => {
+
+      await flow.proceedToOverviewStep();
+    });
 
     // ================================
     // ■ 確認画面から商品一覧へ戻る
     // ================================
-    await flow.cancelFromStepTwo();
+    await test.step('確認画面から商品一覧へ戻る', async () => {
+
+      await flow.cancelFromStepTwo();
+    });
   });
 
 });

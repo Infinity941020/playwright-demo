@@ -67,21 +67,30 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
       // ================================
       // ■ Checkout開始前準備
       // ================================
-      await prepareCheckout(flow);
+      await test.step('Checkout開始前準備', async () => {
+
+        await prepareCheckout(flow);
+      });
 
       // ================================
       // ■ 入力（バリデーション対象）
       // ================================
-      await flow.fillCheckoutInfo(
-        data.first,
-        data.last,
-        data.zip
-      );
+      await test.step('不正な購入者情報を入力', async () => {
+
+        await flow.fillCheckoutInfo(
+          data.first,
+          data.last,
+          data.zip
+        );
+      });
 
       // ================================
       // ■ エラー検証
       // ================================
-      await flow.continueExpectError();
+      await test.step('入力エラーを検証', async () => {
+
+        await flow.continueExpectError();
+      });
     });
   }
 

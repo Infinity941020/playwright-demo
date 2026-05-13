@@ -46,31 +46,46 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
       // ================================
       // ■ Checkout開始前準備
       // ================================
-      await prepareCheckout(flow, item.type);
+      await test.step('Checkout開始前準備', async () => {
+
+        await prepareCheckout(flow, item.type);
+      });
 
       // ================================
       // ■ 情報入力（テストデータ使用）
       // ================================
-      await flow.fillCheckoutInfo(
-        checkoutData.firstName,   // 名（テストデータから取得）
-        checkoutData.lastName,    // 姓（テストデータから取得）
-        checkoutData.postalCode   // 郵便番号（テストデータから取得）
-      );
+      await test.step('購入者情報入力', async () => {
+
+        await flow.fillCheckoutInfo(
+          checkoutData.firstName,   // 名（テストデータから取得）
+          checkoutData.lastName,    // 姓（テストデータから取得）
+          checkoutData.postalCode   // 郵便番号（テストデータから取得）
+        );
+      });
 
       // ================================
       // ■ 次へ（業務ステップ）
       // ================================
-      await flow.proceedToOverviewStep();
+      await test.step('確認画面へ進む', async () => {
+
+        await flow.proceedToOverviewStep();
+      });
 
       // ================================
       // ■ 完了（購入完了）
       // ================================
-      await flow.completePurchase();
+      await test.step('購入完了', async () => {
+
+        await flow.completePurchase();
+      });
 
       // ================================
       // ■ 検証（完了状態確認）
       // ================================
-      await flow.verifyOrderComplete();
+      await test.step('購入完了状態を検証', async () => {
+
+        await flow.verifyOrderComplete();
+      });
     });
   }
 
