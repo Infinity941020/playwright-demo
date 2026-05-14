@@ -1,11 +1,17 @@
-// Playwright test / expect
-import { test, expect } from '@playwright/test';
+// Playwright test
+import { test } from '@playwright/test';
 
 // APIテスト用データ
 import { apiUsers } from '../../data/apiUsers';
 
-// API共通設定
-import { API_BASE_URL, API_KEY } from '../../utils/apiConfig';
+// API Helper
+import { executeLoginApi } from '../../utils/apiHelper';
+
+// API Assertions
+import {
+  expectLoginSuccess,
+  expectMissingPasswordError
+} from '../../utils/apiAssertions';
 
 /*
 ================================
@@ -25,29 +31,17 @@ test.describe('Login APIテスト', () => {
   // 正常ログインAPI検証
   test('正常なログインリクエスト', async ({ request }) => {
 
-    // Login APIへPOSTリクエスト送信
-    const response = await request.post(`${API_BASE_URL}/login`, {
+    // Login API実行
+    const response = await executeLoginApi(
+      request,
+      apiUsers.validUser
+    );
 
-      // API Key header
-      headers: {
-        'x-api-key': API_KEY
-      },
-
-      // request body
-      data: apiUsers.validUser
-    });
-
-    // response内容確認
+    // response確認
     console.log(await response.text());
 
-    // status code検証
-    expect(response.status()).toBe(200);
-
-    // response body取得
-    const body = await response.json();
-
-    // token存在確認
-    expect(body.token).toBeTruthy();
+    // 正常ログイン検証
+    await expectLoginSuccess(response);
   });
 
   /*
@@ -60,27 +54,15 @@ test.describe('Login APIテスト', () => {
   test('password未入力時に400エラーになること', async ({ request }) => {
 
     // Login API実行
-    const response = await request.post(`${API_BASE_URL}/login`, {
-
-      // API Key header
-      headers: {
-        'x-api-key': API_KEY
-      },
-
-      // password未指定request body
-      data: apiUsers.missingPasswordUser
-    });
+    const response = await executeLoginApi(
+      request,
+      apiUsers.missingPasswordUser
+    );
 
     // response確認
     console.log(await response.text());
 
-    // status code検証
-    expect(response.status()).toBe(400);
-
-    // response body取得
-    const body = await response.json();
-
-    // error message確認
-    expect(body.error).toContain('Missing password');
+    // password未入力検証
+    await expectMissingPasswordError(response);
   });
 });
