@@ -142,7 +142,7 @@ UIはユーザー操作フローとして、APIはバックエンド契約検証
 
 本プロジェクトは以下の3層構造でテストを設計しています。
 
-```
+```mermaid
 flowchart TD
 
 subgraph Spec層["Spec層（業務シナリオ層）"]
@@ -202,7 +202,7 @@ E --> F
 - completePurchase()
 - verifyOrderComplete()
 
-```
+```mermaid
 flowchart LR
 
 Spec["Spec層：業務シナリオ層"]
@@ -423,6 +423,7 @@ APIテストもUIと同様に責務分離を行っています。
 APIテストはUIテストの補助ではなく、
 独立した検証レイヤーとして扱っています。
 
+```mermaid
 flowchart TD
 
 UI["E2E UIテスト"]
@@ -431,6 +432,7 @@ System["ECシステム"]
 
 UI -->|"ユーザー操作"| System
 API -->|"HTTP契約検証"| System
+```
 
 ---
 
