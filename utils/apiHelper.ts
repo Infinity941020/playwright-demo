@@ -15,7 +15,66 @@ import type { LoginRequest } from '../types/api';
 
 /*
 ================================
-Login API共通実行
+共通Header
+================================
+*/
+
+// API共通header
+const defaultHeaders = {
+  'x-api-key': API_KEY
+};
+
+/*
+================================
+共通POST API実行
+================================
+*/
+
+// 共通POST API実行
+export async function executePostApi(
+  request: APIRequestContext,
+  endpoint: string,
+  body: unknown
+) {
+
+  return await request.post(
+    `${API_BASE_URL}${endpoint}`,
+    {
+
+      // API header
+      headers: defaultHeaders,
+
+      // request body
+      data: body
+    }
+  );
+}
+
+/*
+================================
+共通GET API実行
+================================
+*/
+
+// 共通GET API実行
+export async function executeGetApi(
+  request: APIRequestContext,
+  endpoint: string
+) {
+
+  return await request.get(
+    `${API_BASE_URL}${endpoint}`,
+    {
+
+      // API header
+      headers: defaultHeaders
+    }
+  );
+}
+
+/*
+================================
+Login API実行
 ================================
 */
 
@@ -25,15 +84,27 @@ export async function executeLoginApi(
   body: LoginRequest
 ) {
 
-  // Login API実行
-  return await request.post(`${API_BASE_URL}/login`, {
+  return await executePostApi(
+    request,
+    '/login',
+    body
+  );
+}
 
-    // API Key header
-    headers: {
-      'x-api-key': API_KEY
-    },
+/*
+================================
+GET User API実行
+================================
+*/
 
-    // request body
-    data: body
-  });
+// 単一ユーザー取得API
+export async function executeGetSingleUserApi(
+  request: APIRequestContext,
+  userId: number
+) {
+
+  return await executeGetApi(
+    request,
+    `/users/${userId}`
+  );
 }

@@ -10,7 +10,10 @@ import type { LoginRequest } from '../types/api';
 // APIテスト用ユーザーデータ
 export const apiUsers: {
   validUser: LoginRequest;
-  missingPasswordUser: LoginRequest;
+
+  invalidUsers: {
+    missingPassword: LoginRequest;
+  };
 } = {
 
   // 正常系ユーザー
@@ -19,8 +22,12 @@ export const apiUsers: {
     password: 'cityslicka'
   },
 
-  // password未入力ユーザー
-  missingPasswordUser: {
-    email: 'eve.holt@reqres.in'
+  // 異常系ユーザー
+  invalidUsers: {
+
+    // password未入力
+    missingPassword: {
+      email: 'eve.holt@reqres.in'
+    }
   }
 };

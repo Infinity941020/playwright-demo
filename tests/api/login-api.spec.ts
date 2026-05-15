@@ -56,7 +56,7 @@ test.describe('Login APIテスト', () => {
     // Login API実行
     const response = await executeLoginApi(
       request,
-      apiUsers.missingPasswordUser
+      apiUsers.invalidUsers.missingPassword
     );
 
     // response確認
