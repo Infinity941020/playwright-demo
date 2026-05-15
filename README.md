@@ -428,7 +428,8 @@ tests/
  │   └ auth.setup.ts
  │
  ├ api/
- │   └ login-api.spec.ts
+ │   ├ login-api.spec.ts
+ │   └ user-api.spec.ts
  │
  ├ login/
  │   ├ login-success.spec.ts
