@@ -7,6 +7,9 @@ import { CheckoutFlow } from '../../flows/CheckoutFlow';
 // checkoutHelper（Checkout前準備共通化）
 import { prepareCheckout } from '../../utils/checkoutHelper';
 
+// checkoutAssertions（Checkout完了検証）
+import { expectCheckoutComplete } from '../../utils/checkoutAssertions';
+
 // チェックアウト入力データ（テストデータ集約）
 import { checkoutData } from '../../data/checkoutData';
 
@@ -19,9 +22,14 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
 
   let flow: CheckoutFlow;
 
-  // Flow初期化（ログイン済みページを利用）
+  /*
+  ================================
+  Flow初期化
+  ================================
+  */
   test.beforeEach(async ({ loggedPage }) => {
 
+    // ログイン済みPageを利用してFlow生成
     flow = new CheckoutFlow(loggedPage);
   });
 
@@ -39,52 +47,73 @@ test.describe('Checkout正常系テスト（Flow版）', () => {
     { title: '⑥ 再追加後購入', type: 'multi' as const },
   ];
 
+  /*
+  ================================
+  正常系シナリオ
+  ================================
+  */
   for (const item of cases) {
 
     test(item.title, async () => {
 
-      // ================================
-      // ■ Checkout開始前準備
-      // ================================
+      /*
+      ================================
+      ■ Checkout開始前準備
+      ================================
+      */
       await test.step('Checkout開始前準備', async () => {
 
         await prepareCheckout(flow, item.type);
       });
 
-      // ================================
-      // ■ 情報入力（テストデータ使用）
-      // ================================
+      /*
+      ================================
+      ■ 購入者情報入力
+      ================================
+      */
       await test.step('購入者情報入力', async () => {
 
         await flow.fillCheckoutInfo(
-          checkoutData.firstName,   // 名（テストデータから取得）
-          checkoutData.lastName,    // 姓（テストデータから取得）
-          checkoutData.postalCode   // 郵便番号（テストデータから取得）
+
+          // 名
+          checkoutData.firstName,
+
+          // 姓
+          checkoutData.lastName,
+
+          // 郵便番号
+          checkoutData.postalCode
         );
       });
 
-      // ================================
-      // ■ 次へ（業務ステップ）
-      // ================================
+      /*
+      ================================
+      ■ 確認画面へ進む
+      ================================
+      */
       await test.step('確認画面へ進む', async () => {
 
         await flow.proceedToOverviewStep();
       });
 
-      // ================================
-      // ■ 完了（購入完了）
-      // ================================
+      /*
+      ================================
+      ■ 購入完了
+      ================================
+      */
       await test.step('購入完了', async () => {
 
         await flow.completePurchase();
       });
 
-      // ================================
-      // ■ 検証（完了状態確認）
-      // ================================
+      /*
+      ================================
+      ■ 購入完了状態を検証
+      ================================
+      */
       await test.step('購入完了状態を検証', async () => {
 
-        await flow.verifyOrderComplete();
+        await expectCheckoutComplete(flow);
       });
     });
   }

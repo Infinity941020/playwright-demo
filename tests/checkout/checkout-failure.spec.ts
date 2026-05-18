@@ -1,4 +1,4 @@
-// Playwrightのfixture（ログイン状態共通）
+// Playwright fixture（ログイン状態共通）
 import { test } from '../../fixtures/loginFixture';
 
 // CheckoutFlow（統一レイヤー・業務フロー操作）
@@ -9,15 +9,27 @@ import { prepareCheckout } from '../../utils/checkoutHelper';
 
 /*
 ================================
+Checkout Assertions
+================================
+*/
+import { expectCheckoutComplete } from '../../utils/checkoutAssertions';
+
+/*
+================================
 Checkout異常系テスト（Flow版）
 入力バリデーション検証
 ================================
 */
 test.describe('Checkout異常系テスト（Flow版）', () => {
 
+  // CheckoutFlow
   let flow: CheckoutFlow;
 
-  // Flow初期化（ログイン済みページを利用）
+  /*
+  ================================
+  Flow初期化
+  ================================
+  */
   test.beforeEach(async ({ loggedPage }) => {
 
     flow = new CheckoutFlow(loggedPage);
@@ -64,17 +76,21 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
 
     test(data.title, async () => {
 
-      // ================================
-      // ■ Checkout開始前準備
-      // ================================
+      /*
+      ================================
+      ■ Checkout開始前準備
+      ================================
+      */
       await test.step('Checkout開始前準備', async () => {
 
         await prepareCheckout(flow);
       });
 
-      // ================================
-      // ■ 入力（バリデーション対象）
-      // ================================
+      /*
+      ================================
+      ■ 入力（バリデーション対象）
+      ================================
+      */
       await test.step('不正な購入者情報を入力', async () => {
 
         await flow.fillCheckoutInfo(
@@ -84,9 +100,11 @@ test.describe('Checkout異常系テスト（Flow版）', () => {
         );
       });
 
-      // ================================
-      // ■ エラー検証
-      // ================================
+      /*
+      ================================
+      ■ Continue押下＋エラー確認
+      ================================
+      */
       await test.step('入力エラーを検証', async () => {
 
         await flow.continueExpectError();
