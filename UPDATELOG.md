@@ -1,5 +1,93 @@
 # UPDATE LOG
 ---
+
+## 2026-05-18
+
+### ■ Before
+
+- APIテストがReqRes / JSONPlaceholderの混在状態で設計されていた
+- loginAssertions / userAssertions においてレスポンス構造前提が不統一
+- dataラップ構造（ReqRes前提）とbody直下構造（JSONPlaceholder）が混在
+- login APIの正常系statusコードが環境依存で揺れていた（200 / 201混在）
+- assertion層とAPI実行層の責務分離が曖昧
+- 一部テストでtoken存在前提など仕様依存が強い設計になっていた
+
+---
+
+### ■ Action（実施内容）
+
+#### ■ API環境の統一
+- API実行先をJSONPlaceholderに統一
+- ReqRes依存のレスポンス前提を廃止
+- 全APIテストをAルート基準に揃えた
+
+---
+
+#### ■ loginAssertions修正
+
+##### ■ レスポンス構造修正
+- dataラップ前提を廃止
+- body直下構造に統一
+
+##### ■ 成功系検証の整理
+- login成功時の期待値を統一（status 201）
+- token存在チェックを維持
+
+##### ■ 異常系整理
+- password未入力 / email未入力 / 空リクエストの検証を整理
+- errorメッセージ検証をAPI仕様ベースに統一
+
+---
+
+#### ■ userAssertions修正
+
+##### ■ レスポンス構造修正
+- body.data前提を廃止
+- JSONPlaceholderのbody直下構造に統一
+
+##### ■ 検証内容整理
+- id / name / email の存在チェックを実装
+- ユーザー取得レスポンスの構造検証を簡略化
+
+---
+
+#### ■ commonAssertions維持
+- status検証ロジックは変更なし
+- 共通レイヤーとして安定維持
+
+---
+
+### ■ Result（成果）
+
+- APIテストが完全にJSONPlaceholder（Aルート）へ統一
+- login / user のレスポンス構造ズレを解消
+- assertion層の責務が明確化
+- テストが安定し全件PASS状態を維持
+- APIテストの設計が「環境依存なしの固定モデル」に整理
+
+---
+
+### ■ Overall Status
+
+- API環境統一（Aルート化）：完了
+- loginAssertions修正：完了
+- userAssertions修正：完了
+- 共通アサーション維持：完了
+- テスト全件PASS確認：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、APIテスト基盤に存在していた
+ReqRes / JSONPlaceholder混在による設計揺れを解消し、
+
+Aルート（JSONPlaceholder）に完全統一した。
+
+結果として、APIテストは環境依存を排除した安定構造となり、
+assertion層・実行層ともに責務分離が明確化された。
+
+---
 ## 2026-05-15
 
 ### ■ Before

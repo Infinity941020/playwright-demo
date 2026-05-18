@@ -3,7 +3,10 @@ import { CartFlow } from '../flows/CartFlow';
 
 /*
 ================================
-Cart件数検証
+Cart Item Assertions
+================================
+責務：
+- カート内商品件数検証
 ================================
 */
 
@@ -30,27 +33,4 @@ export async function expectEmptyCart(
 ) {
 
   await cartFlow.expectItemCount(0);
-}
-
-/*
-================================
-Cart Badge検証
-================================
-*/
-
-// バッジ件数
-export async function expectCartBadgeCount(
-  cartFlow: CartFlow,
-  expectedCount: number
-) {
-
-  await cartFlow.expectBadgeCount(expectedCount);
-}
-
-// バッジ非表示
-export async function expectCartBadgeHidden(
-  cartFlow: CartFlow
-) {
-
-  await cartFlow.expectBadgeCount(0);
 }
