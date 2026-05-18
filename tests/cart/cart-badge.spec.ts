@@ -1,11 +1,36 @@
-// Playwrightテスト機能（fixture版）を使用
+/*
+================================
+Playwrightテスト機能（fixture版）
+================================
+*/
 import { test } from '../../fixtures/loginFixture';
 
-// CartFlow（業務フロー）
+/*
+================================
+CartFlow（業務フロー）
+================================
+*/
 import { CartFlow } from '../../flows/CartFlow';
 
-// cartHelper（Cart前準備共通化）
+/*
+================================
+cartHelper（Cart前準備共通化）
+================================
+*/
 import { prepareCart } from '../../utils/cartHelper';
+
+/*
+================================
+Cart Assertions
+================================
+*/
+import {
+  expectSingleCartItem,
+  expectMultipleCartItems,
+  expectEmptyCart,
+  expectCartBadgeCount,
+  expectCartBadgeHidden
+} from '../../utils/cartAssertions';
 
 /*
 ================================
@@ -29,7 +54,20 @@ test.describe('カートバッジ検証テスト', () => {
     });
 
     await test.step('バッジ件数確認', async () => {
-      await cartFlow.expectBadgeCount(1);
+      await expectCartBadgeCount(cartFlow, 1);
+    });
+
+    /*
+    ================================
+    Cart画面へ遷移
+    ================================
+    */
+    await test.step('カート画面へ遷移', async () => {
+      await cartFlow.openCart();
+    });
+
+    await test.step('Cart状態確認', async () => {
+      await expectSingleCartItem(cartFlow);
     });
   });
 
@@ -49,7 +87,20 @@ test.describe('カートバッジ検証テスト', () => {
     });
 
     await test.step('バッジ件数確認', async () => {
-      await cartFlow.expectBadgeCount(count);
+      await expectCartBadgeCount(cartFlow, count);
+    });
+
+    /*
+    ================================
+    Cart画面へ遷移
+    ================================
+    */
+    await test.step('カート画面へ遷移', async () => {
+      await cartFlow.openCart();
+    });
+
+    await test.step('Cart状態確認', async () => {
+      await expectMultipleCartItems(cartFlow, count);
     });
   });
 
@@ -73,7 +124,7 @@ test.describe('カートバッジ検証テスト', () => {
     });
 
     await test.step('バッジ件数確認', async () => {
-      await cartFlow.expectBadgeCount(count - 1);
+      await expectCartBadgeCount(cartFlow, count - 1);
     });
   });
 
@@ -98,7 +149,7 @@ test.describe('カートバッジ検証テスト', () => {
     });
 
     await test.step('バッジ件数確認', async () => {
-      await cartFlow.expectBadgeCount(count - 2);
+      await expectCartBadgeCount(cartFlow, count - 2);
     });
   });
 
@@ -120,7 +171,11 @@ test.describe('カートバッジ検証テスト', () => {
     });
 
     await test.step('バッジ非表示確認', async () => {
-      await cartFlow.expectBadgeCount(0);
+      await expectCartBadgeHidden(cartFlow);
+    });
+
+    await test.step('Cart状態確認', async () => {
+      await expectEmptyCart(cartFlow);
     });
   });
 
