@@ -17,7 +17,8 @@ User Assertions
 ================================
 */
 import {
-  expectSingleUserResponse
+  expectSingleUserResponse,
+  expectUserNotFoundPattern
 } from '../../utils/apiAssertions/userAssertions';
 
 /*
@@ -42,6 +43,23 @@ test.describe('User APIテスト', () => {
     console.log(await response.text());
 
     await expectSingleUserResponse(response);
+  });
+
+  /*
+  ================================
+  取得パターン：存在しないユーザー
+  ================================
+  */
+  test('存在しないユーザーID', async ({ request }) => {
+
+    const response = await executeGetUserApi(
+      request,
+      9999
+    );
+
+    console.log(await response.text());
+
+    await expectUserNotFoundPattern(response);
   });
 
 });

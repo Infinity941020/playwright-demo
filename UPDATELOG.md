@@ -1,5 +1,106 @@
 # UPDATE LOG
 ---
+## 2026-05-19
+
+### ■ Before
+
+- APIテスト基盤はAルート（JSONPlaceholder）統一後の初期構成段階だった
+- Login APIテストは正常系のみ実装されていた
+- User APIテストは正常系のみ実装されていた
+- Login / User Assertions の責務整理は完了していたが、入力パターン検証が不足していた
+- User API側に異常系（404系）の検証が未実装だった
+- APIテスト拡張時の設計ルール（コメント統一・責務分離・軽量検証）の適用確認が必要だった
+
+---
+
+### ■ Action（実施内容）
+
+#### ■ Login APIテスト拡張
+
+##### ■ 入力パターン追加
+- password未入力パターンを追加
+- email未入力パターンを追加
+- 空リクエストパターンを追加
+- 不正パスワードパターンを追加
+
+##### ■ loginAssertions再設計
+- 異常系を「入力パターン検証」として整理
+- JSONPlaceholder仕様に合わせた軽量構造検証へ変更
+- API依存のerror message検証を廃止
+- 内部helperを整理
+- 成功系／異常系の責務分離を維持
+
+##### ■ Login API spec整理
+- Login APIテストを正常系＋入力パターン構成へ統一
+- console出力位置を統一
+- Assertions import構造を整理
+
+---
+
+#### ■ User API異常系追加
+
+##### ■ User Assertions拡張
+- User API専用内部helperを追加
+- 空レスポンス構造検証を追加
+- 404パターン用Assertionを追加
+- User Assertions構造をLogin Assertionsと統一
+
+##### ■ User API spec拡張
+- 存在しないユーザーIDテストを追加
+- 404レスポンス検証を追加
+- APIテスト構造をLogin API側と統一
+
+---
+
+#### ■ API Helper確認
+
+##### ■ 責務分離維持確認
+- executeGetUserApiは修正不要と判断
+- helper層に検証ロジックを持たせない構造を維持
+- endpoint責務をhelperへ集約した状態を維持
+
+---
+
+### ■ Result（成果）
+
+- Login APIに入力パターン検証を追加
+- User APIに404異常系検証を追加
+- Login / User Assertions構造を完全統一
+- APIテストの責務分離ルールを維持
+- JSONPlaceholder前提の軽量検証モデルが安定化
+- 全37件PASSを維持
+- CI全PASS確認完了
+
+---
+
+### ■ Overall Status
+
+- Login API入力パターン追加：完了
+- User API異常系追加：完了
+- Assertions構造統一：完了
+- helper責務分離維持：完了
+- APIテスト安定化：完了
+- 全テストPASS確認：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、APIテスト基盤は
+正常系のみの初期構成から、
+
+「入力パターン検証」
+「404異常系検証」
+を含む実運用寄り構成へ拡張された。
+
+また、Login / User Assertions の構造統一、
+helper層との責務分離、
+JSONPlaceholder前提の軽量検証方針が整理され、
+
+Phase1〜5を通して、
+安定したAPIテスト基盤が完成した。
+
+---
 
 ## 2026-05-18
 
