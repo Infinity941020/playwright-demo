@@ -11,7 +11,7 @@ User API Assertions
 JSONPlaceholder API仕様に基づいたユーザー取得専用検証（Aルート）
 ・レスポンスは body直下にユーザー情報が存在
 ・dataラップ構造は存在しない
-・loginAssertionsと同一フォーマットで統一
+・Login Assertionsと同一フォーマットで統一
 ================================
 */
 
@@ -22,20 +22,18 @@ const USER_SUCCESS_STATUS = 200;
 
 /*
 ================================
-正常系：単一ユーザー取得
+内部ヘルパー（user専用）
 ================================
-レスポンス:
-・status 200
-・ユーザー情報が存在すること
-・必要項目（id / name / email）が存在すること
 */
-export async function expectSingleUserResponse(response: APIResponse) {
-  expectStatus(response, USER_SUCCESS_STATUS);
 
+/*
+レスポンス構造の最低限チェック
+*/
+async function expectUserStructure(response: APIResponse) {
   const body = await response.json();
 
   /*
-  レスポンス存在チェック（最低限）
+  レスポンス存在チェック
   */
   expect(body).toBeDefined();
 
@@ -45,4 +43,22 @@ export async function expectSingleUserResponse(response: APIResponse) {
   expect(body?.id).toBeTruthy();
   expect(body?.name).toBeTruthy();
   expect(body?.email).toBeTruthy();
+}
+
+/*
+================================
+正常系：単一ユーザー取得
+================================
+レスポンス:
+・status 200
+・ユーザー情報が存在すること
+・必要項目（id / name / email）が存在すること
+================================
+*/
+export async function expectSingleUserResponse(
+  response: APIResponse
+) {
+  expectStatus(response, USER_SUCCESS_STATUS);
+
+  await expectUserStructure(response);
 }

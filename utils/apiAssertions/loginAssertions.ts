@@ -10,20 +10,16 @@ Login API Assertions
 ================================
 JSONPlaceholder API仕様に基づいたログイン専用検証（Aルート）
 ・実際は /posts 作成APIのためtokenは存在しない
-・成功/失敗/特殊ケースをまとめる
+・入力パターン検証として利用
 ・レスポンス構造は id ベースで検証する
 ================================
 */
 
 /*
-ログイン成功時の期待ステータス（JSONPlaceholderでは201）
+ログイン系POST成功時の期待ステータス
+（JSONPlaceholderではPOST成功時に201返却）
 */
 const LOGIN_SUCCESS_STATUS = 201;
-
-/*
-バリデーション系の期待ステータス（環境依存）
-*/
-const LOGIN_ERROR_STATUS = 400;
 
 /*
 ================================
@@ -33,7 +29,7 @@ const LOGIN_ERROR_STATUS = 400;
 
 /*
 レスポンスにidが存在するか検証
-（JSONPlaceholderではtokenの代わりにidが返る）
+（JSONPlaceholderでは作成成功時にidが返却される）
 */
 async function expectCreatedIdExists(response: APIResponse) {
   const body = await response.json();
@@ -41,8 +37,7 @@ async function expectCreatedIdExists(response: APIResponse) {
 }
 
 /*
-レスポンス構造の最低限チェック（異常系共通）
-※JSONPlaceholderではエラー構造保証がないため安全側で検証
+レスポンス構造の最低限チェック
 */
 async function expectResponseStructure(response: APIResponse) {
   const body = await response.json();
@@ -64,48 +59,64 @@ export async function expectLoginSuccess(response: APIResponse) {
 
 /*
 ================================
-異常系：password未入力
+入力パターン：password未入力
 ================================
 レスポンス:
-・構造としてレスポンスが存在すること
-（API仕様依存を排除した軽量検証）
+・status 201
+・レスポンス構造が存在すること
+================================
 */
-export async function expectMissingPasswordError(response: APIResponse) {
-  expectStatus(response, LOGIN_ERROR_STATUS);
+export async function expectMissingPasswordPattern(
+  response: APIResponse
+) {
+  expectStatus(response, LOGIN_SUCCESS_STATUS);
   await expectResponseStructure(response);
 }
 
 /*
 ================================
-異常系：email未入力
+入力パターン：email未入力
 ================================
 レスポンス:
-・構造としてレスポンスが存在すること
+・status 201
+・レスポンス構造が存在すること
+================================
 */
-export async function expectMissingEmailError(response: APIResponse) {
-  expectStatus(response, LOGIN_ERROR_STATUS);
+export async function expectMissingEmailPattern(
+  response: APIResponse
+) {
+  expectStatus(response, LOGIN_SUCCESS_STATUS);
   await expectResponseStructure(response);
 }
 
 /*
 ================================
-異常系：空リクエスト
+入力パターン：空リクエスト
 ================================
 レスポンス:
-・構造としてレスポンスが存在すること
+・status 201
+・レスポンス構造が存在すること
+================================
 */
-export async function expectEmptyRequestError(response: APIResponse) {
-  expectStatus(response, LOGIN_ERROR_STATUS);
+export async function expectEmptyRequestPattern(
+  response: APIResponse
+) {
+  expectStatus(response, LOGIN_SUCCESS_STATUS);
   await expectResponseStructure(response);
 }
 
 /*
 ================================
-特殊ケース：不正パスワード
+入力パターン：不正パスワード
 ================================
-JSONPlaceholder仕様では成功扱い（201 + id返却）
+レスポンス:
+・status 201
+・作成されたリソースのidが存在すること
+================================
 */
-export async function expectWrongPasswordSuccess(response: APIResponse) {
+export async function expectWrongPasswordPattern(
+  response: APIResponse
+) {
   expectStatus(response, LOGIN_SUCCESS_STATUS);
   await expectCreatedIdExists(response);
 }

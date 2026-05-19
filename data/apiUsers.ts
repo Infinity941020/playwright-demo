@@ -4,7 +4,7 @@ APIテスト用ユーザーデータ（Aルート統一）
 ================================
 ・JSONPlaceholder前提のテストデータ管理
 ・API実行時のpayload生成に使用
-・異常系/正常系の入力パターンを集約
+・正常系/入力パターンを集約
 ================================
 */
 
@@ -14,8 +14,8 @@ export const apiUsers = {
   =================================
   正常系ユーザー
   =================================
-  ・ログイン成功パターン想定
-  ・JSONPlaceholderではPOST成功として扱う
+  ・POST成功パターン用
+  ・JSONPlaceholderでは作成成功扱い
   */
   validUser: {
     email: 'test@example.com',
@@ -24,34 +24,34 @@ export const apiUsers = {
 
   /*
   =================================
-  異常系ユーザー群
+  入力パターン用ユーザー群
   =================================
-  ・入力バリデーション検証用
-  ・APIのエラーハンドリング確認用
+  ・入力値バリエーション確認用
+  ・JSONPlaceholder仕様に合わせて利用
   */
   invalidUsers: {
 
     /*
-    パスワード未入力ケース
+    password未入力
     */
     missingPassword: {
       email: 'test@example.com'
     },
 
     /*
-    メール未入力ケース
+    email未入力
     */
     missingEmail: {
       password: 'password123'
     },
 
     /*
-    空リクエストケース
+    空リクエスト
     */
     emptyRequest: {},
 
     /*
-    誤ったパスワードケース
+    不正パスワード
     */
     wrongPassword: {
       email: 'test@example.com',
