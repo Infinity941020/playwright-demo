@@ -1,11 +1,8 @@
-/*
-================================
-User API Assertions
-================================
-*/
+// Playwright APIレスポンス型（APIレスポンスの型定義とexpectを使用）
+import { APIResponse, expect } from '@playwright/test';
 
-// Playwright APIレスポンス型とアサーション用expectを使用
-import { APIResponse, expect } from '@playwright/test'; 
+// 共通ステータス検証ロジック（HTTPステータス検証の共通化）
+import { expectStatus } from './commonAssertions';
 
 /*
 ================================
@@ -19,6 +16,11 @@ JSONPlaceholder API仕様に基づいたユーザー取得専用検証（Aルー
 */
 
 /*
+User取得成功時の期待ステータス
+*/
+const USER_SUCCESS_STATUS = 200;
+
+/*
 ================================
 正常系：単一ユーザー取得
 ================================
@@ -28,20 +30,19 @@ JSONPlaceholder API仕様に基づいたユーザー取得専用検証（Aルー
 ・必要項目（id / name / email）が存在すること
 */
 export async function expectSingleUserResponse(response: APIResponse) {
-  expect(response.status()).toBe(200);
+  expectStatus(response, USER_SUCCESS_STATUS);
 
   const body = await response.json();
-  // レスポンスボディ取得（JSON形式）
 
   /*
-  レスポンス存在チェック
+  レスポンス存在チェック（最低限）
   */
-  expect(body).toBeTruthy();
+  expect(body).toBeDefined();
 
   /*
   ユーザー情報の基本項目チェック
   */
-  expect(body.id).toBeTruthy();
-  expect(body.name).toBeTruthy();
-  expect(body.email).toBeTruthy();
+  expect(body?.id).toBeTruthy();
+  expect(body?.name).toBeTruthy();
+  expect(body?.email).toBeTruthy();
 }

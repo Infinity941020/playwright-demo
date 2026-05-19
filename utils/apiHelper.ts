@@ -1,30 +1,47 @@
+/*
+================================
+API Helper（実行専用レイヤー）
+================================
+・HTTPリクエスト実行のみ担当
+・検証ロジックは持たない
+・URL/endpointはここで管理（Aルート：JSONPlaceholder統一）
+================================
+*/
+
+// Playwright APIリクエスト型
 import { APIRequestContext } from '@playwright/test';
 
-const BASE_URL = 'https://jsonplaceholder.typicode.com';
+// API設定（環境依存をここに集約）
+import { API_BASE_URL } from './apiConfig';
 
 /*
 ================================
-Pseudo Login API（JSONPlaceholder仕様）
-※ 実際は posts 作成API
+Login API（擬似POST）
+================================
+・JSONPlaceholderでは /login は存在しないため /posts を代替利用
+・認証ではなく「作成API」としてログインを擬似表現
 ================================
 */
 export async function executeLoginApi(
   request: APIRequestContext,
   payload: object
 ) {
-  return await request.post(`${BASE_URL}/posts`, {
+  return request.post(`${API_BASE_URL}/posts`, {
     data: payload
   });
 }
 
 /*
 ================================
-User API
+User API（GET）
+================================
+・ユーザー情報取得API
+・JSONPlaceholder標準エンドポイントを使用
 ================================
 */
 export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
-  return await request.get(`${BASE_URL}/users/${userId}`);
+  return request.get(`${API_BASE_URL}/users/${userId}`);
 }
