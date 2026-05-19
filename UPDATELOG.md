@@ -15,49 +15,64 @@
 
 ### ■ Action（実施内容）
 
-#### ■ Login APIテスト拡張
+## ■ Phase6：APIログ基盤追加
 
-##### ■ 入力パターン追加
+### ■ API Logger導入
+- APIレスポンスログ出力処理を統一化
+- spec内console.logを廃止し、logApiResponseへ集約
+- レスポンス確認の可視性を向上
+
+### ■ spec層の統一
+- Login API / User API両方にログ出力を統一適用
+- テストコード内の重複ログ出力を削減
+
+---
+
+## ■ Phase7：APIテスト拡張＆構造強化
+
+### ■ Login APIテスト拡張
+
+#### ■ 入力パターン追加
 - password未入力パターンを追加
 - email未入力パターンを追加
 - 空リクエストパターンを追加
 - 不正パスワードパターンを追加
 
-##### ■ loginAssertions再設計
+#### ■ loginAssertions再設計
 - 異常系を「入力パターン検証」として整理
 - JSONPlaceholder仕様に合わせた軽量構造検証へ変更
-- API依存のerror message検証を廃止
-- 内部helperを整理
-- 成功系／異常系の責務分離を維持
+- API依存のエラーメッセージ検証を廃止
+- helper関数の責務を整理
+- 成功系・異常系の構造分離を維持
 
-##### ■ Login API spec整理
-- Login APIテストを正常系＋入力パターン構成へ統一
-- console出力位置を統一
+#### ■ Login API spec整理
+- テスト構造を正常系＋入力パターン構成へ統一
+- ログ出力位置を統一（logApiResponse）
 - Assertions import構造を整理
 
 ---
 
-#### ■ User API異常系追加
+### ■ User API異常系追加
 
-##### ■ User Assertions拡張
+#### ■ User Assertions拡張
 - User API専用内部helperを追加
 - 空レスポンス構造検証を追加
 - 404パターン用Assertionを追加
-- User Assertions構造をLogin Assertionsと統一
+- Login Assertionsと同一設計フォーマットへ統一
 
-##### ■ User API spec拡張
+#### ■ User API spec拡張
 - 存在しないユーザーIDテストを追加
 - 404レスポンス検証を追加
-- APIテスト構造をLogin API側と統一
+- API構造をLogin APIと同一設計思想へ統一
 
 ---
 
-#### ■ API Helper確認
+### ■ API Helper確認
 
-##### ■ 責務分離維持確認
+#### ■ 責務分離維持
 - executeGetUserApiは修正不要と判断
-- helper層に検証ロジックを持たせない構造を維持
-- endpoint責務をhelperへ集約した状態を維持
+- helper層に検証ロジックを持たせない設計を維持
+- endpoint責務のみをAPI層へ集約
 
 ---
 
@@ -65,16 +80,20 @@
 
 - Login APIに入力パターン検証を追加
 - User APIに404異常系検証を追加
+- API Logger導入によりログ出力を統一
 - Login / User Assertions構造を完全統一
-- APIテストの責務分離ルールを維持
+- helper層・assertion層・spec層の責務分離が確立
 - JSONPlaceholder前提の軽量検証モデルが安定化
-- 全37件PASSを維持
+- APIテスト基盤の再現性と可読性が向上
+- 全37件PASS維持
 - CI全PASS確認完了
 
 ---
 
 ### ■ Overall Status
 
+- Phase6（APIログ基盤）：完了
+- Phase7（API拡張＆構造整理）：完了
 - Login API入力パターン追加：完了
 - User API異常系追加：完了
 - Assertions構造統一：完了
@@ -87,18 +106,17 @@
 ### ■ Conclusion
 
 本対応により、APIテスト基盤は
-正常系のみの初期構成から、
 
-「入力パターン検証」
-「404異常系検証」
-を含む実運用寄り構成へ拡張された。
+- ログ出力の統一（Phase6）
+- 入力パターン追加（Phase7）
+- 404異常系検証の追加
+- Assertions構造統一
+- helper層の責務分離維持
 
-また、Login / User Assertions の構造統一、
-helper層との責務分離、
-JSONPlaceholder前提の軽量検証方針が整理され、
+を通じて、初期構成から「実運用レベルのテスト設計構造」へ拡張された。
 
-Phase1〜5を通して、
-安定したAPIテスト基盤が完成した。
+結果として、APIテストは
+**軽量・再現性・拡張性を備えた安定基盤として完成した。**
 
 ---
 

@@ -33,11 +33,6 @@ Login APIテスト
 */
 test.describe('Login APIテスト', () => {
 
-  /*
-  ================================
-  正常系（POST作成成功）
-  ================================
-  */
   test('正常ログイン（POST作成成功）', async ({ request }) => {
 
     const response = await executeLoginApi(
@@ -50,11 +45,6 @@ test.describe('Login APIテスト', () => {
     await expectLoginSuccess(response);
   });
 
-  /*
-  ================================
-  入力パターン：password未入力
-  ================================
-  */
   test('password未入力', async ({ request }) => {
 
     const response = await executeLoginApi(
@@ -67,11 +57,6 @@ test.describe('Login APIテスト', () => {
     await expectMissingPasswordPattern(response);
   });
 
-  /*
-  ================================
-  入力パターン：email未入力
-  ================================
-  */
   test('email未入力', async ({ request }) => {
 
     const response = await executeLoginApi(
@@ -84,11 +69,6 @@ test.describe('Login APIテスト', () => {
     await expectMissingEmailPattern(response);
   });
 
-  /*
-  ================================
-  入力パターン：空リクエスト
-  ================================
-  */
   test('空リクエスト', async ({ request }) => {
 
     const response = await executeLoginApi(
@@ -101,11 +81,6 @@ test.describe('Login APIテスト', () => {
     await expectEmptyRequestPattern(response);
   });
 
-  /*
-  ================================
-  入力パターン：不正パスワード
-  ================================
-  */
   test('不正パスワード', async ({ request }) => {
 
     const response = await executeLoginApi(

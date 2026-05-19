@@ -1,18 +1,31 @@
 /*
 ================================
-API Logger（Phase6）
+API Logger（Phase7）
 ================================
 ・APIレスポンスの出力専用
 ・spec側のconsole.logを統一
-・将来のログ拡張ポイント
+・CIで読みやすいフォーマットに統一
 ================================
 */
 
 import { APIResponse } from '@playwright/test';
 
 /*
-レスポンスをそのまま出力
+レスポンスを整形して出力
 */
 export async function logApiResponse(response: APIResponse) {
-  console.log(await response.text());
+
+  const status = response.status();
+  const bodyText = await response.text();
+
+  console.log(`
+================================
+API RESPONSE LOG
+================================
+STATUS: ${status}
+--------------------------------
+BODY:
+${bodyText}
+================================
+  `.trim());
 }

@@ -31,11 +31,6 @@ User APIテスト
 */
 test.describe('User APIテスト', () => {
 
-  /*
-  ================================
-  正常系：単一ユーザー取得
-  ================================
-  */
   test('単一ユーザー情報を取得できること', async ({ request }) => {
 
     const response = await executeGetUserApi(
@@ -48,11 +43,6 @@ test.describe('User APIテスト', () => {
     await expectSingleUserResponse(response);
   });
 
-  /*
-  ================================
-  取得パターン：存在しないユーザー
-  ================================
-  */
   test('存在しないユーザーID', async ({ request }) => {
 
     const response = await executeGetUserApi(
