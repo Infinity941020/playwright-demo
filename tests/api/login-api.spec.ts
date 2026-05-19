@@ -14,7 +14,10 @@ import { apiUsers } from '../../data/apiUsers';
 // API実行ヘルパー
 import { executeLoginApi } from '../../utils/apiHelper';
 
-// Assertions（Phase4版）
+// API Logger
+import { logApiResponse } from '../../utils/apiLogger';
+
+// Assertions
 import {
   expectLoginSuccess,
   expectMissingPasswordPattern,
@@ -42,7 +45,7 @@ test.describe('Login APIテスト', () => {
       apiUsers.validUser
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectLoginSuccess(response);
   });
@@ -59,7 +62,7 @@ test.describe('Login APIテスト', () => {
       apiUsers.invalidUsers.missingPassword
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectMissingPasswordPattern(response);
   });
@@ -76,7 +79,7 @@ test.describe('Login APIテスト', () => {
       apiUsers.invalidUsers.missingEmail
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectMissingEmailPattern(response);
   });
@@ -93,7 +96,7 @@ test.describe('Login APIテスト', () => {
       apiUsers.invalidUsers.emptyRequest
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectEmptyRequestPattern(response);
   });
@@ -110,7 +113,7 @@ test.describe('Login APIテスト', () => {
       apiUsers.invalidUsers.wrongPassword
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectWrongPasswordPattern(response);
   });

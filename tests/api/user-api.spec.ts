@@ -11,6 +11,9 @@ import { test } from '@playwright/test';
 // API実行ヘルパー
 import { executeGetUserApi } from '../../utils/apiHelper';
 
+// API Logger
+import { logApiResponse } from '../../utils/apiLogger';
+
 /*
 ================================
 User Assertions
@@ -40,7 +43,7 @@ test.describe('User APIテスト', () => {
       2
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectSingleUserResponse(response);
   });
@@ -57,7 +60,7 @@ test.describe('User APIテスト', () => {
       9999
     );
 
-    console.log(await response.text());
+    await logApiResponse(response);
 
     await expectUserNotFoundPattern(response);
   });
