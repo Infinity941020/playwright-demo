@@ -24,12 +24,12 @@ export const apiUsers = {
 
   /*
   =================================
-  入力パターン用ユーザー群
+  入力パターン検証用データ群
   =================================
-  ・入力値バリエーション確認用
-  ・JSONPlaceholder仕様に合わせて利用
+  ・JSONPlaceholder前提の入力パターン検証用
+  ・HTTPエラーではなくpayload差分確認として利用
   */
-  invalidUsers: {
+  inputPatterns: {
 
     /*
     password未入力
@@ -51,7 +51,7 @@ export const apiUsers = {
     emptyRequest: {},
 
     /*
-    不正パスワード
+    不正パスワード入力
     */
     wrongPassword: {
       email: 'test@example.com',

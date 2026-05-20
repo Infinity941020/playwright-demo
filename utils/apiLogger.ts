@@ -1,31 +1,65 @@
 /*
 ================================
-API Logger（Phase7）
-================================
-・APIレスポンスの出力専用
-・spec側のconsole.logを統一
-・CIで読みやすいフォーマットに統一
+APIレスポンスログ出力
+（軽量版）
 ================================
 */
 
 import { APIResponse } from '@playwright/test';
 
-/*
-レスポンスを整形して出力
-*/
-export async function logApiResponse(response: APIResponse) {
+export async function logApiResponse(
+  response: APIResponse
+): Promise<void> {
 
-  const status = response.status();
-  const bodyText = await response.text();
+  const body = await response.json();
 
-  console.log(`
-================================
-API RESPONSE LOG
-================================
-STATUS: ${status}
---------------------------------
-BODY:
-${bodyText}
-================================
-  `.trim());
+  console.log('================================');
+  console.log('API RESPONSE LOG');
+  console.log('================================');
+
+  console.log('URL:');
+  console.log(response.url());
+
+  console.log('');
+
+  console.log('STATUS:');
+  console.log(response.status());
+
+  console.log('');
+
+  /*
+  =================================
+  HEADERSは重要なものだけ表示
+  =================================
+  */
+  console.log('HEADERS:');
+
+  console.log({
+    'content-type': response.headers()['content-type'],
+    server: response.headers()['server']
+  });
+
+  console.log('');
+
+  /*
+  =================================
+  BODY大量対策
+  =================================
+  */
+
+  if (Array.isArray(body)) {
+
+    console.log('BODY:');
+    console.log(`Array Length: ${body.length}`);
+
+    console.log('First Item Preview:');
+    console.log(body[0]);
+
+  } else {
+
+    console.log('BODY:');
+    console.log(body);
+  }
+
+  console.log('================================');
 }

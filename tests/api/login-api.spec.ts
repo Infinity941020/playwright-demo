@@ -28,11 +28,24 @@ import {
 
 /*
 ================================
+JSONPlaceholder仕様上、
+異常系HTTPエラーは返却されないため、
+入力パターン検証として実施する
+================================
+*/
+
+/*
+================================
 Login APIテスト
 ================================
 */
 test.describe('Login APIテスト', () => {
 
+  /*
+  =================================
+  正常ログイン
+  =================================
+  */
   test('正常ログイン（POST作成成功）', async ({ request }) => {
 
     const response = await executeLoginApi(
@@ -45,11 +58,16 @@ test.describe('Login APIテスト', () => {
     await expectLoginSuccess(response);
   });
 
-  test('password未入力', async ({ request }) => {
+  /*
+  =================================
+  password未入力
+  =================================
+  */
+  test('password未入力パターン', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
-      apiUsers.invalidUsers.missingPassword
+      apiUsers.inputPatterns.missingPassword
     );
 
     await logApiResponse(response);
@@ -57,11 +75,16 @@ test.describe('Login APIテスト', () => {
     await expectMissingPasswordPattern(response);
   });
 
-  test('email未入力', async ({ request }) => {
+  /*
+  =================================
+  email未入力
+  =================================
+  */
+  test('email未入力パターン', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
-      apiUsers.invalidUsers.missingEmail
+      apiUsers.inputPatterns.missingEmail
     );
 
     await logApiResponse(response);
@@ -69,11 +92,16 @@ test.describe('Login APIテスト', () => {
     await expectMissingEmailPattern(response);
   });
 
-  test('空リクエスト', async ({ request }) => {
+  /*
+  =================================
+  空リクエスト
+  =================================
+  */
+  test('空リクエストパターン', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
-      apiUsers.invalidUsers.emptyRequest
+      apiUsers.inputPatterns.emptyRequest
     );
 
     await logApiResponse(response);
@@ -81,11 +109,16 @@ test.describe('Login APIテスト', () => {
     await expectEmptyRequestPattern(response);
   });
 
-  test('不正パスワード', async ({ request }) => {
+  /*
+  =================================
+  不正パスワード
+  =================================
+  */
+  test('不正パスワード入力パターン', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
-      apiUsers.invalidUsers.wrongPassword
+      apiUsers.inputPatterns.wrongPassword
     );
 
     await logApiResponse(response);

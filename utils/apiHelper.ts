@@ -18,9 +18,6 @@ import { API_BASE_URL } from './apiConfig';
 ================================
 Login API（擬似POST）
 ================================
-・JSONPlaceholderでは /login は存在しないため /posts を代替利用
-・認証ではなく「作成API」としてログインを擬似表現
-================================
 */
 export async function executeLoginApi(
   request: APIRequestContext,
@@ -35,13 +32,49 @@ export async function executeLoginApi(
 ================================
 User API（GET）
 ================================
-・ユーザー情報取得API
-・JSONPlaceholder標準エンドポイントを使用
-================================
 */
 export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
   return request.get(`${API_BASE_URL}/users/${userId}`);
+}
+
+/*
+================================
+Cart API（Phase8追加）
+================================
+・JSONPlaceholderのpostsを擬似Cartとして使用
+================================
+*/
+
+/*
+Cart追加
+*/
+export async function executeAddCartApi(
+  request: APIRequestContext,
+  payload: object
+) {
+  return request.post(`${API_BASE_URL}/posts`, {
+    data: payload
+  });
+}
+
+/*
+Cart取得
+*/
+export async function executeGetCartApi(
+  request: APIRequestContext
+) {
+  return request.get(`${API_BASE_URL}/posts`);
+}
+
+/*
+Cart削除
+*/
+export async function executeDeleteCartApi(
+  request: APIRequestContext,
+  cartId: number
+) {
+  return request.delete(`${API_BASE_URL}/posts/${cartId}`);
 }
