@@ -1,5 +1,150 @@
 # UPDATE LOG
 ---
+## 2026-05-20
+
+### ■ Before
+
+- APIテスト基盤はPhase7完了状態だった
+- Login API / User APIは構造統一済みだった
+- Cart APIテストは未実装だった
+- API Loggerは導入済みだったが、レスポンスBody肥大化問題が残っていた
+- JSONPlaceholder仕様との差異により、Cart Assertions設計が未整理状態だった
+- Cart API用helper / assertions / specの責務分離が未構築だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase8：Cart APIテスト追加＆APIログ最適化
+
+### ■ Cart API helper追加
+
+#### ■ executeAddCartApi追加
+- Cart追加API用helperを追加
+- POST `/posts` を利用したJSONPlaceholder対応構成へ統一
+
+#### ■ executeGetCartApi追加
+- Cart一覧取得API helperを追加
+- GET `/posts` 構成を追加
+
+#### ■ executeDeleteCartApi追加
+- Cart削除API helperを追加
+- DELETE `/posts/:id` 構成を追加
+
+#### ■ helper責務整理
+- endpoint責務のみに限定
+- assertionロジックを完全排除
+- Login / User APIと同一構造へ統一
+
+---
+
+## ■ Cart Assertions新規実装
+
+### ■ expectAddCartSuccess追加
+- Cart追加成功検証を追加
+- JSONPlaceholder仕様に合わせた軽量構造検証へ変更
+- `id` 存在確認ベースへ統一
+
+### ■ expectGetCartListSuccess追加
+- Cart一覧取得検証を追加
+- 配列レスポンス検証を追加
+- Array Length確認を導入
+- 先頭要素の構造検証を追加
+
+### ■ expectDeleteCartSuccess追加
+- Cart削除成功検証を追加
+- DELETEレスポンス `{}` に対応
+- JSONPlaceholder仕様へ完全準拠
+
+### ■ Assertions責務整理
+- Login / User Assertionsと同一設計へ統一
+- helper内部関数を整理
+- JSONPlaceholder前提の軽量設計へ最適化
+
+---
+
+## ■ Cart API spec追加
+
+### ■ Cart追加テスト追加
+- Cart追加成功テストを追加
+- helper → logger → assertion の責務分離構成を適用
+
+### ■ Cart一覧取得テスト追加
+- 一覧取得テストを追加
+- 大量レスポンス対応確認を実施
+
+### ■ Cart削除テスト追加
+- DELETE成功検証を追加
+- 空オブジェクトレスポンス対応を確認
+
+### ■ spec構造統一
+- Login / User APIと同一コメント構成へ統一
+- describe / test構成を統一
+- import構造を整理
+
+---
+
+## ■ API Logger最適化
+
+### ■ 大量レスポンス対策
+- Cart一覧取得時のログ肥大化問題を修正
+- Array Length表示を追加
+- First Item Preview表示を追加
+- 全件dump出力を廃止
+
+### ■ ログ可読性改善
+- HEADERS簡略表示を追加
+- 必要最低限のレスポンス表示へ調整
+- CIログ可読性を向上
+
+---
+
+### ■ Result（成果）
+
+- Cart APIテスト基盤を新規追加
+- Cart helper / assertions / spec の責務分離を確立
+- JSONPlaceholder仕様に完全対応
+- API Loggerの大量ログ問題を解消
+- Arrayレスポンス可読性を改善
+- Login / User / Cart API構造を完全統一
+- APIテスト全体の保守性を向上
+- 全10件PASS確認完了
+- APIテスト基盤のPhase8を完了
+
+---
+
+### ■ Overall Status
+
+- Phase8（Cart API追加）：完了
+- Cart helper追加：完了
+- Cart Assertions追加：完了
+- Cart spec追加：完了
+- API Logger最適化：完了
+- JSONPlaceholder対応整理：完了
+- API構造統一：完了
+- 全APIテストPASS確認：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、APIテスト基盤は
+
+- Cart API追加
+- helper / assertion / spec責務分離
+- JSONPlaceholder対応最適化
+- API Logger改善
+- Arrayレスポンス可読性向上
+- API構造完全統一
+
+を通じて、Login / User / Cart を含む
+「実運用可能な統一APIテスト基盤」として完成した。
+
+結果として、APIテストは
+**軽量・拡張性・可読性・保守性を備えた安定構造へ到達した。**
+
+---
+
 ## 2026-05-19
 
 ### ■ Before
