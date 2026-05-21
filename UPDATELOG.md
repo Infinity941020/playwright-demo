@@ -1,5 +1,146 @@
 # UPDATE LOG
 ---
+## 2026-05-21
+
+### ■ Before
+
+- Phase8完了時点で Login / User / Cart API構造は統一済みだった
+- Checkout APIは正常系のみの軽量構成だった
+- Checkout Assertionsは単一成功検証のみ実装されていた
+- Cart / Checkout の入力パターン設計が未整理状態だった
+- APIデータレイヤ分離がLoginのみで実施されていた
+- RecRes移行方針が未確定だった
+- APIテストの実装範囲（正常系・異常系）の定義が曖昧だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase9：Checkout API拡張＆API設計整理
+
+### ■ Checkout APIテスト拡張
+
+#### ■ 入力パターン追加
+- cartId未指定パターン追加
+- userId未指定パターン追加
+- totalPrice未指定パターン追加
+- 空リクエストパターン追加
+
+#### ■ Checkout spec構造整理
+- Login APIと同一構造へ統一
+- describe / test構成を統一
+- helper → logger → assertion の責務分離を維持
+
+#### ■ JSONPlaceholder前提設計整理
+- JSONPlaceholderではHTTP異常系が返却されない仕様を整理
+- 入力パターン検証として実装方針を統一
+- 「異常系」ではなく「payload差分検証」として整理
+
+---
+
+## ■ Cart API拡張
+
+### ■ 入力パターン追加
+- title未入力パターン追加
+- userId未入力パターン追加
+- 空リクエストパターン追加
+
+### ■ Cart Assertions拡張
+- JSONPlaceholderレスポンス仕様に合わせた軽量検証を追加
+- id生成確認ベースへ統一
+- optional payload前提へ整理
+
+### ■ apiCarts.ts追加
+- Cart API専用データレイヤファイルを追加
+- Login APIと同様のデータ分離構成へ移行開始
+
+---
+
+## ■ APIテスト設計整理
+
+### ■ 実案件ベースのAPIテスト設計を整理
+- UIテストは正常系中心になりやすいことを整理
+- APIテストは入力パターン・validation検証中心になることを整理
+- UI/APIの責務差分を明文化
+
+### ■ APIテスト実装範囲を整理
+- Login → 正常系＋入力パターン検証
+- Cart → CRUD＋入力パターン
+- Checkout → 入力パターン中心
+- Logout → API対象外（UI責務）として整理
+
+### ■ RecRes移行方針整理
+- Login/UserのみReqRes移行
+- Cart/CheckoutはJSONPlaceholder維持
+- 将来的にB案（ReqRes擬似化）
+  → C案（MSW/mock server）へ段階拡張可能な構成として整理
+
+---
+
+## ■ API実行確認
+
+### ■ 実行結果
+- 全18件PASS確認
+- Login API：PASS
+- User API：PASS
+- Cart API：PASS
+- Checkout API：PASS
+
+### ■ ログ確認
+- API Logger正常動作確認
+- Array Length表示確認
+- First Item Preview確認
+- JSONPlaceholderレスポンス整合確認
+
+---
+
+### ■ Result（成果）
+
+- Checkout APIを入力パターン対応へ拡張
+- Cart API入力パターンを追加
+- APIテスト構造を完全統一
+- data / helper / assertion / spec の責務分離を強化
+- APIテスト実装範囲を整理
+- RecRes移行方針を確定
+- APIテスト18件PASS確認
+- APIテスト基盤を次フェーズ（ReqRes移行）へ進行可能状態へ整理
+
+---
+
+### ■ Overall Status
+
+- Phase9（Checkout API拡張）：完了
+- Cart入力パターン追加：完了
+- Checkout入力パターン追加：完了
+- API実装範囲整理：完了
+- RecRes移行方針整理：完了
+- API責務整理：完了
+- APIテスト18件PASS：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、APIテスト基盤は
+
+- Login / User / Cart / Checkout の構造統一
+- 入力パターン検証対応
+- data / helper / assertion / spec 分離
+- JSONPlaceholder仕様整理
+- RecRes移行準備
+- API設計方針整理
+
+を通じて、
+「段階的に実APIへ移行可能な拡張型APIテスト基盤」
+として整理された。
+
+結果として、APIテストは
+軽量構造を維持しつつ、
+将来的な実API validation・schema強化・mock server導入へ
+自然に拡張可能な設計状態へ到達した。
+
+---
+
 ## 2026-05-20
 
 ### ■ Before

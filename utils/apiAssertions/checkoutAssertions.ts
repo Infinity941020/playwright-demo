@@ -1,27 +1,43 @@
 /*
 ================================
 Checkout API Assertions
+（JSONPlaceholder対応）
 ================================
 */
 
-import { expect, APIResponse } from '@playwright/test';
+import { APIResponse } from '@playwright/test';
+
+// 共通Assertion
+import {
+  expectStatus,
+  expectCreatedResource
+} from './commonAssertions';
 
 /*
 ================================
-Checkout成功検証（軽量版）
+Checkout API Assertions
+================================
+JSONPlaceholder API仕様に基づいた
+Checkout専用検証
+================================
+*/
+
+const CHECKOUT_SUCCESS_STATUS = 201;
+
+/*
+================================
+Checkout成功検証
 ================================
 */
 export async function expectCheckoutSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expect(response.status()).toBe(201);
+  expectStatus(response, CHECKOUT_SUCCESS_STATUS);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-
-  expect(body.id).toBeDefined();
+  expectCreatedResource(body);
 
   /*
   =================================

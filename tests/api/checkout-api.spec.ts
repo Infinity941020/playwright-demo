@@ -8,6 +8,9 @@ Checkout APIテスト
 // Playwrightテストランナー
 import { test } from '@playwright/test';
 
+// テストデータ
+import { apiCheckout } from '../../data/apiCheckout';
+
 // API実行ヘルパー
 import { executeCheckoutApi } from '../../utils/apiHelper';
 
@@ -16,6 +19,14 @@ import { logApiResponse } from '../../utils/apiLogger';
 
 // Assertions
 import { expectCheckoutSuccess } from '../../utils/apiAssertions/checkoutAssertions';
+
+/*
+================================
+JSONPlaceholder仕様上、
+異常系HTTPエラーは返却されないため、
+入力パターン検証として実施する
+================================
+*/
 
 /*
 ================================
@@ -31,11 +42,10 @@ test.describe('Checkout APIテスト', () => {
   */
   test('Checkoutが成功すること', async ({ request }) => {
 
-    const response = await executeCheckoutApi(request, {
-      cartId: 1,
-      userId: 1,
-      totalPrice: 5000
-    });
+    const response = await executeCheckoutApi(
+      request,
+      apiCheckout.validCheckout
+    );
 
     await logApiResponse(response);
 
@@ -49,10 +59,10 @@ test.describe('Checkout APIテスト', () => {
   */
   test('cartId未指定パターン', async ({ request }) => {
 
-    const response = await executeCheckoutApi(request, {
-      userId: 1,
-      totalPrice: 5000
-    });
+    const response = await executeCheckoutApi(
+      request,
+      apiCheckout.inputPatterns.missingCartId
+    );
 
     await logApiResponse(response);
 
@@ -66,10 +76,10 @@ test.describe('Checkout APIテスト', () => {
   */
   test('userId未指定パターン', async ({ request }) => {
 
-    const response = await executeCheckoutApi(request, {
-      cartId: 1,
-      totalPrice: 5000
-    });
+    const response = await executeCheckoutApi(
+      request,
+      apiCheckout.inputPatterns.missingUserId
+    );
 
     await logApiResponse(response);
 
@@ -83,10 +93,10 @@ test.describe('Checkout APIテスト', () => {
   */
   test('totalPrice未指定パターン', async ({ request }) => {
 
-    const response = await executeCheckoutApi(request, {
-      cartId: 1,
-      userId: 1
-    });
+    const response = await executeCheckoutApi(
+      request,
+      apiCheckout.inputPatterns.missingTotalPrice
+    );
 
     await logApiResponse(response);
 
@@ -100,7 +110,10 @@ test.describe('Checkout APIテスト', () => {
   */
   test('空リクエストパターン', async ({ request }) => {
 
-    const response = await executeCheckoutApi(request, {});
+    const response = await executeCheckoutApi(
+      request,
+      apiCheckout.inputPatterns.emptyRequest
+    );
 
     await logApiResponse(response);
 

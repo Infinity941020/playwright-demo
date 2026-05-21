@@ -5,7 +5,26 @@ Cart API Assertions
 ================================
 */
 
-import { expect, APIResponse } from '@playwright/test';
+import { APIResponse, expect } from '@playwright/test';
+
+// 共通Assertion
+import {
+  expectStatus,
+  expectCreatedResource
+} from './commonAssertions';
+
+/*
+================================
+Cart API Assertions
+================================
+JSONPlaceholder API仕様に基づいた
+Cart専用検証
+================================
+*/
+
+const CART_SUCCESS_STATUS = 201;
+const CART_GET_STATUS = 200;
+const CART_DELETE_STATUS = 200;
 
 /*
 ================================
@@ -16,7 +35,7 @@ export async function expectGetCartListSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expect(response.status()).toBe(200);
+  expectStatus(response, CART_GET_STATUS);
 
   const body = await response.json();
 
@@ -34,13 +53,71 @@ export async function expectAddCartSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expect(response.status()).toBe(201);
+  expectStatus(response, CART_SUCCESS_STATUS);
 
   const body = await response.json();
 
-  expect(body.id).toBeDefined();
+  expectCreatedResource(body);
 
   expect(body.title).toBeDefined();
+}
+
+/*
+================================
+title未入力パターン
+================================
+*/
+export async function expectMissingTitlePattern(
+  response: APIResponse
+): Promise<void> {
+
+  expectStatus(response, CART_SUCCESS_STATUS);
+
+  const body = await response.json();
+
+  expect(body.title).toBeUndefined();
+
+  expect(body.userId).toBe(1);
+
+  expectCreatedResource(body);
+}
+
+/*
+================================
+userId未入力パターン
+================================
+*/
+export async function expectMissingUserIdPattern(
+  response: APIResponse
+): Promise<void> {
+
+  expectStatus(response, CART_SUCCESS_STATUS);
+
+  const body = await response.json();
+
+  expect(body.title).toBe('Sample Cart Item');
+
+  expect(body.userId).toBeUndefined();
+
+  expectCreatedResource(body);
+}
+
+/*
+================================
+空リクエストパターン
+================================
+*/
+export async function expectEmptyCartRequestPattern(
+  response: APIResponse
+): Promise<void> {
+
+  expectStatus(response, CART_SUCCESS_STATUS);
+
+  const body = await response.json();
+
+  expectCreatedResource(body);
+
+  expect(Object.keys(body)).toContain('id');
 }
 
 /*
@@ -52,13 +129,15 @@ export async function expectDeleteCartSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expect(response.status()).toBe(200);
+  expectStatus(response, CART_DELETE_STATUS);
 
   const body = await response.json();
 
   /*
+  =================================
   JSONPlaceholder DELETEは {}
   を返す
+  =================================
   */
 
   expect(body).toEqual({});
