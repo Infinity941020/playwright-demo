@@ -78,3 +78,25 @@ export async function executeDeleteCartApi(
 ) {
   return request.delete(`${API_BASE_URL}/posts/${cartId}`);
 }
+
+/*
+================================
+Checkout API（Phase9追加）
+================================
+・Cart確定 → Checkout生成（擬似POST）
+・JSONPlaceholder postsを流用
+・異常系対応のため payload は optional 許容
+================================
+*/
+export async function executeCheckoutApi(
+  request: APIRequestContext,
+  payload: {
+    cartId?: number;
+    userId?: number;
+    totalPrice?: number;
+  }
+) {
+  return request.post(`${API_BASE_URL}/posts`, {
+    data: payload
+  });
+}
