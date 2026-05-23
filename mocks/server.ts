@@ -1,7 +1,7 @@
-import { setupServer } from 'msw/node';
+const { setupServer } = require('msw/node');
 
-import { loginHandlers } from './handlers/loginHandlers';
-import { userHandlers } from './handlers/userHandlers';
+const { loginHandlers } = require('./handlers/loginHandlers');
+const { userHandlers } = require('./handlers/userHandlers');
 
 /*
 ================================
@@ -9,7 +9,7 @@ MSW Server
 ================================
 */
 
-export const server = setupServer(
+exports.server = setupServer(
   ...loginHandlers,
   ...userHandlers
 );
