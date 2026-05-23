@@ -6,10 +6,10 @@ import { z } from 'zod';
 ================================
 Login Response Schema
 ================================
-JSONPlaceholder /posts のレスポンス構造
+ReqRes Login Response
 ================================
 */
 
 export const loginSchema = z.object({
-  id: z.number(),
+  token: z.string(),
 });

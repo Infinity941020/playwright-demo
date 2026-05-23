@@ -1,91 +1,66 @@
-/*
-================================
-API Helper（実行専用レイヤー）
-================================
-・HTTPリクエスト実行のみ担当
-・検証ロジックは持たない
-・URL/endpointはここで管理（Aルート：JSONPlaceholder統一）
-================================
-*/
-
-// Playwright APIリクエスト型
 import { APIRequestContext } from '@playwright/test';
 
-// API設定（環境依存をここに集約）
-import { API_BASE_URL } from './apiConfig';
+import {
+  JSONPLACEHOLDER_BASE_URL,
+  REQRES_BASE_URL
+} from './apiConfig';
 
 /*
 ================================
-Login API（擬似POST）
+Login API（ReqRes移行対象）
 ================================
 */
 export async function executeLoginApi(
   request: APIRequestContext,
   payload: object
 ) {
-  return request.post(`${API_BASE_URL}/posts`, {
+  return request.post(`${REQRES_BASE_URL}/api/login`, {
     data: payload
   });
 }
 
 /*
 ================================
-User API（GET）
+User API（ReqRes移行対象）
 ================================
 */
 export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
-  return request.get(`${API_BASE_URL}/users/${userId}`);
+  return request.get(`${REQRES_BASE_URL}/api/users/${userId}`);
 }
 
 /*
 ================================
-Cart API（Phase8追加）
+Cart API（JSONPlaceholder維持）
 ================================
-・JSONPlaceholderのpostsを擬似Cartとして使用
-================================
-*/
-
-/*
-Cart追加
 */
 export async function executeAddCartApi(
   request: APIRequestContext,
   payload: object
 ) {
-  return request.post(`${API_BASE_URL}/posts`, {
+  return request.post(`${JSONPLACEHOLDER_BASE_URL}/posts`, {
     data: payload
   });
 }
 
-/*
-Cart取得
-*/
 export async function executeGetCartApi(
   request: APIRequestContext
 ) {
-  return request.get(`${API_BASE_URL}/posts`);
+  return request.get(`${JSONPLACEHOLDER_BASE_URL}/posts`);
 }
 
-/*
-Cart削除
-*/
 export async function executeDeleteCartApi(
   request: APIRequestContext,
   cartId: number
 ) {
-  return request.delete(`${API_BASE_URL}/posts/${cartId}`);
+  return request.delete(`${JSONPLACEHOLDER_BASE_URL}/posts/${cartId}`);
 }
 
 /*
 ================================
-Checkout API（Phase9追加）
-================================
-・Cart確定 → Checkout生成（擬似POST）
-・JSONPlaceholder postsを流用
-・異常系対応のため payload は optional 許容
+Checkout API（JSONPlaceholder維持）
 ================================
 */
 export async function executeCheckoutApi(
@@ -96,7 +71,7 @@ export async function executeCheckoutApi(
     totalPrice?: number;
   }
 ) {
-  return request.post(`${API_BASE_URL}/posts`, {
+  return request.post(`${JSONPLACEHOLDER_BASE_URL}/posts`, {
     data: payload
   });
 }

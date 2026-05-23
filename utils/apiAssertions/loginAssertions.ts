@@ -1,25 +1,23 @@
-// Playwright APIレスポンス型
+/*
+================================
+Login API Assertions（ReqRes版）
+================================
+・ReqRes API /api/login 前提
+・成功 / 失敗の2パターンのみ
+・入力バリエーション検証は廃止
+================================
+*/
+
 import { APIResponse, expect } from '@playwright/test';
 
-// 共通Assertion
-import {
-  expectStatus,
-  expectCreatedResource
-} from './commonAssertions';
+// 共通
+import { expectStatus } from './commonAssertions';
 
 // schema
 import { loginSchema } from '../schema/loginSchema';
 
-/*
-================================
-Login API Assertions
-================================
-JSONPlaceholder API仕様に基づいた
-ログイン専用検証
-================================
-*/
-
-const LOGIN_SUCCESS_STATUS = 201;
+const LOGIN_SUCCESS_STATUS = 200;
+const LOGIN_FAILURE_STATUS = 400;
 
 /*
 ================================
@@ -29,89 +27,29 @@ const LOGIN_SUCCESS_STATUS = 201;
 export async function expectLoginSuccess(
   response: APIResponse
 ) {
-
   expectStatus(response, LOGIN_SUCCESS_STATUS);
 
   const body = await response.json();
 
-  // schema構造保証
+  // schema（token構造）
   loginSchema.parse(body);
+
+  expect(body.token).toBeDefined();
+  expect(typeof body.token).toBe('string');
 }
 
 /*
 ================================
-password未入力パターン
+異常系：ログイン失敗
 ================================
 */
-export async function expectMissingPasswordPattern(
+export async function expectLoginFailure(
   response: APIResponse
 ) {
-
-  expectStatus(response, LOGIN_SUCCESS_STATUS);
+  expectStatus(response, LOGIN_FAILURE_STATUS);
 
   const body = await response.json();
 
-  expect(body.email).toBe('test@example.com');
-
-  expect(body.password).toBeUndefined();
-
-  expectCreatedResource(body);
-}
-
-/*
-================================
-email未入力パターン
-================================
-*/
-export async function expectMissingEmailPattern(
-  response: APIResponse
-) {
-
-  expectStatus(response, LOGIN_SUCCESS_STATUS);
-
-  const body = await response.json();
-
-  expect(body.password).toBe('password123');
-
-  expect(body.email).toBeUndefined();
-
-  expectCreatedResource(body);
-}
-
-/*
-================================
-空リクエストパターン
-================================
-*/
-export async function expectEmptyRequestPattern(
-  response: APIResponse
-) {
-
-  expectStatus(response, LOGIN_SUCCESS_STATUS);
-
-  const body = await response.json();
-
-  expectCreatedResource(body);
-
-  expect(Object.keys(body)).toContain('id');
-}
-
-/*
-================================
-不正パスワード入力パターン
-================================
-*/
-export async function expectWrongPasswordPattern(
-  response: APIResponse
-) {
-
-  expectStatus(response, LOGIN_SUCCESS_STATUS);
-
-  const body = await response.json();
-
-  expect(body.email).toBe('test@example.com');
-
-  expect(body.password).toBe('wrong-password');
-
-  expectCreatedResource(body);
+  expect(body.error).toBeDefined();
+  expect(typeof body.error).toBe('string');
 }

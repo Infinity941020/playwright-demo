@@ -1,15 +1,13 @@
 /*
 ================================
-Login APIテスト
-（JSONPlaceholder対応）
+Login APIテスト（ReqRes）
 ================================
 */
 
-// Playwrightテストランナー
-import { test } from '@playwright/test';
+// MSW Setup
+import '../setup/msw.setup';
 
-// テストデータ
-import { apiUsers } from '../../data/apiUsers';
+import { test } from '@playwright/test';
 
 // API実行ヘルパー
 import { executeLoginApi } from '../../utils/apiHelper';
@@ -17,36 +15,28 @@ import { executeLoginApi } from '../../utils/apiHelper';
 // API Logger
 import { logApiResponse } from '../../utils/apiLogger';
 
-// Assertions
+// テストデータ
+import { apiUsers } from '../../data/apiUsers';
+
+// Assertions（ReqRes版）
 import {
   expectLoginSuccess,
-  expectMissingPasswordPattern,
-  expectMissingEmailPattern,
-  expectEmptyRequestPattern,
-  expectWrongPasswordPattern
+  expectLoginFailure
 } from '../../utils/apiAssertions/loginAssertions';
-
-/*
-================================
-JSONPlaceholder仕様上、
-異常系HTTPエラーは返却されないため、
-入力パターン検証として実施する
-================================
-*/
 
 /*
 ================================
 Login APIテスト
 ================================
 */
-test.describe('Login APIテスト', () => {
+test.describe('Login APIテスト（ReqRes）', () => {
 
   /*
   =================================
-  正常ログイン
+  正常系：ログイン成功
   =================================
   */
-  test('正常ログイン（POST作成成功）', async ({ request }) => {
+  test('ログイン成功', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
@@ -60,70 +50,22 @@ test.describe('Login APIテスト', () => {
 
   /*
   =================================
-  password未入力
+  異常系：ログイン失敗
   =================================
   */
-  test('password未入力パターン', async ({ request }) => {
+  test('ログイン失敗（不正認証）', async ({ request }) => {
 
     const response = await executeLoginApi(
       request,
-      apiUsers.inputPatterns.missingPassword
+      {
+        email: 'invalid@test.com',
+        password: 'wrong-password'
+      }
     );
 
     await logApiResponse(response);
 
-    await expectMissingPasswordPattern(response);
-  });
-
-  /*
-  =================================
-  email未入力
-  =================================
-  */
-  test('email未入力パターン', async ({ request }) => {
-
-    const response = await executeLoginApi(
-      request,
-      apiUsers.inputPatterns.missingEmail
-    );
-
-    await logApiResponse(response);
-
-    await expectMissingEmailPattern(response);
-  });
-
-  /*
-  =================================
-  空リクエスト
-  =================================
-  */
-  test('空リクエストパターン', async ({ request }) => {
-
-    const response = await executeLoginApi(
-      request,
-      apiUsers.inputPatterns.emptyRequest
-    );
-
-    await logApiResponse(response);
-
-    await expectEmptyRequestPattern(response);
-  });
-
-  /*
-  =================================
-  不正パスワード
-  =================================
-  */
-  test('不正パスワード入力パターン', async ({ request }) => {
-
-    const response = await executeLoginApi(
-      request,
-      apiUsers.inputPatterns.wrongPassword
-    );
-
-    await logApiResponse(response);
-
-    await expectWrongPasswordPattern(response);
+    await expectLoginFailure(response);
   });
 
 });

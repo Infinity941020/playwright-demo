@@ -1,5 +1,223 @@
 # UPDATE LOG
 ---
+## 2026-05-22
+
+### ■ Before
+
+- ReqRes APIは実APIへ直接接続していた
+- ReqRes側のAPI Key制限により401が頻発していた
+- Login/User APIは外部API状態に依存していた
+- APIテストはネットワーク状態や外部仕様変更の影響を受ける状態だった
+- Login/User AssertionsはJSONPlaceholder構造依存が残存していた
+- MSW（Mock Service Worker）は未導入だった
+- API Mock Layerが存在していなかった
+- APIレスポンス制御が不可能だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase10：MSW導入＆ReqRes Mock化
+
+### ■ MSW導入
+
+#### ■ npm package追加
+- `msw` をdevDependenciesへ追加
+
+#### ■ Mock Server構築
+- `mocks/server.ts` 作成
+- `setupServer()` によるNode Mock Server構築
+
+#### ■ Playwright Hook連携
+- `tests/setup/msw.setup.ts` 作成
+- `beforeAll`
+- `afterEach`
+- `afterAll`
+
+を利用したMSW lifecycle管理を実装
+
+#### ■ テスト汚染対策
+- `resetHandlers()` によるhandler初期化
+- テスト間状態分離を導入
+
+---
+
+## ■ Login API Mock化
+
+### ■ loginHandlers.ts作成
+
+#### ■ ReqRes Login APIをMSW化
+- `https://reqres.in/api/login`
+  をMock化
+
+#### ■ 正常系実装
+- `eve.holt@reqres.in`
+- `cityslicka`
+
+時に token返却
+
+#### ■ 異常系実装
+- 不正認証時
+  → 400返却
+- `user not found`
+  レスポンス生成
+
+---
+
+## ■ User API Mock化
+
+### ■ userHandlers.ts作成
+
+#### ■ ReqRes User APIをMSW化
+- `https://reqres.in/api/users/:id`
+  をMock化
+
+#### ■ 正常系実装
+- userId=2
+  の固定レスポンス生成
+
+#### ■ 異常系実装
+- 存在しないID時
+  → 404返却
+
+---
+
+## ■ Mock Handler統合
+
+### ■ handlers/index.ts追加
+- loginHandlers
+- userHandlers
+
+を統合管理化
+
+### ■ server.ts更新
+- loginHandlers
+- userHandlers
+
+をsetupServerへ統合
+
+---
+
+## ■ ReqRes Schema対応
+
+### ■ loginSchema.ts更新
+- ReqRes token構造へ変更
+
+### ■ userSchema.ts更新
+- ReqRes `data`構造へ変更
+
+### ■ loginAssertions.ts更新
+- ReqRes token検証へ変更
+
+### ■ userAssertions.ts更新
+- ReqRes `data.id`
+- `data.email`
+- `data.first_name`
+- `data.last_name`
+
+構造へ対応
+
+---
+
+## ■ APIテスト構造整理
+
+### ■ ReqRes依存除去
+- Login API
+- User API
+
+を完全Mock駆動へ移行
+
+### ■ 外部API依存排除
+- API Key不要化
+- ネットワーク依存低減
+- Cloudflare制限回避
+
+### ■ ローカル完結化
+- オフライン実行可能化
+- CI安定化準備
+
+---
+
+## ■ API実行確認
+
+### ■ Login API
+- 正常系PASS
+- 異常系PASS
+
+### ■ User API
+- 正常系PASS
+- 異常系PASS
+
+### ■ 全体実行確認
+- 全45件PASS
+
+---
+
+### ■ Result（成果）
+
+- MSWによるMock Server基盤を導入
+- ReqRes APIを完全Mock化
+- Login/User APIをローカル制御可能化
+- API Key問題を完全解消
+- 外部API依存を大幅削減
+- APIレスポンスを任意制御可能化
+- schema/assertionをReqRes構造へ完全対応
+- Playwright + MSW lifecycleを確立
+- APIテスト安定性を大幅向上
+- 将来的なMock拡張基盤を構築
+
+---
+
+### ■ Overall Status
+
+- MSW導入：完了
+- Mock Server構築：完了
+- Login API Mock化：完了
+- User API Mock化：完了
+- ReqRes schema対応：完了
+- Playwright lifecycle連携：完了
+- ReqRes API Key問題解消：完了
+- 全45件PASS：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、APIテスト基盤は
+
+- MSWによるMock Layer導入
+- ReqRes API完全Mock化
+- 外部API依存排除
+- schema validation強化
+- Playwright lifecycle統合
+- ローカル完結型APIテスト化
+
+を通じて、
+
+「実API切替・Mock制御・CI安定化へ対応可能な
+拡張型APIテスト基盤」
+
+として大幅に進化した。
+
+結果として、
+従来の「外部API依存型テスト」から、
+
+- Mock First
+- Local Controlled
+- Schema Driven
+
+な構成へ移行され、
+将来的な
+
+- Contract Test
+- API Virtualization
+- Test Data Factory
+- CI/CD統合
+
+へ自然拡張可能な状態へ到達した。
+
+---
+
 ## 2026-05-21
 
 ### ■ Before

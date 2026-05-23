@@ -1,15 +1,32 @@
 /*
 ================================
-API 共通設定（Aルート統一）
+API 共通設定（Aルート + Bルート対応）
 ================================
-・JSONPlaceholder APIを基準としたテスト環境
-・環境依存をここに集約
-・API実行層（apiHelper）から参照される
+・JSONPlaceholder（現行）
+・ReqRes（移行先）
+・段階移行（A→B→C）前提設計
 ================================
 */
 
-// API Base URL（JSONPlaceholder統一）
-export const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
+/*
+================================
+Aルート（現行：JSONPlaceholder）
+================================
+*/
+export const JSONPLACEHOLDER_BASE_URL =
+  'https://jsonplaceholder.typicode.com';
 
-// API Key（Aルートでは不要のため未使用）
+/*
+================================
+Bルート（移行先：ReqRes）
+================================
+*/
+export const REQRES_BASE_URL =
+  'https://reqres.in';
+
+/*
+================================
+API Key（現状未使用）
+================================
+*/
 export const API_KEY = '';
