@@ -1,15 +1,31 @@
-const { setupServer } = require('msw/node');
+import { setupServer } from 'msw/node';
 
-const { loginHandlers } = require('./handlers/loginHandlers');
-const { userHandlers } = require('./handlers/userHandlers');
+import { loginHandlers } from './handlers/loginHandlers';
+import { userHandlers } from './handlers/userHandlers';
 
 /*
 ================================
 MSW Server
 ================================
+CI / Node / Playwright 共通対応版
+================================
 */
 
-exports.server = setupServer(
+/*
+================================
+Handler統合
+================================
+*/
+const handlers = [
   ...loginHandlers,
-  ...userHandlers
+  ...userHandlers,
+];
+
+/*
+================================
+MSW Server Instance
+================================
+*/
+export const server = setupServer(
+  ...handlers
 );

@@ -14,9 +14,18 @@ export async function executeLoginApi(
   request: APIRequestContext,
   payload: object
 ) {
-  return request.post(`${REQRES_BASE_URL}/api/login`, {
-    data: payload
-  });
+
+  console.log(
+    '[MSW TARGET]',
+    `${REQRES_BASE_URL}/api/login`
+  );
+
+  return request.post(
+    `${REQRES_BASE_URL}/api/login`,
+    {
+      data: payload
+    }
+  );
 }
 
 /*
@@ -28,7 +37,15 @@ export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
-  return request.get(`${REQRES_BASE_URL}/api/users/${userId}`);
+
+  console.log(
+    '[MSW TARGET]',
+    `${REQRES_BASE_URL}/api/users/${userId}`
+  );
+
+  return request.get(
+    `${REQRES_BASE_URL}/api/users/${userId}`
+  );
 }
 
 /*
@@ -40,22 +57,29 @@ export async function executeAddCartApi(
   request: APIRequestContext,
   payload: object
 ) {
-  return request.post(`${JSONPLACEHOLDER_BASE_URL}/posts`, {
-    data: payload
-  });
+  return request.post(
+    `${JSONPLACEHOLDER_BASE_URL}/posts`,
+    {
+      data: payload
+    }
+  );
 }
 
 export async function executeGetCartApi(
   request: APIRequestContext
 ) {
-  return request.get(`${JSONPLACEHOLDER_BASE_URL}/posts`);
+  return request.get(
+    `${JSONPLACEHOLDER_BASE_URL}/posts`
+  );
 }
 
 export async function executeDeleteCartApi(
   request: APIRequestContext,
   cartId: number
 ) {
-  return request.delete(`${JSONPLACEHOLDER_BASE_URL}/posts/${cartId}`);
+  return request.delete(
+    `${JSONPLACEHOLDER_BASE_URL}/posts/${cartId}`
+  );
 }
 
 /*
@@ -71,7 +95,10 @@ export async function executeCheckoutApi(
     totalPrice?: number;
   }
 ) {
-  return request.post(`${JSONPLACEHOLDER_BASE_URL}/posts`, {
-    data: payload
-  });
+  return request.post(
+    `${JSONPLACEHOLDER_BASE_URL}/posts`,
+    {
+      data: payload
+    }
+  );
 }

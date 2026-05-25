@@ -4,10 +4,10 @@ Login APIテスト（ReqRes）
 ================================
 */
 
-// MSW Setup
-import '../setup/msw.setup';
-
 import { test } from '@playwright/test';
+
+// MSW Server
+import { server } from '../../mocks/server';
 
 // API実行ヘルパー
 import { executeLoginApi } from '../../utils/apiHelper';
@@ -23,6 +23,28 @@ import {
   expectLoginSuccess,
   expectLoginFailure
 } from '../../utils/apiAssertions/loginAssertions';
+
+/*
+================================
+MSW Setup
+================================
+*/
+test.beforeAll(() => {
+
+  server.listen({
+    onUnhandledRequest: 'bypass',
+  });
+});
+
+test.afterEach(() => {
+
+  server.resetHandlers();
+});
+
+test.afterAll(() => {
+
+  server.close();
+});
 
 /*
 ================================

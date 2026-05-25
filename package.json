@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Playwright E2E automation project with Flow/PageObject architecture",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "test": "playwright test",
     "test:login": "playwright test tests/login --reporter=list",

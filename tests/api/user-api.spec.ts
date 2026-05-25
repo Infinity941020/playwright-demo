@@ -4,11 +4,10 @@ User APIテスト（ReqRes + MSW）
 ================================
 */
 
-// Playwrightテストランナー
-import { test } from '@playwright/test';
-
 // MSW Setup
 import '../setup/msw.setup';
+
+import { test } from '@playwright/test';
 
 // API実行ヘルパー
 import { executeGetUserApi } from '../../utils/apiHelper';

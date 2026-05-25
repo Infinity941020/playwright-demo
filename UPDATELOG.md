@@ -1,5 +1,179 @@
 # UPDATE LOG
 ---
+## 2026-05-25
+
+### ■ Before
+
+- MSW導入後、CI環境でNodeモジュール解決エラーが発生
+- `Cannot use import statement outside a module` エラーが発生
+- Node16系のmoduleResolution設定によりimport拡張子警告が発生
+- MSWがCI上で正しく起動せず、ReqRes APIへ直接アクセスしていた
+- ReqRes API Key制限により401エラーが再発していた
+- Playwright + MSW + Node環境の構成が不安定な状態だった
+- 一時的なdebugログ（console.log）が散在していた
+- ローカルとCIで挙動差異が発生していた
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase11：MSW CI安定化対応
+
+### ■ CommonJS / ESM互換調整
+
+- package.jsonのmodule設定をESM（module）へ統一
+- TypeScript/Node実行環境の整合性調整
+- import/export構文のNode互換性を確立
+
+---
+
+### ■ tsconfig調整
+
+- moduleResolutionをNodeベースに統一
+- import拡張子問題の解消
+- TypeScript警告の抑制および整合性確保
+
+---
+
+### ■ MSW安定化対応
+
+- msw.setup.tsのlifecycle整理
+  - beforeAll
+  - afterEach
+  - afterAll
+
+- onUnhandledRequest: 'bypass' を設定
+- JSONPlaceholderとReqResの責務分離を維持
+- Mockと実APIの共存構成を安定化
+
+---
+
+### ■ Mock Handler調整
+
+- loginHandlers.tsのReqRes login mock安定化
+- userHandlers.tsのuser/:id mock安定化
+- server.tsのhandler統合確認
+
+---
+
+### ■ API実行経路整理
+
+- executeLoginApi / executeGetUserApi のURL整合確認
+- ReqRes APIへの直接依存を排除
+- MSW経由の制御構造を確立
+
+---
+
+### ■ CI障害解消
+
+- Node module resolutionエラー解消
+- MSW未起動問題解消
+- ReqRes API Key依存問題解消
+- 401エラー再発問題解消
+- Mock未intercept問題解消
+
+---
+
+### ■ Debugログ整理
+
+- MSW interceptログ削除
+- request bodyログ削除
+- lifecycle debugログ削除
+- console.log完全削除
+
+---
+
+### ■ API実行確認
+
+- Login API：2件PASS
+- User API：2件PASS
+- Cart API：6件PASS
+- Checkout API：5件PASS
+
+API合計：15件PASS
+
+---
+
+### ■ UI実行確認
+
+- Login系：6件PASS
+- Cart系：8件PASS
+- Checkout正常系：6件PASS
+- Checkout異常系：4件PASS
+- Checkoutキャンセル系：5件PASS
+- Logout系：1件PASS
+
+UI合計：30件PASS
+
+---
+
+### ■ 全体結果
+
+- 全45件PASS
+
+---
+
+### ■ Result（成果）
+
+- MSW CI環境での安定動作を確立
+- ReqRes API完全Mock化を維持
+- Node/TypeScript/Playwright互換性を確立
+- CI/ローカル差異を解消
+- API Key依存を完全排除
+- Mock/実API共存構成を安定化
+- Debugログ完全削除
+- 全45件PASS達成
+
+---
+
+### ■ Overall Status
+
+- MSW CI安定化：完了
+- ReqRes Mock化：完了
+- Node互換対応：完了
+- TypeScript整合性：完了
+- API Key問題解消：完了
+- Mock/実API分離：完了
+- CI安定化：完了
+- 全45件PASS：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、
+
+MSW導入後に発生していた
+
+- Node module resolutionエラー
+- MSW未起動問題
+- ReqRes API Key制限問題
+- Mock未intercept問題
+- CI/ローカル差異
+
+をすべて解消し、
+
+Playwright + MSW + Node/TypeScript構成は
+
+- CI安定実行可能
+- ローカル安定実行可能
+- Mock/実API共存可能
+- 拡張可能なテスト基盤
+
+として完成度の高い状態へ到達した。
+
+結果として、
+本テスト基盤は
+
+- Mock First設計
+- CI Stable実行
+- Node ESM対応
+- MSW統合済み構成
+
+として安定運用フェーズへ移行可能となった。
+
+---
+
 ## 2026-05-22
 
 ### ■ Before
