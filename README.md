@@ -4,11 +4,10 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ログイン / カート / Checkout(購入) / ログアウト を対象に、保守性・拡張性・CI運用まで意識して実装しています。
 
-**総テスト数：30件 / GitHub ActionsによるCI自動実行対応**
-
+**UI E2E + API Testing に対応 / GitHub ActionsによるCI自動実行対応**
 ---
 
-## テスト実装状況
+## テスト設計概要
 
 本プロジェクトでは、E2E観点に基づき「状態変化・業務フロー単位」でテストを設計しています。
 
@@ -23,7 +22,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ---
 
-### 設計方針
+### プロジェクト方針
 
 本プロジェクトはE2E観点でのユーザー操作フロー再現性と保守性を重視したテスト設計を採用しています。
 
@@ -33,7 +32,10 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ### アーキテクチャ方針
 
-保守性と運用性を意識し、以下の構成を採用しています。
+保守性・拡張性・CI運用を考慮し、
+Flow Layer / Page Object Model / Fixture / API Layer を組み合わせた構成を採用しています。
+
+詳細な責務分離構成は後述の「テストアーキテクチャ構造」に整理しています。
 
 - Page Object Model（POM）
 - Fixtureによるログイン共通化
@@ -53,7 +55,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 - Flow Layer Architecture
 - Fixture / storageState
 - Data-driven testing
-- ReqRes API（外部API検証）
+- MSW（Mock Service Worker：APIモックレイヤー）
 
 ---
 
@@ -61,6 +63,8 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 **SauceDemo（テスト用デモサイト）**  
 https://www.saucedemo.com/
+
+および補助検証用API（MSW mock環境）
 
 ---
 
@@ -137,6 +141,8 @@ D --> I
 E --> F
 ```
 
+---
+
 ### ■ Spec層（業務シナリオ層）
 - テストケースの定義
 - 業務フローの組み立て
@@ -189,7 +195,7 @@ Spec --> Flow --> Page
 
 ---
 
-## ■ Flow実装例（LoginFlow）
+### ■ Flow実装例（LoginFlow）
 
 本プロジェクトでは、Flow層が業務操作を抽象化しています。
 
@@ -200,8 +206,7 @@ UI操作（Page Object）を直接呼ぶのではなく、
 
 ### LoginFlow.ts（例）
 
-```
-ts id="flow-login-example"
+```ts
 export class LoginFlow {
   constructor(private loginPage: LoginPage) {}
 
@@ -238,11 +243,12 @@ export class LoginFlow {
 
 ---
 
-## ■ テスト詳細仕様（設計補足）
+### ■ テスト詳細仕様（設計補足）
 
 各機能の詳細なテスト設計（観点・シナリオ・状態遷移）はGitHub Wikiに分離しています。
 
-詳細設計（GitHub Wiki）
+詳細設計（GitHub Wiki）：
+
 https://github.com/Infinity941020/playwright-demo/wiki
 
 - Login：認証フロー設計
@@ -303,10 +309,11 @@ E2E品質を補強する役割を持ちます。
 
 ### 実装範囲
 
+- Login API（MSW mock化済みReqRes API）
 - Login API 正常系（200）
 - Login API 異常系（400）
+- GET User API（MSW mock化済みReqRes API）
 - GET User API 正常系（200）
-- API Key認証ヘッダー検証
 - request body バリデーション
 - レスポンス構造検証（token / error / user data）
 
@@ -338,8 +345,47 @@ API Base URLや認証情報などの設定管理層。
 - HTTPレベルでの契約検証に限定する
 - UI依存を持たない軽量テストとして扱う
 - Spec層から実装詳細（HTTP/ヘッダー/エンドポイント）を排除する
-- GET / POST を共通化した抽象APIで統一する
-- APIメソッドは Helper 層で共通化する（executeGetApi / executePostApi）
+- エンドポイント単位のAPIヘルパーで統一する（login / user / cart / checkout）
+
+---
+
+### ■ APIテスト実装例
+
+APIテストでは、
+Spec層からHTTP実装詳細を分離し、
+Helper / Assertions / TestData を責務別に管理しています。
+
+これにより、
+Spec側では「何を検証するか」のみに集中できる構成としています。
+
+また、
+MSWを利用することで、
+外部APIに依存しない安定したAPIテストを実現しています。
+
+```ts
+test('ログイン成功', async ({ request }) => {
+
+  const response = await executeLoginApi(
+    request,
+    apiUsers.validUser
+  );
+
+  await expectLoginSuccess(response);
+});
+
+test('ログイン失敗（不正認証）', async ({ request }) => {
+
+  const response = await executeLoginApi(
+    request,
+    {
+      email: 'invalid@test.com',
+      password: 'wrong-password'
+    }
+  );
+
+  await expectLoginFailure(response);
+});
+```
 
 ---
 
@@ -356,37 +402,269 @@ API Base URLや認証情報などの設定管理層。
 UI E2EとAPI検証は、
 独立した観点として分離しています。
 
+APIテストはMSWによるMock Layer上で動作し、
+外部API依存を排除した構成になっています。
+
 ```mermaid
 flowchart TD
 
 UI["E2E UIテスト"]
-API["APIテスト"]
+API["APIテスト（MSW Mock）"]
 System["ECシステム"]
 
 UI -->|"ユーザー操作"| System
-API -->|"HTTP契約検証"| System
+API -->|"HTTP契約検証（Mock）"| System
 ```
+
+---
+
+## MSW（Mock Service Worker）構成
+
+本プロジェクトでは、APIテストの安定化および外部依存排除のために
+MSW（Mock Service Worker）を導入しています。
+
+MSWは「実APIの代替レイヤー」として動作し、
+Node / Playwright / CI 環境すべてで統一されたレスポンス制御を実現しています。
+
+---
+
+### ■ handlers構成
+
+APIごとに責務分離されたモックレイヤーを構築しています。
+
+### ■ loginHandlers
+- POST /api/login
+- 正常系：token返却（200）
+- 異常系：user not found（400）
+
+---
+
+### ■ userHandlers
+- GET /api/users/:id
+- path parameter による動的レスポンス制御
+- id=2 → 正常レスポンス（200）
+- その他 → 404
+
+存在しないユーザーを明示的に404で返却することで、
+異常系APIテストも実APIに近い形で検証可能としています。
+
+---
+
+### ■ Handler実装例
+
+handlerでは、
+request body の取得・条件分岐・mock response生成を行っています。
+
+正常系 / 異常系レスポンスを明示的に分離することで、
+APIテスト時に複数パターンのレスポンス検証を可能としています。
+
+また、HTTP status code を含めてmock可能なため、
+実APIに近いテスト構成を実現しています。
+
+```ts
+http.post(
+  'https://reqres.in/api/login',
+  async ({ request }) => {
+
+    const body = await request.json();
+
+    if (
+      body.email === 'test@example.com' &&
+      body.password === 'password123'
+    ) {
+
+      return HttpResponse.json(
+        { token: 'mock-token' },
+        { status: 200 }
+      );
+    }
+
+    return HttpResponse.json(
+      { error: 'user not found' },
+      { status: 400 }
+    );
+  }
+)
+```
+
+---
+
+### ■ Handler統合管理
+
+各handlerは `handlers/index.ts` で統合管理しています。
+
+これにより、
+MSW server側では単一のhandlers定義を利用でき、
+handler追加時の保守性を向上させています。
+
+handler責務とserver生成責務を分離することで、
+mock構成の拡張性を確保しています。
+
+```text
+export const handlers = [
+  ...loginHandlers,
+  ...userHandlers,
+];
+```
+
+---
+
+### ■ MSW実行フロー
+
+```mermaid id="msw-flow-only"
+flowchart TD
+
+Test["Playwright Test"]
+Server["server.listen()"]
+Handlers["handlers intercept"]
+Response["Mock Response"]
+
+Test --> Server --> Handlers --> Response
+
+```
+
+---
+
+### ■ MSW Setup Lifecycle
+
+MSWはPlaywright lifecycleに統合されており、
+テスト開始時にmock serverを起動します。
+
+各テスト終了後にはhandlerをリセットし、
+テスト間でmock状態が汚染されないようにしています。
+
+テスト完了後はserverを停止し、
+不要なintercept状態を残さない構成としています。
+
+また、`onUnhandledRequest: 'bypass'` を利用することで、
+未定義APIへの通信を妨げず、
+段階的にMSWを導入できる構成としています。
+
+---
+
+#### ■ msw.setup.ts
+
+MSWの起動・handlerリセット・server停止は
+`tests/setup/msw.setup.ts` に集約しています。
+
+Playwright lifecycle hooks を利用することで、
+全APIテストで共通のmock環境を利用可能としています。
+
+また、
+handler状態を各テストごとに初期化することで、
+テスト間の独立性を保証しています。
+
+---
+
+```mermaid
+flowchart TD
+
+A[Test Start]
+--> B[server.listen]
+
+B --> C[Test Execution]
+
+C --> D[server.resetHandlers]
+
+D --> E[Next Test]
+
+E --> F[server.close]
+```
+
+---
+
+### ■ MSW Server Configuration
+
+MSW serverは `setupServer()` を利用して生成しています。
+
+各handlerは責務ごとに分離されており、
+server.ts 側で統合管理する構成としています。
+
+これにより、
+mock API追加時はhandlerを追加するだけで
+server側へ容易に組み込み可能となっています。
+
+また、Node / Playwright / CI 環境で
+同一mock serverを利用できる構成としており、
+実行環境差異を最小化しています。
+
+```text
+const handlers = [
+  ...loginHandlers,
+  ...userHandlers,
+];
+
+export const server = setupServer(
+  ...handlers
+);
+```
+
+---
+
+### ■ テストとの連携
+
+test → server.listen → handler intercept → mock response
+
+---
+### ■ 設計意図
+
+- 外部API依存の完全排除
+- APIレスポンスの完全制御
+- CI環境での安定性確保
+- テスト間での独立性保証
+- ハンドラー単位の責務分離
 
 ---
 
 ## Utility Layer（共通処理）
 
-Flow層では扱わない前準備・補助処理を担当する軽量レイヤーです。
+本プロジェクトでは、テスト補助・API制御・データ検証を責務別に分離しています。
+utils配下では、
+API制御・検証・データ構造・テスト補助処理を
+責務ごとにディレクトリ分離しています。
 
 ---
 
-### loginHelper.ts
-ログイン処理や認証準備を共通化する補助Utility。
+### ■ api（API制御層）
+APIリクエストの共通処理を担当するレイヤー。
+
+- apiHelper.ts
+- apiConfig.ts
+- apiLogger.ts
 
 ---
 
-### checkoutHelper.ts
-Checkout開始前の状態準備を共通化するHelper。
+### ■ assertions（検証レイヤー）
+APIレスポンスおよびUI状態の検証処理を集約。
+
+- loginAssertions.ts
+- userAssertions.ts
+- cartAssertions.ts
+- checkoutAssertions.ts
+- cartBadgeAssertions.ts
+- commonAssertions.ts
 
 ---
 
-### cartHelper.ts
-Cart操作前の状態準備を共通化するHelper。
+### ■ schema（データ構造定義）
+APIレスポンス構造の型定義・バリデーション管理。
+
+- loginSchema.ts
+- userSchema.ts
+
+---
+
+### ■ helpers（テスト補助処理）
+Flow層より軽量な前準備処理を担当。
+
+- loginHelper.ts
+- cartHelper.ts
+- checkoutHelper.ts
+
+---
+
+### ■ urls.ts
+アプリケーションURL管理
 
 ---
 
@@ -425,9 +703,12 @@ flows/
 
 tests/
  ├ setup/
- │   └ auth.setup.ts
+ │   ├ auth.setup.ts
+ │   └ msw.setup.ts
  │
  ├ api/
+ │   ├ cart-api.spec.ts
+ │   ├ checkout-api.spec.ts
  │   ├ login-api.spec.ts
  │   └ user-api.spec.ts
  │
@@ -451,11 +732,28 @@ fixtures/
  └ loginFixture.ts
 
 utils/
- ├ loginHelper.ts
- ├ cartHelper.ts
- ├ checkoutHelper.ts
- ├ apiHelper.ts
- ├ apiConfig.ts
+ ├ api/
+ │   ├ apiHelper.ts
+ │   ├ apiConfig.ts
+ │   ├ apiLogger.ts
+ │
+ ├ assertions/
+ │   ├ loginAssertions.ts
+ │   ├ userAssertions.ts
+ │   ├ cartAssertions.ts
+ │   ├ checkoutAssertions.ts
+ │   ├ cartBadgeAssertions.ts
+ │   └ commonAssertions.ts
+ │
+ ├ schema/
+ │   ├ loginSchema.ts
+ │   └ userSchema.ts
+ │
+ ├ helpers/
+ │   ├ loginHelper.ts
+ │   ├ cartHelper.ts
+ │   ├ checkoutHelper.ts
+ │
  └ urls.ts
 
 data/
@@ -463,14 +761,22 @@ data/
  ├ checkoutData.ts
  └ apiUsers.ts
 
+mocks/
+ ├ server.ts
+ └ handlers/
+     ├ index.ts
+     ├ loginHandlers.ts
+     └ userHandlers.ts
+
 ```
 ### ディレクトリ責務
 
 - pages/：UI操作実装層（Page Object）
 - flows/：業務フロー抽象化層
 - fixtures/：共通前処理・ログイン状態管理
-- utils/：テスト補助処理・共通Helper
+- utils/：API制御・検証・schema・Helper管理層
 - data/：テストデータ管理
+- mocks/：MSW mock API管理層
 - tests/：テストケース本体
 
 ## 実行方法
@@ -526,6 +832,36 @@ mainブランチへのpush / Pull Request時に
 
 ---
 
+## Playwright実行設定
+
+本プロジェクトでは、
+CI環境とローカル開発環境で
+Playwright設定を切り替えています。
+
+CIでは安定実行を重視し、
+retry・worker制御・失敗時のみ証跡保存を採用しています。
+
+一方、ローカル環境では
+デバッグ効率を重視し、
+trace / video の常時取得および slowMo を有効化しています。
+
+これにより、
+CI安定性とローカル解析性の両立を実現しています。
+
+```ts
+const isCI = !!process.env.CI;
+
+retries: isCI ? 2 : 0,
+
+workers: isCI ? 2 : undefined,
+
+trace: isCI
+  ? 'on-first-retry'
+  : 'on',
+```
+
+---
+
 ## Checkout設計思想
 
 Checkoutは以下3段階で構成されています：
@@ -570,14 +906,20 @@ Checkoutは以下3段階で構成されています：
 ## 改善予定
 
 - テストデータ管理のさらなる外部化（JSON / Fixture連携）
-- APIテスト追加
+- APIテスト拡張（cart / checkout API対応強化）
 - Visual Regressionテスト導入
-- Page Objectのさらなる分割最適化
-- test.step導入によるレポート可読性向上
+- Page Objectのさらなる責務分離最適化
+- Playwright Projectsによるブラウザ並列実行対応
+- API mock data管理の外部化
 - レポート自動通知（Slack / Teams）
 
 ---
 
 ## 作成者
 
-テスト自動化学習・実務活用を目的とした個人ポートフォリオ
+テスト自動化学習および実務レベルの設計・運用を意識して作成した
+Playwright E2Eテストポートフォリオです。
+
+単純なUI自動化ではなく、
+保守性・責務分離・CI運用・API補助検証まで含めた
+継続運用可能なテスト構成を目指して設計しています。

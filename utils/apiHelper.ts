@@ -14,12 +14,6 @@ export async function executeLoginApi(
   request: APIRequestContext,
   payload: object
 ) {
-
-  console.log(
-    '[MSW TARGET]',
-    `${REQRES_BASE_URL}/api/login`
-  );
-
   return request.post(
     `${REQRES_BASE_URL}/api/login`,
     {
@@ -37,12 +31,6 @@ export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
-
-  console.log(
-    '[MSW TARGET]',
-    `${REQRES_BASE_URL}/api/users/${userId}`
-  );
-
   return request.get(
     `${REQRES_BASE_URL}/api/users/${userId}`
   );
