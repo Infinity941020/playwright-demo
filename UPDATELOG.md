@@ -142,6 +142,8 @@ After
 - Logout系：1件PASS
   - ログアウト成功
 
+---
+
 ### ■ UI / E2E影響
 
 - Checkout関連のみ影響範囲
@@ -156,19 +158,194 @@ After
 
 ---
 
+---
+
+## ■ Phase13：Logout API追加実装（追記）
+
+---
+
+### ■ Before
+
+- Logout APIはUI側のみのセッション終了操作として実装済み
+- APIレイヤーでは未実装状態
+- MSW側では `logoutHandlers` は存在するが、テスト実行経路が未整備
+- executeLogoutApi / logoutAssertions / helper層未統一
+- UIテストでのみログアウト動作を確認する構成
+
+---
+
+### ■ Action（実施内容）
+
+## ■ API実装整理
+
+- executeLogoutApi を正式なAPI Helperとして整理
+- Logout APIをUI依存から独立した検証対象として定義
+- API層・UI層の責務分離を明確化
+
+---
+
+## ■ Assertion層追加・整理
+
+logoutAssertions.ts
+
+- successレスポンス検証追加
+  - success: true
+- errorレスポンス検証追加
+  - 401 / 400
+- セッション終了レスポンスの構造統一
+
+---
+
+## ■ MSW仕様確認
+
+logoutHandlers.ts
+
+- POST /api/logout
+  - 200: { success: true }
+  - 401: unauthorized
+  - 400: invalid request
+
+→ API仕様とAssertion整合確認済み
+
+---
+
+## ■ API構造確認
+
+- request bodyなし設計（ステートレス）
+- 認証状態依存レスポンス設計
+- 他API（Login / Cart / Checkout）との独立性維持
+
+---
+
+## ■ API実行経路確認
+
+- executeLogoutApi
+  - POST /api/logout
+  - MSW intercept正常動作
+  - UI依存なしで単体実行可能化
+
+---
+
+## ■ 回帰確認
+
+- Login API：正常
+- Cart API：正常
+- Checkout API：正常
+- User API：正常
+- Logout API：新規追加分として正常動作確認
+
+---
+
+### ■ API実行結果
+
+- Logout API：3件PASS
+  - ログアウト成功（200）
+  - 未認証ログアウト（401）
+  - 不正リクエスト（400）
+
+- Cart API：7件PASS
+  - Cart追加成功
+  - productId未指定で失敗
+  - quantity未指定（デフォルト1）
+  - 空リクエストで失敗
+  - Cart一覧取得
+  - Cart削除成功
+  - MSW動作確認（Cart追加）
+
+- Login API：2件PASS
+  - ログイン成功（200）
+  - ログイン失敗（400）
+
+- Checkout API：6件PASS
+  - Checkout成功
+  - cartId未指定
+  - userId未指定
+  - totalPrice未指定
+  - 空リクエスト
+  - MSW動作確認（201）
+
+- User API：2件PASS
+  - 単一ユーザー取得
+  - 存在しないユーザーID
+
+- 総APIテスト数：19件PASS
+
+---
+
+### ■ UI / E2E実行結果
+
+- Login系：6件PASS
+  - ログイン成功
+  - ログイン失敗系（4パターン）
+  - locked_out_user
+
+- Cart系：8件PASS
+  - カート追加
+  - 複数商品追加
+  - 削除
+  - バッジ表示確認（5パターン）
+
+- Checkout正常系：6件PASS
+  - 単一商品購入
+  - 複数商品購入
+  - カート経由購入
+  - 確認画面遷移
+  - 削除後購入
+  - 再追加後購入
+
+- Checkout異常系：4件PASS
+  - First Name未入力
+  - Last Name未入力
+  - Postal Code未入力
+  - 全項目未入力
+
+- Checkoutキャンセル系：5件PASS
+  - カート画面戻り
+  - Checkout直後戻り
+  - 入力途中戻り
+  - 確認画面戻り
+  - 商品一覧へ戻る
+
+- Logout系：1件PASS
+  - ログアウト成功
+
+- 総UI/E2Eテスト数：30件PASS
+
+---
+
+## ■ UI / E2E影響
+
+- 既存Loginフローへの影響なし
+- Cart / Checkoutフロー影響なし
+- Flow層変更なし（LogoutFlow軽微追加のみ）
+
+---
+
+### ■ 全体結果
+
+- APIテスト：19件PASS
+- UI / E2Eテスト：30件PASS
+
+→ 合計：49件PASS
+
+---
+
 ### ■ Result（成果）
 
 - Checkout API Assertion不一致を解消
 - MSW仕様との完全整合を確立
+- Logout APIの責務をUIから分離
+- APIテストレイヤーとして独立化
 - テスト仕様のズレを排除
-- 他APIへの影響ゼロで修正完了
 - テスト基盤の安定性維持
+- 認証ライフサイクル（Login / Logout）をAPI+E2Eでカバー
 
 ---
 
 ### ■ Overall Status
 
 - Checkout API修正：完了
+- Logout API追加：完了
 - Assertion修正：完了
 - MSW仕様整合：完了
 - 回帰確認：完了
@@ -178,13 +355,10 @@ After
 
 ### ■ Conclusion
 
-本対応により、Checkout APIテストにおいて発生していた
+本対応により、以下2点を達成：
 
-- `id` と `checkoutId` の仕様不一致
-- 成功ケースのみ失敗するAssertionエラー
-- テスト期待値とMSWレスポンスの乖離
-
-を解消し、MSW仕様とテスト仕様の完全統一を達成した。
+① Checkout APIにおける仕様不一致の解消  
+② Logout APIのテストレイヤー追加による認証ライフサイクル強化
 
 結果として、
 
@@ -192,7 +366,7 @@ After
 - 実行層（Playwright）
 - Assertion層
 
-の整合性が確立され、Checkout APIは安定動作状態へ復帰した。
+の整合性が確立され、E2E + API両面で安定したテスト基盤が維持された。
 
 ---
 

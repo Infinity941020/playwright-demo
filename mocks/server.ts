@@ -4,104 +4,32 @@ import { loginHandlers } from './handlers/loginHandlers';
 import { userHandlers } from './handlers/userHandlers';
 import { cartHandlers } from './handlers/cartHandlers';
 import { checkoutHandlers } from './handlers/checkoutHandlers';
+import { logoutHandlers } from './handlers/logoutHandlers';
 
 /*
 ================================
 MSW Server
 ================================
-CI / Node / Playwright 共通対応版
+CI / Node / Playwright 共通
 ================================
 */
-
-/*
-================================
-Login Handler
-================================
-ReqRes Login API Mock
-================================
-*/
-const loginMockHandlers = [
-  ...loginHandlers,
-];
-
-/*
-================================
-User Handler
-================================
-ReqRes User API Mock
-================================
-*/
-const userMockHandlers = [
-  ...userHandlers,
-];
-
-/*
-================================
-Cart Handler
-================================
-MSW Cart API Mock
-================================
-*/
-const cartMockHandlers = [
-  ...cartHandlers,
-];
-
-/*
-================================
-Checkout Handler
-================================
-MSW Checkout API Mock
-================================
-*/
-const checkoutMockHandlers = [
-  ...checkoutHandlers,
-];
 
 /*
 ================================
 Handler統合
 ================================
-全MSW Handlerを統合
-================================
 */
 const handlers = [
-
-  /*
-  ----------------------------
-  Login APIs
-  ----------------------------
-  */
-  ...loginMockHandlers,
-
-  /*
-  ----------------------------
-  User APIs
-  ----------------------------
-  */
-  ...userMockHandlers,
-
-  /*
-  ----------------------------
-  Cart APIs
-  ----------------------------
-  */
-  ...cartMockHandlers,
-
-  /*
-  ----------------------------
-  Checkout APIs
-  ----------------------------
-  */
-  ...checkoutMockHandlers,
+  ...loginHandlers,
+  ...userHandlers,
+  ...cartHandlers,
+  ...checkoutHandlers,
+  ...logoutHandlers,
 ];
 
 /*
 ================================
-MSW Server Instance
-================================
-Playwright Node環境で使用
+Server Instance
 ================================
 */
-export const server = setupServer(
-  ...handlers
-);
+export const server = setupServer(...handlers);

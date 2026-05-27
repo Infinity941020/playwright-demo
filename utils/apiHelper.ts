@@ -119,3 +119,32 @@ export async function executeCheckoutApi(
     data: payload,
   });
 }
+
+/*
+================================
+Logout API（MSW）
+================================
+MSW intercept対象URL
+================================
+*/
+const LOGOUT_BASE_URL = 'http://localhost/api/logout';
+
+/*
+================================
+Logout API実行
+================================
+ステートレス認証解除API
+================================
+*/
+export async function executeLogoutApi(
+  request: APIRequestContext,
+  payload: Record<string, any> = {},
+  token?: string
+) {
+  return request.post(LOGOUT_BASE_URL, {
+    data: payload,
+    headers: {
+      ...(token ? { Authorization: token } : {}),
+    },
+  });
+}
