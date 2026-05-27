@@ -1,92 +1,121 @@
 import { APIRequestContext } from '@playwright/test';
-
-import {
-  JSONPLACEHOLDER_BASE_URL,
-  REQRES_BASE_URL
-} from './apiConfig';
+import { REQRES_BASE_URL } from './apiConfig';
 
 /*
 ================================
-Login API（ReqRes移行対象）
+Login API（ReqRes）
+================================
+*/
+
+/*
+================================
+Login API実行
+================================
+ReqRes実APIへリクエスト送信
 ================================
 */
 export async function executeLoginApi(
   request: APIRequestContext,
-  payload: object
+  payload: Record<string, any>
 ) {
-  return request.post(
-    `${REQRES_BASE_URL}/api/login`,
-    {
-      data: payload
-    }
-  );
+  return request.post(`${REQRES_BASE_URL}/api/login`, {
+    data: payload,
+  });
 }
 
 /*
 ================================
-User API（ReqRes移行対象）
+User API（ReqRes）
+================================
+*/
+
+/*
+================================
+User取得API実行
+================================
+ReqRes実APIへリクエスト送信
 ================================
 */
 export async function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ) {
-  return request.get(
-    `${REQRES_BASE_URL}/api/users/${userId}`
-  );
+  return request.get(`${REQRES_BASE_URL}/api/users/${userId}`);
 }
 
 /*
 ================================
-Cart API（JSONPlaceholder維持）
+Cart API（MSW）
+================================
+MSW intercept対象URL
+================================
+*/
+const CART_BASE_URL = 'http://localhost/api/cart';
+
+/*
+================================
+Cart追加API実行
+================================
+MSWでPOST /api/cartをMock化
 ================================
 */
 export async function executeAddCartApi(
   request: APIRequestContext,
-  payload: object
+  payload: Record<string, any>
 ) {
-  return request.post(
-    `${JSONPLACEHOLDER_BASE_URL}/posts`,
-    {
-      data: payload
-    }
-  );
-}
-
-export async function executeGetCartApi(
-  request: APIRequestContext
-) {
-  return request.get(
-    `${JSONPLACEHOLDER_BASE_URL}/posts`
-  );
-}
-
-export async function executeDeleteCartApi(
-  request: APIRequestContext,
-  cartId: number
-) {
-  return request.delete(
-    `${JSONPLACEHOLDER_BASE_URL}/posts/${cartId}`
-  );
+  return request.post(CART_BASE_URL, {
+    data: payload,
+  });
 }
 
 /*
 ================================
-Checkout API（JSONPlaceholder維持）
+Cart取得API実行
+================================
+MSWでGET /api/cartをMock化
+================================
+*/
+export async function executeGetCartApi(
+  request: APIRequestContext
+) {
+  return request.get(CART_BASE_URL);
+}
+
+/*
+================================
+Cart削除API実行
+================================
+MSWでDELETE /api/cart/:idをMock化
+================================
+*/
+export async function executeDeleteCartApi(
+  request: APIRequestContext,
+  cartId: number
+) {
+  return request.delete(`${CART_BASE_URL}/${cartId}`);
+}
+
+/*
+================================
+Checkout API（MSW）
+================================
+MSW intercept対象URL
+================================
+*/
+const CHECKOUT_BASE_URL = 'http://localhost/api/checkout';
+
+/*
+================================
+Checkout API実行
+================================
+MSWでPOST /api/checkoutをMock化
 ================================
 */
 export async function executeCheckoutApi(
   request: APIRequestContext,
-  payload: {
-    cartId?: number;
-    userId?: number;
-    totalPrice?: number;
-  }
+  payload: Record<string, any>
 ) {
-  return request.post(
-    `${JSONPLACEHOLDER_BASE_URL}/posts`,
-    {
-      data: payload
-    }
-  );
+  return request.post(CHECKOUT_BASE_URL, {
+    data: payload,
+  });
 }

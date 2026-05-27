@@ -1,49 +1,45 @@
 /*
 ================================
-APIテスト用Cartデータ
-（JSONPlaceholder対応）
+Cart API Test Data（MSW対応版）
 ================================
 */
 
 export const apiCarts = {
 
   /*
-  =================================
+  ================================
   正常系Cart
-  =================================
+  ================================
   */
   validCart: {
-    title: 'Sample Cart Item',
-    body: 'Cart Item Body',
-    userId: 1
+    productId: 1,
+    quantity: 2,
   },
 
   /*
-  =================================
+  ================================
   入力パターン検証用
-  =================================
+  ================================
   */
   inputPatterns: {
 
     /*
-    title未入力
+    productId未指定（必須エラー）
     */
-    missingTitle: {
-      body: 'Cart Item Body',
-      userId: 1
+    missingProductId: {
+      quantity: 1,
     },
 
     /*
-    userId未入力
+    quantity未指定（デフォルト値検証）
     */
-    missingUserId: {
-      title: 'Sample Cart Item',
-      body: 'Cart Item Body'
+    missingQuantity: {
+      productId: 1,
     },
 
     /*
-    空リクエスト
+    空リクエスト（両方未指定）
     */
-    emptyRequest: {}
-  }
+    emptyRequest: {},
+  },
 };

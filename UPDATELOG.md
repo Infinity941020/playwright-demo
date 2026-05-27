@@ -1,5 +1,201 @@
 # UPDATE LOG
 ---
+## 2026-05-27
+
+### ■ Before
+
+- Checkout APIテストにおいて成功ケースのみ失敗が発生
+- `expect(body.id).toBeDefined()` によりAssertionエラー
+- MSWレスポンスは `checkoutId` を返却しているが、テスト側が `id` を期待していた
+- APIレスポンス自体は201で正常返却されており通信・MSWは正常
+- Checkout以外（Cart / Login / User）は全て正常動作
+- 仕様不一致によるAssertion層のみの不整合状態
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase12：Checkout API仕様統一修正
+
+---
+
+### ■ Assertion修正（根本対応）
+
+checkoutAssertions.ts
+
+Before
+`expect(body.id).toBeDefined();`
+
+After
+`expect(body.checkoutId).toBeDefined();`
+
+---
+
+### ■ MSW仕様との整合確認
+
+- checkoutHandlers.ts のレスポンス仕様確認
+  - success: true
+  - checkoutId: Date.now()
+  - cartId
+  - userId
+  - totalPrice
+
+→ テスト期待値をMSW仕様へ統一
+
+---
+
+### ■ API構造確認
+
+- 必須チェックロジック確認
+  - cartId
+  - userId
+  - totalPrice
+- 400 / 201レスポンス分岐正常
+- checkoutCountロジック影響なし
+
+---
+
+### ■ API実行経路確認
+
+- executeCheckoutApi
+  - POST http://localhost/api/checkout
+  - MSW intercept正常動作
+  - networkエラーなし
+
+---
+
+### ■ MSW統合確認
+
+- server.ts / msw.setup.ts
+  - checkoutHandlers登録済み
+  - 他APIへの影響なし
+  - intercept正常動作維持
+
+---
+
+### ■ 回帰確認
+
+- Cart API：正常
+- Login API：正常
+- User API：正常
+- Checkout API：修正後正常
+
+---
+
+### ■ API実行結果
+
+- Checkout API：5件PASS
+  - Checkout成功
+  - cartId未指定
+  - userId未指定
+  - totalPrice未指定
+  - 空リクエスト
+
+- Cart API：6件PASS
+  - Cart追加成功
+  - productId未指定
+  - quantity未指定（デフォルト補完）
+  - 空リクエスト
+  - 一覧取得
+  - 削除
+
+- Login API：2件PASS
+  - ログイン成功
+  - ログイン失敗（不正認証）
+
+- User API：2件PASS
+  - 単一ユーザー取得
+  - 存在しないユーザーID
+
+---
+
+### ■ UI / E2E実行結果
+
+- Login系：6件PASS
+  - ログイン成功
+  - ログイン失敗系（複数パターン）
+
+- Cart系：8件PASS
+  - カート追加
+  - 複数商品追加
+  - 削除
+  - バッジ表示確認（複数パターン）
+
+- Checkout正常系：6件PASS
+  - 単一商品購入
+  - 複数商品購入
+  - カート経由購入
+  - 確認画面遷移系
+
+- Checkout異常系：4件PASS
+  - First Name未入力
+  - Last Name未入力
+  - Postal Code未入力
+  - 全項目未入力
+
+- Checkoutキャンセル系：5件PASS
+  - カート画面戻り
+  - 入力途中戻り
+  - 確認画面戻り
+  - 再操作系
+
+- Logout系：1件PASS
+  - ログアウト成功
+
+### ■ UI / E2E影響
+
+- Checkout関連のみ影響範囲
+- 他UIフロー影響なし
+- Flowテストへの影響なし
+
+---
+
+### ■ 全体結果
+
+- 全46件PASS維持
+
+---
+
+### ■ Result（成果）
+
+- Checkout API Assertion不一致を解消
+- MSW仕様との完全整合を確立
+- テスト仕様のズレを排除
+- 他APIへの影響ゼロで修正完了
+- テスト基盤の安定性維持
+
+---
+
+### ■ Overall Status
+
+- Checkout API修正：完了
+- Assertion修正：完了
+- MSW仕様整合：完了
+- 回帰確認：完了
+- 全46件PASS維持：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、Checkout APIテストにおいて発生していた
+
+- `id` と `checkoutId` の仕様不一致
+- 成功ケースのみ失敗するAssertionエラー
+- テスト期待値とMSWレスポンスの乖離
+
+を解消し、MSW仕様とテスト仕様の完全統一を達成した。
+
+結果として、
+
+- API層（MSW）
+- 実行層（Playwright）
+- Assertion層
+
+の整合性が確立され、Checkout APIは安定動作状態へ復帰した。
+
+---
+
 ## 2026-05-25
 
 ### ■ Before

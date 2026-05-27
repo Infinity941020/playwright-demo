@@ -1,7 +1,9 @@
+import '../setup/msw.setup';
+
 /*
 ================================
 Checkout APIテスト
-（JSONPlaceholder対応）
+（MSW仕様準拠版）
 ================================
 */
 
@@ -18,15 +20,10 @@ import { executeCheckoutApi } from '../../utils/apiHelper';
 import { logApiResponse } from '../../utils/apiLogger';
 
 // Assertions
-import { expectCheckoutSuccess } from '../../utils/apiAssertions/checkoutAssertions';
-
-/*
-================================
-JSONPlaceholder仕様上、
-異常系HTTPエラーは返却されないため、
-入力パターン検証として実施する
-================================
-*/
+import {
+  expectCheckoutSuccess,
+  expectCheckoutBadRequest,
+} from '../../utils/apiAssertions/checkoutAssertions';
 
 /*
 ================================
@@ -42,13 +39,28 @@ test.describe('Checkout APIテスト', () => {
   */
   test('Checkoutが成功すること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    Checkout API実行
+    ----------------------------
+    */
     const response = await executeCheckoutApi(
       request,
       apiCheckout.validCheckout
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
+    /*
+    ----------------------------
+    Checkout成功検証
+    ----------------------------
+    */
     await expectCheckoutSuccess(response);
   });
 
@@ -59,14 +71,29 @@ test.describe('Checkout APIテスト', () => {
   */
   test('cartId未指定パターン', async ({ request }) => {
 
+    /*
+    ----------------------------
+    cartId未指定リクエスト
+    ----------------------------
+    */
     const response = await executeCheckoutApi(
       request,
       apiCheckout.inputPatterns.missingCartId
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectCheckoutSuccess(response);
+    /*
+    ----------------------------
+    400エラー検証
+    ----------------------------
+    */
+    await expectCheckoutBadRequest(response);
   });
 
   /*
@@ -76,14 +103,29 @@ test.describe('Checkout APIテスト', () => {
   */
   test('userId未指定パターン', async ({ request }) => {
 
+    /*
+    ----------------------------
+    userId未指定リクエスト
+    ----------------------------
+    */
     const response = await executeCheckoutApi(
       request,
       apiCheckout.inputPatterns.missingUserId
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectCheckoutSuccess(response);
+    /*
+    ----------------------------
+    400エラー検証
+    ----------------------------
+    */
+    await expectCheckoutBadRequest(response);
   });
 
   /*
@@ -93,14 +135,29 @@ test.describe('Checkout APIテスト', () => {
   */
   test('totalPrice未指定パターン', async ({ request }) => {
 
+    /*
+    ----------------------------
+    totalPrice未指定リクエスト
+    ----------------------------
+    */
     const response = await executeCheckoutApi(
       request,
       apiCheckout.inputPatterns.missingTotalPrice
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectCheckoutSuccess(response);
+    /*
+    ----------------------------
+    400エラー検証
+    ----------------------------
+    */
+    await expectCheckoutBadRequest(response);
   });
 
   /*
@@ -110,14 +167,29 @@ test.describe('Checkout APIテスト', () => {
   */
   test('空リクエストパターン', async ({ request }) => {
 
+    /*
+    ----------------------------
+    空リクエスト送信
+    ----------------------------
+    */
     const response = await executeCheckoutApi(
       request,
       apiCheckout.inputPatterns.emptyRequest
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectCheckoutSuccess(response);
+    /*
+    ----------------------------
+    400エラー検証
+    ----------------------------
+    */
+    await expectCheckoutBadRequest(response);
   });
 
 });

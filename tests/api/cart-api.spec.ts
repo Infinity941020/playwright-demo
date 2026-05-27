@@ -1,17 +1,11 @@
-/*
-================================
-Cart APIテスト
-（JSONPlaceholder対応）
-================================
-*/
+import '../setup/msw.setup';
 
-// Playwrightテストランナー
 import { test } from '@playwright/test';
 
 // テストデータ
 import { apiCarts } from '../../data/apiCarts';
 
-// テスト実行ヘルパー
+// API実行ヘルパー
 import {
   executeAddCartApi,
   executeGetCartApi,
@@ -26,24 +20,21 @@ import {
   expectAddCartSuccess,
   expectGetCartListSuccess,
   expectDeleteCartSuccess,
-  expectMissingTitlePattern,
-  expectMissingUserIdPattern,
+  expectMissingProductIdPattern,
   expectEmptyCartRequestPattern
 } from '../../utils/apiAssertions/cartAssertions';
 
 /*
 ================================
-JSONPlaceholder仕様上、
-異常系HTTPエラーは返却されないため、
-入力パターン検証として実施する
+Cart API Tests（MSW固定版）
+================================
+責務：
+- Cart APIのMSW疎通確認
+- Request/Response仕様確認
+- Mock状態リセット確認
 ================================
 */
 
-/*
-================================
-Cart APIテスト
-================================
-*/
 test.describe('Cart APIテスト', () => {
 
   /*
@@ -53,64 +44,124 @@ test.describe('Cart APIテスト', () => {
   */
   test('Cart追加が成功すること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    正常なCart追加リクエスト実行
+    ----------------------------
+    */
     const response = await executeAddCartApi(
       request,
       apiCarts.validCart
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
+    /*
+    ----------------------------
+    レスポンス検証
+    ----------------------------
+    */
     await expectAddCartSuccess(response);
   });
 
   /*
   ================================
-  ② title未入力
+  ② productId未指定エラー
   ================================
   */
-  test('title未入力パターン', async ({ request }) => {
+  test('productId未指定で失敗すること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    productId未指定リクエスト実行
+    ----------------------------
+    */
     const response = await executeAddCartApi(
       request,
-      apiCarts.inputPatterns.missingTitle
+      apiCarts.inputPatterns.missingProductId
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectMissingTitlePattern(response);
+    /*
+    ----------------------------
+    バリデーションエラー検証
+    ----------------------------
+    */
+    await expectMissingProductIdPattern(response);
   });
 
   /*
   ================================
-  ③ userId未入力
+  ③ quantity未指定（デフォルト補完）
   ================================
   */
-  test('userId未入力パターン', async ({ request }) => {
+  test('quantity未指定でもデフォルト1で追加されること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    quantity未指定リクエスト実行
+    ----------------------------
+    */
     const response = await executeAddCartApi(
       request,
-      apiCarts.inputPatterns.missingUserId
+      apiCarts.inputPatterns.missingQuantity
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
-    await expectMissingUserIdPattern(response);
+    /*
+    ----------------------------
+    デフォルト値補完確認
+    ----------------------------
+    */
+    await expectAddCartSuccess(response);
   });
 
   /*
   ================================
-  ④ 空リクエスト
+  ④ 空リクエストエラー
   ================================
   */
-  test('空リクエストパターン', async ({ request }) => {
+  test('空リクエストで失敗すること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    空リクエスト実行
+    ----------------------------
+    */
     const response = await executeAddCartApi(
       request,
       apiCarts.inputPatterns.emptyRequest
     );
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
+    /*
+    ----------------------------
+    バリデーションエラー検証
+    ----------------------------
+    */
     await expectEmptyCartRequestPattern(response);
   });
 
@@ -121,10 +172,25 @@ test.describe('Cart APIテスト', () => {
   */
   test('Cart一覧を取得できること', async ({ request }) => {
 
+    /*
+    ----------------------------
+    Cart一覧取得API実行
+    ----------------------------
+    */
     const response = await executeGetCartApi(request);
 
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
+    /*
+    ----------------------------
+    一覧取得結果検証
+    ----------------------------
+    */
     await expectGetCartListSuccess(response);
   });
 
@@ -135,14 +201,88 @@ test.describe('Cart APIテスト', () => {
   */
   test('Cart削除が成功すること', async ({ request }) => {
 
-    const response = await executeDeleteCartApi(
+    /*
+    ----------------------------
+    削除対象Cartを事前作成
+    ----------------------------
+    */
+    const createResponse = await executeAddCartApi(
       request,
-      1
+      apiCarts.validCart
     );
 
+    /*
+    ----------------------------
+    作成したCart情報取得
+    ----------------------------
+    */
+    const createdBody = await createResponse.json();
+
+    /*
+    ----------------------------
+    作成したCart IDで削除実行
+    ----------------------------
+    */
+    const response = await executeDeleteCartApi(
+      request,
+      createdBody.id
+    );
+
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
     await logApiResponse(response);
 
+    /*
+    ----------------------------
+    削除成功検証
+    ----------------------------
+    */
     await expectDeleteCartSuccess(response);
+  });
+
+  /*
+  ================================
+  ⑦ MSW動作確認（追加）
+  ================================
+  */
+  test('MSW動作確認（Cart追加）', async ({ request }) => {
+
+    /*
+    ----------------------------
+    API Helper経由で実行
+    ----------------------------
+    */
+    const response = await executeAddCartApi(
+      request,
+      {
+        productId: 1,
+        quantity: 1,
+      }
+    );
+
+    /*
+    ----------------------------
+    APIレスポンスログ出力
+    ----------------------------
+    */
+    await logApiResponse(response);
+
+    /*
+    ----------------------------
+    レスポンスBody取得
+    ----------------------------
+    */
+    const body = await response.json();
+
+    /*
+    ----------------------------
+    MSW疎通ログ
+    ----------------------------
+    */
+    console.log('MSW CHECK:', body);
   });
 
 });

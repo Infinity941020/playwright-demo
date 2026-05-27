@@ -1,144 +1,115 @@
 /*
 ================================
-Cart API Assertions
-（JSONPlaceholder対応）
+Cart API Assertions（MSW安定版）
 ================================
 */
 
 import { APIResponse, expect } from '@playwright/test';
-
-// 共通Assertion
-import {
-  expectStatus,
-  expectCreatedResource
-} from './commonAssertions';
+import { expectStatus } from './commonAssertions';
 
 /*
 ================================
-Cart API Assertions
-================================
-JSONPlaceholder API仕様に基づいた
-Cart専用検証
+HTTP Status
 ================================
 */
-
-const CART_SUCCESS_STATUS = 201;
-const CART_GET_STATUS = 200;
-const CART_DELETE_STATUS = 200;
+const STATUS = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+} as const;
 
 /*
 ================================
-Cart一覧取得成功
+① Cart一覧取得成功
 ================================
 */
 export async function expectGetCartListSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expectStatus(response, CART_GET_STATUS);
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
-  expect(Array.isArray(body)).toBeTruthy();
-
-  expect(body.length).toBeGreaterThan(0);
+  expect(body).toBeDefined();
+  expect(Array.isArray(body.items)).toBe(true);
 }
 
 /*
 ================================
-Cart作成成功
+② Cart追加成功
 ================================
 */
 export async function expectAddCartSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expectStatus(response, CART_SUCCESS_STATUS);
+  expectStatus(response, STATUS.CREATED);
 
   const body = await response.json();
 
-  expectCreatedResource(body);
+  expect(body).toBeDefined();
 
-  expect(body.title).toBeDefined();
+  expect(body.id).toBeDefined();
+  expect(body.productId).toBeDefined();
+
+  expect(typeof body.productId).toBe('number');
+
+  // MSW仕様：quantityは必ず1以上
+  expect(body.quantity).toBeGreaterThan(0);
 }
 
 /*
 ================================
-title未入力パターン
+③ productId未指定エラー
 ================================
 */
-export async function expectMissingTitlePattern(
+export async function expectMissingProductIdPattern(
   response: APIResponse
 ): Promise<void> {
 
-  expectStatus(response, CART_SUCCESS_STATUS);
+  expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
-  expect(body.title).toBeUndefined();
-
-  expect(body.userId).toBe(1);
-
-  expectCreatedResource(body);
+  expect(body).toMatchObject({
+    error: 'invalid payload',
+  });
 }
 
 /*
 ================================
-userId未入力パターン
-================================
-*/
-export async function expectMissingUserIdPattern(
-  response: APIResponse
-): Promise<void> {
-
-  expectStatus(response, CART_SUCCESS_STATUS);
-
-  const body = await response.json();
-
-  expect(body.title).toBe('Sample Cart Item');
-
-  expect(body.userId).toBeUndefined();
-
-  expectCreatedResource(body);
-}
-
-/*
-================================
-空リクエストパターン
+④ 空リクエストエラー
 ================================
 */
 export async function expectEmptyCartRequestPattern(
   response: APIResponse
 ): Promise<void> {
 
-  expectStatus(response, CART_SUCCESS_STATUS);
+  expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
-  expectCreatedResource(body);
-
-  expect(Object.keys(body)).toContain('id');
+  expect(body).toMatchObject({
+    error: 'invalid payload',
+  });
 }
 
 /*
 ================================
-Cart削除成功
+⑤ Cart削除成功
 ================================
 */
 export async function expectDeleteCartSuccess(
   response: APIResponse
 ): Promise<void> {
 
-  expectStatus(response, CART_DELETE_STATUS);
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
-  /*
-  =================================
-  JSONPlaceholder DELETEは {}
-  を返す
-  =================================
-  */
+  expect(body).toBeDefined();
 
-  expect(body).toEqual({});
+  // MSW仕様：削除は成功フラグのみ保証
+  expect(body.success).toBe(true);
 }
