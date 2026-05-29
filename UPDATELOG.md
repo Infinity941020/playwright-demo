@@ -1,5 +1,199 @@
 # UPDATE LOG
 ---
+## 2026-05-29
+
+### ■ Before
+
+- READMEにテスト設計・MSW・API Testing・アーキテクチャ詳細が集中し肥大化していた
+- Wiki側はUI/API仕様ページ中心で、基盤設計情報の導線が不足していた
+- Flow / Fixture / MSW / Assertion / Helper構成の責務分離情報がREADME依存状態
+- ディレクトリ構成およびレイヤー責務を整理したページが未存在
+- Wiki親ページ間の導線が不足しており、設計情報への到達性が低い状態
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase14：README短縮化 + Wiki責務分離対応
+
+---
+
+### ■ Wiki設計ページ新規作成
+
+以下の設計ページをGitHub Wikiへ新規作成。
+
+#### ■ UI / テスト設計系
+
+- テスト設計方針（詳細設計）
+- テスト戦略（状態ベース設計）
+- テストアーキテクチャ（Flow / Page Object / Fixture）
+
+---
+
+#### ■ API / Mock設計系
+
+- API Testing（補助検証レイヤー）
+- MSW（Mock Service Worker）構成設計
+
+---
+
+#### ■ ディレクトリ / 構成管理系
+
+- フォルダ構成 / ディレクトリ設計
+
+---
+
+### ■ README責務分離
+
+READMEから以下詳細説明をWikiへ分離。
+
+- API Testing詳細設計
+- MSW lifecycle詳細
+- Flow / Page / Fixture設計詳細
+- 状態ベーステスト戦略
+- Utility Layer責務
+- ディレクトリ構成詳細
+- アーキテクチャ説明
+
+---
+
+### ■ Wiki親ページ導線整理
+
+以下親ページへ設計導線を追加。
+
+#### ■ UI Test Specifications
+
+- Login仕様
+- Cart仕様
+- Checkout仕様
+- Logout仕様
+
+---
+
+#### ■ API Test Specifications
+
+- Login API
+- Cart API
+- Checkout API
+- Logout API
+
+---
+
+#### ■ CI / テスト設計
+
+##### ■ UIテスト設計
+
+- テスト設計方針（詳細設計）
+- テスト戦略（状態ベース設計）
+- テストケース設計
+
+##### ■ テストアーキテクチャ
+
+- テストアーキテクチャ（Flow / Page Object / Fixture）
+- Flow Layer設計
+- Page Object設計
+- Fixture / storageState設計
+- フォルダ構成 / ディレクトリ設計
+
+##### ■ API / Mock設計
+
+- API Testing（補助検証レイヤー）
+- MSW（Mock Service Worker）構成設計
+
+##### ■ テスト実装戦略
+
+- Data-driven testing設計
+
+---
+
+### ■ フォルダ構成ページ追加
+
+READMEに存在していた構成情報を独立ページ化。
+
+#### ■ 追加内容
+
+- pages責務
+- flows責務
+- tests責務
+- fixtures責務
+- utils責務
+- data責務
+- mocks責務
+
+---
+
+### ■ Mermaid図追加
+
+以下設計図をWikiへ追加。
+
+- Flow / Page / Fixture責務図
+- MSW lifecycle図
+- API Layer構成図
+- Mock Layer構成図
+- ディレクトリ責務レイヤー図
+
+---
+
+### ■ Wiki設計統一
+
+以下ルールへ統一。
+
+- 概要 → 設計思想 → 構成 → 役割 → 補足 の順序統一
+- コードブロック形式統一
+- Mermaid記法統一
+- Wikiリンク形式統一（[[PageName]]）
+- READMEとWikiの責務分離
+
+---
+
+### ■ Result（成果）
+
+- README肥大化を解消
+- 設計情報をWikiへ責務分離
+- UI / API / MSW / Flow設計導線を整理
+- ディレクトリ責務を明文化
+- テスト基盤構成の可視化を強化
+- Wikiベースでの設計参照性を向上
+- ポートフォリオとしての構成可読性を向上
+
+---
+
+### ■ Overall Status
+
+- README短縮化：完了
+- Wiki移行対応：完了
+- 設計ページ作成：完了
+- 親ページ導線整理：完了
+- Mermaid図追加：完了
+- ディレクトリ構成ページ追加：完了
+- README責務分離：完了
+
+---
+
+### ■ Conclusion
+
+本対応により、
+
+- README
+- Wiki
+- テスト設計資料
+
+の責務分離が整理され、
+E2E / API / MSW / Flow / Fixture を含む
+実務レベルのテスト設計情報を
+Wikiベースで体系的に管理できる構成へ移行完了。
+
+結果として、
+
+- 保守性
+- 可読性
+- 導線整理
+- ポートフォリオ性
+
+を向上させた構成へ改善された。
+
+---
+
 ## 2026-05-27
 
 ### ■ Before
