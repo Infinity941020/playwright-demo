@@ -4,13 +4,14 @@ Login APIテスト（ReqRes）
 ================================
 */
 
-import { test } from '@playwright/test';
+/*
+================================
+MSW Setup
+================================
+*/
+import '../setup/msw.setup';
 
-// MSW Server
-import { server } from '../../mocks/server';
-
-// API実行ヘルパー
-import { executeLoginApi } from '../../utils/apiHelper';
+import { test } from '../../fixtures/apiFixture';
 
 // API Logger
 import { logApiResponse } from '../../utils/apiLogger';
@@ -26,28 +27,6 @@ import {
 
 /*
 ================================
-MSW Setup
-================================
-*/
-test.beforeAll(() => {
-
-  server.listen({
-    onUnhandledRequest: 'bypass',
-  });
-});
-
-test.afterEach(() => {
-
-  server.resetHandlers();
-});
-
-test.afterAll(() => {
-
-  server.close();
-});
-
-/*
-================================
 Login APIテスト
 ================================
 */
@@ -58,10 +37,9 @@ test.describe('Login APIテスト（ReqRes）', () => {
   正常系：ログイン成功
   =================================
   */
-  test('ログイン成功', async ({ request }) => {
+  test('ログイン成功', async ({ api }) => {
 
-    const response = await executeLoginApi(
-      request,
+    const response = await api.login(
       apiUsers.validUser
     );
 
@@ -75,15 +53,12 @@ test.describe('Login APIテスト（ReqRes）', () => {
   異常系：ログイン失敗
   =================================
   */
-  test('ログイン失敗（不正認証）', async ({ request }) => {
+  test('ログイン失敗（不正認証）', async ({ api }) => {
 
-    const response = await executeLoginApi(
-      request,
-      {
-        email: 'invalid@test.com',
-        password: 'wrong-password'
-      }
-    );
+    const response = await api.login({
+      email: 'invalid@test.com',
+      password: 'wrong-password'
+    });
 
     await logApiResponse(response);
 

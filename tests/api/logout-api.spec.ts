@@ -1,61 +1,102 @@
+import { test } from '@playwright/test';
+
 /*
 ================================
-Login APIテスト（ReqRes）
+Logout APIテスト（MSW）
 ================================
 */
 
-import { test } from '../../fixtures/apiFixture';
+// MSW Server
+import { server } from '../../mocks/server';
+
+// API実行ヘルパー
+import { executeLogoutApi } from '../../utils/apiHelper';
 
 // API Logger
 import { logApiResponse } from '../../utils/apiLogger';
 
-// テストデータ
-import { apiUsers } from '../../data/apiUsers';
-
-// Assertions（ReqRes版）
+// Assertions
 import {
-  expectLoginSuccess,
-  expectLoginFailure
-} from '../../utils/apiAssertions/loginAssertions';
+  expectLogoutSuccess,
+  expectLogoutUnauthorized,
+  expectLogoutBadRequest,
+} from '../../utils/apiAssertions/logoutAssertions';
 
 /*
 ================================
-Login APIテスト
+MSW Setup
 ================================
 */
-test.describe('Login APIテスト（ReqRes）', () => {
+test.beforeAll(() => {
+  server.listen({
+    onUnhandledRequest: 'bypass',
+  });
+});
+
+test.afterEach(() => {
+  server.resetHandlers();
+});
+
+test.afterAll(() => {
+  server.close();
+});
+
+/*
+================================
+Logout APIテスト
+================================
+*/
+test.describe('Logout APIテスト（MSW）', () => {
 
   /*
   =================================
-  正常系：ログイン成功
+  正常系：ログアウト成功
   =================================
   */
-  test('ログイン成功', async ({ api }) => {
-
-    const response = await api.login(
-      apiUsers.validUser
+  test('ログアウト成功', async ({ request }) => {
+    const response = await executeLogoutApi(
+      request,
+      {},
+      'Bearer mock-token'
     );
 
     await logApiResponse(response);
 
-    await expectLoginSuccess(response);
+    await expectLogoutSuccess(response);
   });
 
   /*
   =================================
-  異常系：ログイン失敗
+  異常系：未認証
   =================================
   */
-  test('ログイン失敗（不正認証）', async ({ api }) => {
-
-    const response = await api.login({
-      email: 'invalid@test.com',
-      password: 'wrong-password'
-    });
+  test('未認証ログアウト（401）', async ({ request }) => {
+    const response = await executeLogoutApi(
+      request,
+      {},
+      undefined
+    );
 
     await logApiResponse(response);
 
-    await expectLoginFailure(response);
+    await expectLogoutUnauthorized(response);
+  });
+
+  /*
+  =================================
+  異常系：不正リクエスト
+  =================================
+  */
+  test('不正リクエスト（400）', async ({ request }) => {
+    const response = await executeLogoutApi(
+      request,
+      { invalid: 'data' },
+      'Bearer mock-token'
+    );
+
+    await logApiResponse(response);
+
+    await expectLogoutBadRequest(response);
   });
 
 });
