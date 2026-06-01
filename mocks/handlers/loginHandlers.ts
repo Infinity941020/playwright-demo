@@ -10,11 +10,11 @@ export const loginHandlers = [
 
   /*
   =================================
-  ログインAPI
+  ログインAPI（MSW化・localhost統一）
   =================================
   */
   http.post(
-    'https://reqres.in/api/login',
+    'http://localhost/api/login',
     async ({ request }) => {
 
       const body = await request.json() as {
@@ -25,35 +25,33 @@ export const loginHandlers = [
       /*
       =================================
       正常ログイン
-      apiUsers.validUser と一致
       =================================
       */
       if (
         body.email === 'test@example.com' &&
         body.password === 'password123'
       ) {
-
         return HttpResponse.json(
           {
-            token: 'mock-token'
+            token: 'mock-token',
           },
           {
-            status: 200
+            status: 200,
           }
         );
       }
 
       /*
       =================================
-      ログイン失敗
+      異常ログイン
       =================================
       */
       return HttpResponse.json(
         {
-          error: 'user not found'
+          error: 'user not found',
         },
         {
-          status: 400
+          status: 400,
         }
       );
     }

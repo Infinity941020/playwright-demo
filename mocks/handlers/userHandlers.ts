@@ -14,7 +14,7 @@ export const userHandlers = [
   =================================
   */
   http.get(
-    'https://reqres.in/api/users/:id',
+    'http://localhost/api/users/:id',
     async ({ params }) => {
 
       const id = Number(params.id);
@@ -33,8 +33,7 @@ export const userHandlers = [
               email: 'janet.weaver@reqres.in',
               first_name: 'Janet',
               last_name: 'Weaver',
-              avatar:
-                'https://reqres.in/img/faces/2-image.jpg',
+              avatar: 'https://reqres.in/img/faces/2-image.jpg',
             }
           },
           {

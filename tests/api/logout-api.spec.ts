@@ -1,16 +1,17 @@
-import { test } from '@playwright/test';
-
 /*
 ================================
 Logout APIテスト（MSW）
 ================================
 */
 
-// MSW Server
-import { server } from '../../mocks/server';
+/*
+================================
+MSW Setup
+================================
+*/
+import '../setup/msw.setup';
 
-// API実行ヘルパー
-import { executeLogoutApi } from '../../utils/apiHelper';
+import { test } from '../../fixtures/apiFixture';
 
 // API Logger
 import { logApiResponse } from '../../utils/apiLogger';
@@ -24,41 +25,22 @@ import {
 
 /*
 ================================
-MSW Setup
-================================
-*/
-test.beforeAll(() => {
-  server.listen({
-    onUnhandledRequest: 'bypass',
-  });
-});
-
-test.afterEach(() => {
-  server.resetHandlers();
-});
-
-test.afterAll(() => {
-  server.close();
-});
-
-/*
-================================
 Logout APIテスト
 ================================
 */
 test.describe('Logout APIテスト（MSW）', () => {
 
   /*
-  =================================
+  ================================
   正常系：ログアウト成功
-  =================================
+  ================================
   */
-  test('ログアウト成功', async ({ request }) => {
-    const response = await executeLogoutApi(
-      request,
-      {},
-      'Bearer mock-token'
-    );
+  test('ログアウト成功', async ({ api }) => {
+
+    const response = await api.logout({
+      body: {},
+      token: 'Bearer mock-token',
+    });
 
     await logApiResponse(response);
 
@@ -66,16 +48,16 @@ test.describe('Logout APIテスト（MSW）', () => {
   });
 
   /*
-  =================================
-  異常系：未認証
-  =================================
+  ================================
+  未認証
+  ================================
   */
-  test('未認証ログアウト（401）', async ({ request }) => {
-    const response = await executeLogoutApi(
-      request,
-      {},
-      undefined
-    );
+  test('未認証ログアウト（401）', async ({ api }) => {
+
+    const response = await api.logout({
+      body: {},
+      token: undefined,
+    });
 
     await logApiResponse(response);
 
@@ -83,16 +65,16 @@ test.describe('Logout APIテスト（MSW）', () => {
   });
 
   /*
-  =================================
-  異常系：不正リクエスト
-  =================================
+  ================================
+  不正リクエスト
+  ================================
   */
-  test('不正リクエスト（400）', async ({ request }) => {
-    const response = await executeLogoutApi(
-      request,
-      { invalid: 'data' },
-      'Bearer mock-token'
-    );
+  test('不正リクエスト（400）', async ({ api }) => {
+
+    const response = await api.logout({
+      body: { invalid: 'data' },
+      token: 'Bearer mock-token',
+    });
 
     await logApiResponse(response);
 

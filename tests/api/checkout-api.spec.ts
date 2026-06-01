@@ -1,20 +1,20 @@
-import '../setup/msw.setup';
-
 /*
 ================================
-Checkout APIテスト
-（MSW仕様準拠版）
+Checkout APIテスト（MSW）
 ================================
 */
 
-// Playwrightテストランナー
-import { test } from '@playwright/test';
+/*
+================================
+MSW Setup
+================================
+*/
+import '../setup/msw.setup';
+
+import { test } from '../../fixtures/apiFixture';
 
 // テストデータ
 import { apiCheckout } from '../../data/apiCheckout';
-
-// API実行ヘルパー
-import { executeCheckoutApi } from '../../utils/apiHelper';
 
 // API Logger
 import { logApiResponse } from '../../utils/apiLogger';
@@ -37,158 +37,78 @@ test.describe('Checkout APIテスト', () => {
   ① Checkout成功
   ================================
   */
-  test('Checkoutが成功すること', async ({ request }) => {
+  test('Checkoutが成功すること', async ({ api }) => {
 
-    /*
-    ----------------------------
-    Checkout API実行
-    ----------------------------
-    */
-    const response = await executeCheckoutApi(
-      request,
+    const response = await api.checkout.create(
       apiCheckout.validCheckout
     );
 
-    /*
-    ----------------------------
-    APIレスポンスログ出力
-    ----------------------------
-    */
     await logApiResponse(response);
 
-    /*
-    ----------------------------
-    Checkout成功検証
-    ----------------------------
-    */
     await expectCheckoutSuccess(response);
   });
 
   /*
   ================================
-  ② cartId未指定パターン
+  ② cartId未指定
   ================================
   */
-  test('cartId未指定パターン', async ({ request }) => {
+  test('cartId未指定パターン', async ({ api }) => {
 
-    /*
-    ----------------------------
-    cartId未指定リクエスト
-    ----------------------------
-    */
-    const response = await executeCheckoutApi(
-      request,
+    const response = await api.checkout.create(
       apiCheckout.inputPatterns.missingCartId
     );
 
-    /*
-    ----------------------------
-    APIレスポンスログ出力
-    ----------------------------
-    */
     await logApiResponse(response);
 
-    /*
-    ----------------------------
-    400エラー検証
-    ----------------------------
-    */
     await expectCheckoutBadRequest(response);
   });
 
   /*
   ================================
-  ③ userId未指定パターン
+  ③ userId未指定
   ================================
   */
-  test('userId未指定パターン', async ({ request }) => {
+  test('userId未指定パターン', async ({ api }) => {
 
-    /*
-    ----------------------------
-    userId未指定リクエスト
-    ----------------------------
-    */
-    const response = await executeCheckoutApi(
-      request,
+    const response = await api.checkout.create(
       apiCheckout.inputPatterns.missingUserId
     );
 
-    /*
-    ----------------------------
-    APIレスポンスログ出力
-    ----------------------------
-    */
     await logApiResponse(response);
 
-    /*
-    ----------------------------
-    400エラー検証
-    ----------------------------
-    */
     await expectCheckoutBadRequest(response);
   });
 
   /*
   ================================
-  ④ totalPrice未指定パターン
+  ④ totalPrice未指定
   ================================
   */
-  test('totalPrice未指定パターン', async ({ request }) => {
+  test('totalPrice未指定パターン', async ({ api }) => {
 
-    /*
-    ----------------------------
-    totalPrice未指定リクエスト
-    ----------------------------
-    */
-    const response = await executeCheckoutApi(
-      request,
+    const response = await api.checkout.create(
       apiCheckout.inputPatterns.missingTotalPrice
     );
 
-    /*
-    ----------------------------
-    APIレスポンスログ出力
-    ----------------------------
-    */
     await logApiResponse(response);
 
-    /*
-    ----------------------------
-    400エラー検証
-    ----------------------------
-    */
     await expectCheckoutBadRequest(response);
   });
 
   /*
   ================================
-  ⑤ 空リクエストパターン
+  ⑤ 空リクエスト
   ================================
   */
-  test('空リクエストパターン', async ({ request }) => {
+  test('空リクエストパターン', async ({ api }) => {
 
-    /*
-    ----------------------------
-    空リクエスト送信
-    ----------------------------
-    */
-    const response = await executeCheckoutApi(
-      request,
+    const response = await api.checkout.create(
       apiCheckout.inputPatterns.emptyRequest
     );
 
-    /*
-    ----------------------------
-    APIレスポンスログ出力
-    ----------------------------
-    */
     await logApiResponse(response);
 
-    /*
-    ----------------------------
-    400エラー検証
-    ----------------------------
-    */
     await expectCheckoutBadRequest(response);
   });
 
