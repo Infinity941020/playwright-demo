@@ -1,13 +1,18 @@
 import { test as base } from '@playwright/test';
 
 // API実行ヘルパー
-import { executeLoginApi } from '../utils/apiHelper';
+import {
+  executeLoginApi,
+  executeAddCartApi,
+  executeGetCartApi,
+  executeDeleteCartApi
+} from '../utils/apiHelper';
 
 /*
 ================================
 API Fixture
 ================================
-Login API版
+Login / Cart API版
 ================================
 */
 
@@ -33,6 +38,39 @@ type ApiFixture = {
     login: (
       payload: Record<string, any>
     ) => ReturnType<typeof executeLoginApi>;
+
+    /*
+    ================================
+    Cart API
+    ================================
+    */
+    cart: {
+
+      /*
+      ----------------------------
+      Cart追加
+      ----------------------------
+      */
+      add: (
+        payload: Record<string, any>
+      ) => ReturnType<typeof executeAddCartApi>;
+
+      /*
+      ----------------------------
+      Cart一覧取得
+      ----------------------------
+      */
+      get: () => ReturnType<typeof executeGetCartApi>;
+
+      /*
+      ----------------------------
+      Cart削除
+      ----------------------------
+      */
+      delete: (
+        cartId: number
+      ) => ReturnType<typeof executeDeleteCartApi>;
+    };
   };
 };
 
@@ -63,6 +101,47 @@ export const test = base.extend<ApiFixture>({
         request,
         payload
       ),
+
+      /*
+      ================================
+      Cart API
+      ================================
+      */
+      cart: {
+
+        /*
+        ----------------------------
+        Cart追加
+        ----------------------------
+        */
+        add: (
+          payload: Record<string, any>
+        ) => executeAddCartApi(
+          request,
+          payload
+        ),
+
+        /*
+        ----------------------------
+        Cart一覧取得
+        ----------------------------
+        */
+        get: () => executeGetCartApi(
+          request
+        ),
+
+        /*
+        ----------------------------
+        Cart削除
+        ----------------------------
+        */
+        delete: (
+          cartId: number
+        ) => executeDeleteCartApi(
+          request,
+          cartId
+        ),
+      },
     };
 
     /*
