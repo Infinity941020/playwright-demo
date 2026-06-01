@@ -158,6 +158,66 @@ Fixture・Data-driven testing を利用し、
 
 ---
 
+## APIテストアーキテクチャ（ハイブリッド構成）
+
+本プロジェクトのAPIテストは以下の2層構造で設計されています。
+
+---
+
+### ■ ① 外部API層（ReqRes）
+
+以下は実API（ReqRes）を直接利用しています。
+
+- Login API
+- User API
+
+#### 目的
+- 外部API連携の実通信検証
+- APIレスポンス構造の実データ確認
+
+---
+
+### ■ ② Mock API層（MSW / localhost）
+
+以下はMSWによりローカルでモック化しています。
+
+- Cart API
+- Checkout API
+- Logout API
+
+#### 目的
+- 状態制御テスト（成功・失敗・異常系）
+- CI環境での安定性確保
+- エッジケース再現
+
+---
+
+### ■ MSWの役割
+
+MSWは単なるモックではなく、テスト制御レイヤーとして機能します。
+
+- APIレスポンス制御（成功/失敗/異常系）
+- テスト用状態管理
+- CI安定化
+- 外部API依存の排除（Cart / Checkout領域）
+
+---
+
+### ■ API実行レイヤー（apiHelper）
+
+全APIリクエストは `apiHelper.ts` に集約されています。
+
+- ReqRes API
+- MSW API（localhost）
+- 共通インターフェース化
+
+#### 目的
+- テスト側でAPI差異を意識させない
+- 実API / Mock APIの透過化
+- 保守性向上
+
+---
+
 ## API Testing
 
 本プロジェクトではUI E2Eテストに加えて、
