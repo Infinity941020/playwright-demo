@@ -24,8 +24,7 @@ import {
   expectAddCartSuccess,
   expectGetCartListSuccess,
   expectDeleteCartSuccess,
-  expectMissingProductIdPattern,
-  expectEmptyCartRequestPattern
+  expectCartBadRequest
 } from '../../utils/apiAssertions/cartAssertions';
 
 /*
@@ -64,7 +63,7 @@ test.describe('Cart APIテスト', () => {
 
     await logApiResponse(response);
 
-    await expectMissingProductIdPattern(response);
+    await expectCartBadRequest(response);
   });
 
   /*
@@ -96,7 +95,7 @@ test.describe('Cart APIテスト', () => {
 
     await logApiResponse(response);
 
-    await expectEmptyCartRequestPattern(response);
+    await expectCartBadRequest(response);
   });
 
   /*

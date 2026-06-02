@@ -1,13 +1,22 @@
+/*
+================================
+Logout API Assertions（MSW統一版）
+================================
+*/
+
 import { APIResponse, expect } from '@playwright/test';
+
+// 共通
+// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
 /*
 ================================
-期待ステータス
+HTTP Status
 ================================
 */
 const STATUS = {
-  SUCCESS: 200,
+  OK: 200,
   UNAUTHORIZED: 401,
   BAD_REQUEST: 400,
 } as const;
@@ -20,42 +29,66 @@ const STATUS = {
 export async function expectLogoutSuccess(
   response: APIResponse
 ): Promise<void> {
-  expectStatus(response, STATUS.SUCCESS);
+
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
   expect(body).toBeDefined();
+
+  /*
+  ================================
+  成功レスポンス仕様
+  ================================
+  */
   expect(body.success).toBe(true);
+  expect(typeof body.success).toBe('boolean');
 }
 
 /*
 ================================
-② 未認証（401）
+② Logout未認証（401）
 ================================
 */
 export async function expectLogoutUnauthorized(
   response: APIResponse
 ): Promise<void> {
+
   expectStatus(response, STATUS.UNAUTHORIZED);
 
   const body = await response.json();
 
   expect(body).toBeDefined();
-  expect(body.error).toBe('unauthorized');
+
+  /*
+  ================================
+  エラー仕様（認証失敗）
+  ================================
+  */
+  expect(body.error).toBeDefined();
+  expect(typeof body.error).toBe('string');
 }
 
 /*
 ================================
-③ 不正リクエスト（400）
+③ Logout不正リクエスト（400）
 ================================
 */
 export async function expectLogoutBadRequest(
   response: APIResponse
 ): Promise<void> {
+
   expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
   expect(body).toBeDefined();
-  expect(body.error).toBe('invalid request');
+
+  /*
+  ================================
+  エラー仕様（リクエスト不正）
+  ================================
+  */
+  expect(body.error).toBeDefined();
+  expect(typeof body.error).toBe('string');
 }

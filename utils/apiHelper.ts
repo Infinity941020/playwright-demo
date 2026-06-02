@@ -1,10 +1,8 @@
-import { APIRequestContext } from '@playwright/test';
+import { APIRequestContext, APIResponse } from '@playwright/test';
 
 /*
 ================================
 Base URL（MSW統一）
-================================
-すべて localhost に統一
 ================================
 */
 const BASE_URL = 'http://localhost/api';
@@ -14,10 +12,10 @@ const BASE_URL = 'http://localhost/api';
 Login API
 ================================
 */
-export async function executeLoginApi(
+export function executeLoginApi(
   request: APIRequestContext,
-  payload: Record<string, any>
-) {
+  payload: Record<string, unknown>
+): Promise<APIResponse> {
   return request.post(`${BASE_URL}/login`, {
     data: payload,
   });
@@ -28,10 +26,10 @@ export async function executeLoginApi(
 User API
 ================================
 */
-export async function executeGetUserApi(
+export function executeGetUserApi(
   request: APIRequestContext,
   userId: number
-) {
+): Promise<APIResponse> {
   return request.get(`${BASE_URL}/users/${userId}`);
 }
 
@@ -40,28 +38,26 @@ export async function executeGetUserApi(
 Cart API
 ================================
 */
-const CART_URL = `${BASE_URL}/cart`;
-
-export async function executeAddCartApi(
+export function executeAddCartApi(
   request: APIRequestContext,
-  payload: Record<string, any>
-) {
-  return request.post(CART_URL, {
+  payload: Record<string, unknown>
+): Promise<APIResponse> {
+  return request.post(`${BASE_URL}/cart`, {
     data: payload,
   });
 }
 
-export async function executeGetCartApi(
+export function executeGetCartApi(
   request: APIRequestContext
-) {
-  return request.get(CART_URL);
+): Promise<APIResponse> {
+  return request.get(`${BASE_URL}/cart`);
 }
 
-export async function executeDeleteCartApi(
+export function executeDeleteCartApi(
   request: APIRequestContext,
   cartId: number
-) {
-  return request.delete(`${CART_URL}/${cartId}`);
+): Promise<APIResponse> {
+  return request.delete(`${BASE_URL}/cart/${cartId}`);
 }
 
 /*
@@ -69,13 +65,11 @@ export async function executeDeleteCartApi(
 Checkout API
 ================================
 */
-const CHECKOUT_URL = `${BASE_URL}/checkout`;
-
-export async function executeCheckoutApi(
+export function executeCheckoutApi(
   request: APIRequestContext,
-  payload: Record<string, any>
-) {
-  return request.post(CHECKOUT_URL, {
+  payload: Record<string, unknown>
+): Promise<APIResponse> {
+  return request.post(`${BASE_URL}/checkout`, {
     data: payload,
   });
 }
@@ -85,14 +79,12 @@ export async function executeCheckoutApi(
 Logout API
 ================================
 */
-const LOGOUT_URL = `${BASE_URL}/logout`;
-
-export async function executeLogoutApi(
+export function executeLogoutApi(
   request: APIRequestContext,
-  payload: Record<string, any> = {},
+  payload: Record<string, unknown> = {},
   token?: string
-) {
-  return request.post(LOGOUT_URL, {
+): Promise<APIResponse> {
+  return request.post(`${BASE_URL}/logout`, {
     data: payload,
     headers: {
       ...(token ? { Authorization: token } : {}),

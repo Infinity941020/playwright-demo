@@ -1,37 +1,45 @@
 /*
 ================================
-Login API Assertions（ReqRes版）
-================================
-・ReqRes API /api/login 前提
-・成功 / 失敗の2パターンのみ
-・入力バリエーション検証は廃止
+Login API Assertions（ReqRes / MSW統一版）
 ================================
 */
 
 import { APIResponse, expect } from '@playwright/test';
 
 // 共通
+// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
 // schema
+// Loginレスポンス構造検証（成功時のみ）
 import { loginSchema } from '../schema/loginSchema';
-
-const LOGIN_SUCCESS_STATUS = 200;
-const LOGIN_FAILURE_STATUS = 400;
 
 /*
 ================================
-正常系：ログイン成功
+HTTP Status
+================================
+*/
+const STATUS = {
+  OK: 200,
+  BAD_REQUEST: 400,
+} as const;
+
+/*
+================================
+① Login成功
 ================================
 */
 export async function expectLoginSuccess(
   response: APIResponse
-) {
-  expectStatus(response, LOGIN_SUCCESS_STATUS);
+): Promise<void> {
+
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
-  // schema（token構造）
+  expect(body).toBeDefined();
+
+  // schema（token構造保証）
   loginSchema.parse(body);
 
   expect(body.token).toBeDefined();
@@ -40,16 +48,20 @@ export async function expectLoginSuccess(
 
 /*
 ================================
-異常系：ログイン失敗
+② Login失敗（不正リクエスト）
 ================================
 */
-export async function expectLoginFailure(
+export async function expectLoginBadRequest(
   response: APIResponse
-) {
-  expectStatus(response, LOGIN_FAILURE_STATUS);
+): Promise<void> {
+
+  expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
+  expect(body).toBeDefined();
   expect(body.error).toBeDefined();
+
+  // errorは構造のみ保証（内容固定しない）
   expect(typeof body.error).toBe('string');
 }

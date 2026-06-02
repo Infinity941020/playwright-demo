@@ -22,7 +22,7 @@ import { apiUsers } from '../../data/apiUsers';
 // Assertions（ReqRes版）
 import {
   expectLoginSuccess,
-  expectLoginFailure
+  expectLoginBadRequest
 } from '../../utils/apiAssertions/loginAssertions';
 
 /*
@@ -62,7 +62,7 @@ test.describe('Login APIテスト（ReqRes）', () => {
 
     await logApiResponse(response);
 
-    await expectLoginFailure(response);
+    await expectLoginBadRequest(response);
   });
 
 });

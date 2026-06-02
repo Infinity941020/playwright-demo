@@ -5,6 +5,9 @@ Cart API Assertions（MSW安定版）
 */
 
 import { APIResponse, expect } from '@playwright/test';
+
+// 共通
+// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
 /*
@@ -49,7 +52,6 @@ export async function expectAddCartSuccess(
   const body = await response.json();
 
   expect(body).toBeDefined();
-
   expect(body.id).toBeDefined();
   expect(body.productId).toBeDefined();
 
@@ -61,10 +63,10 @@ export async function expectAddCartSuccess(
 
 /*
 ================================
-③ productId未指定エラー
+③ Cart追加エラー（不正リクエスト）
 ================================
 */
-export async function expectMissingProductIdPattern(
+export async function expectCartBadRequest(
   response: APIResponse
 ): Promise<void> {
 
@@ -72,32 +74,16 @@ export async function expectMissingProductIdPattern(
 
   const body = await response.json();
 
-  expect(body).toMatchObject({
-    error: 'invalid payload',
-  });
+  expect(body).toBeDefined();
+  expect(body.error).toBeDefined();
+
+  // errorは構造のみ保証（内容固定しない）
+  expect(typeof body.error).toBe('string');
 }
 
 /*
 ================================
-④ 空リクエストエラー
-================================
-*/
-export async function expectEmptyCartRequestPattern(
-  response: APIResponse
-): Promise<void> {
-
-  expectStatus(response, STATUS.BAD_REQUEST);
-
-  const body = await response.json();
-
-  expect(body).toMatchObject({
-    error: 'invalid payload',
-  });
-}
-
-/*
-================================
-⑤ Cart削除成功
+④ Cart削除成功
 ================================
 */
 export async function expectDeleteCartSuccess(

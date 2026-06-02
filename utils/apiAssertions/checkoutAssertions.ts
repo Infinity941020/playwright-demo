@@ -1,22 +1,23 @@
 /*
 ================================
-Checkout API Assertions
-（MSW仕様準拠版）
+Checkout API Assertions（MSW統一版）
 ================================
 */
 
 import { APIResponse, expect } from '@playwright/test';
+
+// 共通
+// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
 /*
 ================================
-期待ステータス定義
+HTTP Status
 ================================
 */
 const STATUS = {
-  SUCCESS: 201,
+  OK: 201,
   BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
 } as const;
 
 /*
@@ -27,64 +28,54 @@ const STATUS = {
 export async function expectCheckoutSuccess(
   response: APIResponse
 ): Promise<void> {
-  expectStatus(response, STATUS.SUCCESS);
+
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
   expect(body).toBeDefined();
 
-  // MSW仕様：成功時は必ずcheckoutIdが返る
+  /*
+  ================================
+  成功レスポンス必須項目
+  ================================
+  */
   expect(body.checkoutId).toBeDefined();
-
-  // 必須項目チェック（仕様整合性確認）
   expect(body.cartId).toBeDefined();
   expect(body.userId).toBeDefined();
   expect(body.totalPrice).toBeDefined();
+
+  /*
+  ================================
+  型保証（最低限）
+  ================================
+  */
+  expect(typeof body.checkoutId).toBe('number');
+  expect(typeof body.cartId).toBe('number');
+  expect(typeof body.userId).toBe('number');
+  expect(typeof body.totalPrice).toBe('number');
 }
 
 /*
 ================================
-② Checkout失敗（400系）
+② Checkout失敗（不正リクエスト）
 ================================
 */
 export async function expectCheckoutBadRequest(
   response: APIResponse
 ): Promise<void> {
+
   expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
   expect(body).toBeDefined();
   expect(body.error).toBeDefined();
-}
 
-/*
-================================
-③ Checkout未認証（将来用）
-================================
-*/
-export async function expectCheckoutUnauthorized(
-  response: APIResponse
-): Promise<void> {
-  expectStatus(response, STATUS.UNAUTHORIZED);
-
-  const body = await response.json();
-
-  expect(body).toBeDefined();
-  expect(body.error).toBeDefined();
-}
-
-/*
-================================
-④ 汎用（必要なら）
-================================
-*/
-export async function expectCheckoutResponse(
-  response: APIResponse,
-  expectedStatus: number
-): Promise<void> {
-  expectStatus(response, expectedStatus);
-
-  const body = await response.json();
-  expect(body).toBeDefined();
+  /*
+  ================================
+  エラー形式統一（MSW仕様）
+  ================================
+  */
+  expect(typeof body.error).toBe('string');
 }

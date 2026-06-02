@@ -6,9 +6,10 @@ Login / Cart / Checkout / Logout API版
 ================================
 */
 
-import { test as base } from '@playwright/test';
+import { APIResponse, test as base } from '@playwright/test';
 
 // API実行ヘルパー
+// Login / Cart / Checkout / Logout はすべてhelperに統一
 import {
   executeLoginApi,
   executeAddCartApi,
@@ -32,8 +33,9 @@ type ApiFixture = {
     Login API
     ================================
     */
-    login: (payload: Record<string, any>) =>
-      ReturnType<typeof executeLoginApi>;
+    login: (
+      payload: Record<string, unknown>
+    ) => Promise<APIResponse>;
 
     /*
     ================================
@@ -41,14 +43,16 @@ type ApiFixture = {
     ================================
     */
     cart: {
-      add: (payload: Record<string, any>) =>
-        ReturnType<typeof executeAddCartApi>;
 
-      get: () =>
-        ReturnType<typeof executeGetCartApi>;
+      add: (
+        payload: Record<string, unknown>
+      ) => Promise<APIResponse>;
 
-      delete: (cartId: number) =>
-        ReturnType<typeof executeDeleteCartApi>;
+      get: () => Promise<APIResponse>;
+
+      delete: (
+        cartId: number
+      ) => Promise<APIResponse>;
     };
 
     /*
@@ -57,8 +61,10 @@ type ApiFixture = {
     ================================
     */
     checkout: {
-      create: (payload: Record<string, any>) =>
-        ReturnType<typeof executeCheckoutApi>;
+
+      create: (
+        payload: Record<string, unknown>
+      ) => Promise<APIResponse>;
     };
 
     /*
@@ -66,10 +72,12 @@ type ApiFixture = {
     Logout API
     ================================
     */
-    logout: (payload: {
-      body: Record<string, any>;
-      token?: string;
-    }) => ReturnType<typeof executeLogoutApi>;
+    logout: (
+      payload: {
+        body: Record<string, unknown>;
+        token?: string;
+      }
+    ) => Promise<APIResponse>;
   };
 };
 
@@ -85,19 +93,19 @@ export const test = base.extend<ApiFixture>({
 
       /*
       ================================
-      Login API
+      Login API（統一）
       ================================
       */
-      login: (payload: Record<string, any>) =>
+      login: (payload: Record<string, unknown>) =>
         executeLoginApi(request, payload),
 
       /*
       ================================
-      Cart API
+      Cart API（統一）
       ================================
       */
       cart: {
-        add: (payload: Record<string, any>) =>
+        add: (payload: Record<string, unknown>) =>
           executeAddCartApi(request, payload),
 
         get: () =>
@@ -109,24 +117,24 @@ export const test = base.extend<ApiFixture>({
 
       /*
       ================================
-      Checkout API
+      Checkout API（統一）
       ================================
       */
       checkout: {
-        create: (payload: Record<string, any>) =>
+        create: (payload: Record<string, unknown>) =>
           executeCheckoutApi(request, payload),
       },
 
       /*
       ================================
-      Logout API
+      Logout API（統一）
       ================================
       */
-      logout: ({ body, token }: {
-        body: Record<string, any>;
+      logout: (payload: {
+        body: Record<string, unknown>;
         token?: string;
       }) =>
-        executeLogoutApi(request, body, token),
+        executeLogoutApi(request, payload.body, payload.token),
     };
 
     await use(apiClient);
