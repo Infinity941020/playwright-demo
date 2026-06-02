@@ -23,7 +23,7 @@ export function executeLoginApi(
 
 /*
 ================================
-User API
+User API（参照専用）
 ================================
 */
 export function executeGetUserApi(
@@ -76,18 +76,25 @@ export function executeCheckoutApi(
 
 /*
 ================================
-Logout API
+Logout API（最終固定版）
 ================================
 */
+
+export type LogoutPayload = {
+  body?: {
+    reason?: string;
+  };
+  token?: string;
+};
+
 export function executeLogoutApi(
   request: APIRequestContext,
-  payload: Record<string, unknown> = {},
-  token?: string
+  payload: LogoutPayload = {}
 ): Promise<APIResponse> {
   return request.post(`${BASE_URL}/logout`, {
-    data: payload,
-    headers: {
-      ...(token ? { Authorization: token } : {}),
-    },
+    data: payload.body ?? {},
+    headers: payload.token
+      ? { Authorization: payload.token }
+      : undefined,
   });
 }
