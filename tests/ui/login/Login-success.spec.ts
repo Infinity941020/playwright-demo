@@ -2,10 +2,13 @@
 import { test } from '@playwright/test';
 
 // ログイン業務フローをまとめたFlowクラスをインポート
-import { LoginFlow } from '../../flows/LoginFlow';
+import { LoginFlow } from '../../../flows/LoginFlow';
+
+// Login UI Assertions
+import { expectLoginSuccess } from '../../../utils/uiAssertions/loginAssertions';
 
 // テスト用ユーザーデータをインポート
-import { users } from '../../data/users';
+import { users } from '../../../data/users';
 
 /*
 ========================================
@@ -30,5 +33,5 @@ test('ログイン成功して商品一覧が表示されること', async ({ pa
   // ================================
   // ■ 検証（業務レベル）
   // ================================
-  await loginFlow.expectLoginSuccess();
+  await expectLoginSuccess(loginFlow);
 });

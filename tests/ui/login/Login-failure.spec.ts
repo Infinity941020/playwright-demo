@@ -2,10 +2,13 @@
 import { test } from '@playwright/test';
 
 // ログイン業務フローをインポート
-import { LoginFlow } from '../../flows/LoginFlow';
+import { LoginFlow } from '../../../flows/LoginFlow';
+
+// Login UI Assertions
+import { expectLoginError } from '../../../utils/uiAssertions/loginAssertions';
 
 // テストデータをインポート
-import { users } from '../../data/users';
+import { users } from '../../../data/users';
 
 /*
 ========================================
@@ -27,7 +30,7 @@ test.describe('ログイン異常系確認', () => {
       users.invalid.password
     );
 
-    await loginFlow.expectLoginError();
+    await expectLoginError(loginFlow);
   });
 
   // ================================
@@ -42,7 +45,7 @@ test.describe('ログイン異常系確認', () => {
       users.standard.password
     );
 
-    await loginFlow.expectLoginError();
+    await expectLoginError(loginFlow);
   });
 
   // ================================
@@ -57,7 +60,7 @@ test.describe('ログイン異常系確認', () => {
       ''
     );
 
-    await loginFlow.expectLoginError();
+    await expectLoginError(loginFlow);
   });
 
   // ================================
@@ -69,7 +72,7 @@ test.describe('ログイン異常系確認', () => {
 
     await loginFlow.login('', '');
 
-    await loginFlow.expectLoginError();
+    await expectLoginError(loginFlow);
   });
 
   // ================================
@@ -84,7 +87,7 @@ test.describe('ログイン異常系確認', () => {
       users.locked.password
     );
 
-    await loginFlow.expectLoginError();
+    await expectLoginError(loginFlow);
   });
 
 });

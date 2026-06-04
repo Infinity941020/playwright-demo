@@ -1,5 +1,113 @@
 # UPDATE LOG
 ---
+
+## 2026-06-04
+
+### ■ Before
+
+- E2Eテスト基盤（Playwright + TypeScript）は既に安定稼働していた
+- UI / API / MSW / Flow / Fixture を分離したテストアーキテクチャは構築済み
+- UIテストは Login / Logout を中心に旧構成（tests/login・tests/logout）で管理されていた
+- UI Assertionsレイヤーは未整備で、Flow依存の検証がテスト側に直接記述されている状態だった
+- tests配下の構造は機能別分割（login / logout / cart / checkout）止まりで、UIレイヤー統一が未完了だった
+- UIテストとAPIテストの責務分離は存在していたが、UI側の抽象化レイヤー統一が未完成だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase18：UIテスト構造再編およびUI Assertionsレイヤー導入（Login / Logout）
+
+---
+
+### ■ UI Assertionsレイヤー導入（Login）
+
+- utils/uiAssertions/loginAssertions.ts を新規作成
+- LoginFlow経由で業務レベル検証を統一
+- specファイルから直接Flow検証を呼び出す構造へ変更
+- UI検証の責務を Flow → Assertions へ分離
+- Login成功 / Login失敗 / 画面表示確認のUI検証を統一インターフェース化
+
+---
+
+### ■ UI Assertionsレイヤー導入（Logout）
+
+- utils/uiAssertions/logoutAssertions.ts を新規作成
+- LogoutFlow経由の検証をUI Assertionsとしてラップ
+- logout.spec.ts の検証処理をUI Assertions経由へ統一
+- ログアウト後の画面遷移検証をUIレイヤーとして明確化
+- Flow内部検証との重複を排除し、責務を整理
+
+---
+
+### ■ UIテスト構造のフォルダ再編
+
+- tests/login → tests/ui/login へ移行
+- tests/logout → tests/ui/logout へ移行
+- UIテスト専用領域として tests/ui を新設
+- APIテスト（tests/api）との明確な分離を確立
+- UIテストの責務境界を「ユーザー操作検証」に統一
+
+---
+
+### ■ Flowレイヤーの整理（Login / Logout）
+
+- LoginFlowの責務を「業務操作＋検証補助」に統一
+- LogoutFlowの責務を「業務操作中心」に整理
+- Page Objectとの依存関係をFlowに集約
+- UI検証はAssertionsレイヤーへ委譲する構造へ移行
+- Flowの役割を「UI詳細隠蔽レイヤー」として再定義
+
+---
+
+### ■ テスト構造の統一方針確立
+
+- Spec → Assertions → Flow → Page の責務分離構造を確立
+- UI検証の直接記述を排除し、再利用可能な検証レイヤーへ統一
+- UIテストの可読性と保守性を向上
+- 機能単位（Login / Logout）での段階的移行方式を採用
+
+---
+
+### ■ Result（成果）
+
+- UI Assertionsレイヤー（Login / Logout）の導入完了
+- UIテスト構造を tests/ui 配下へ統一
+- Login / Logout の責務分離が明確化
+- FlowとAssertionsの役割分担が確定
+- UIテストの再利用性・保守性が向上
+- UIテスト構造が「機能分割」から「レイヤー分離設計」へ移行
+
+---
+
+### ■ Overall Status
+
+- UI Assertions（Login）：完了
+- UI Assertions（Logout）：完了
+- tests/login → tests/ui/login：完了
+- tests/logout → tests/ui/logout：完了
+- Flow / Page / Assertions 分離構造：確立
+- UIテスト基盤再編：フェーズ完了
+
+---
+
+### ■ Conclusion
+
+本対応により、UIテスト基盤は従来の「機能単位分割構造」から、
+「レイヤー分離型E2E設計」へと移行した。
+
+特に以下が明確化された：
+
+- UI検証はAssertionsレイヤーに集約されるべきである
+- Flowは業務操作とUI抽象化のみに責務を限定する
+- Specは検証フローのオーケストレーションに専念する
+- UIテストは tests/ui 配下で統一管理される
+
+結果として、UIテストは保守性・再利用性・責務分離の観点で
+安定した構造へと移行した。
+
+---
+
 ## 2026-06-03
 
 ### ■ Before

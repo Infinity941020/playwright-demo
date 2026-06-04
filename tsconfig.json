@@ -28,11 +28,12 @@
   },
 
   "include": [
-    "tests",
-    "flows",
-    "pages",
-    "fixtures",
-    "data",
-    "playwright.config.ts"
-  ]
+  "tests",
+  "flows",
+  "pages",
+  "fixtures",
+  "data",
+  "utils",
+  "playwright.config.ts"
+]
 }

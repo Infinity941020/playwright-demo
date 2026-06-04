@@ -1,8 +1,11 @@
 // Playwright fixture（ログイン状態共通）
-import { test } from '../../fixtures/loginFixture';
+import { test } from '../../../fixtures/loginFixture';
 
 // LogoutFlow
-import { LogoutFlow } from '../../flows/LogoutFlow';
+import { LogoutFlow } from '../../../flows/LogoutFlow';
+
+// Logout UI Assertions
+import { expectLogoutSuccess } from '../../../utils/uiAssertions/logoutAssertions';
 
 /*
 ================================
@@ -36,7 +39,7 @@ test.describe('Logout機能テスト（Flow版）', () => {
     });
 
     await test.step('ログイン画面表示確認', async () => {
-      await flow.expectOnLoginPage();
+      await expectLogoutSuccess(flow);
     });
 
   });
