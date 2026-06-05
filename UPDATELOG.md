@@ -1,5 +1,114 @@
 # UPDATE LOG
 ---
+## 2026-06-05
+
+### ■ Before
+
+- E2Eテスト基盤（Playwright + TypeScript）は安定稼働状態を維持していた
+- UI / API / MSW / Flow / Fixture を分離したテストアーキテクチャは確立済みで、全体構造は安定していた
+- UIテスト（tests/ui）は Login / Cart / Checkout / Logout の各機能単位で安定実行されていた
+- Flowレイヤーは LoginFlow / CartFlow / CheckoutFlow / LogoutFlow として業務操作抽象化が完了していた
+- UI Assertionsレイヤーは Login / Logout を中心に導入済みで、検証責務の分離が進んでいた
+- APIテストは MSW含め安定稼働しており、Contractテストとして独立性を確保していた
+- utils配下の構造は apiAssertions / uiAssertions を含め整理済みだったが、Wiki側ドキュメント整備は部分的に未整理状態だった
+- Flow / Page / Assertions / Fixture の責務分離自体は確立していたが、ドキュメント間リンク整合性が完全ではなかった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase19：Cart / Checkoutテスト基盤の安定化およびFlow統一適用
+
+---
+
+### ■ Cartテスト安定化（Flow統一）
+
+- CartFlowを基盤としたUIテスト構造の統一を確認
+- cart.spec / cart-badge.spec のFlow依存構造を維持しつつ安定化
+- 商品追加・削除・バッジ検証の業務フロー化を維持
+- UI操作をFlow経由に統一し、直接操作の排除を継続
+- Cart関連テストの再現性と安定性を確保
+
+---
+
+### ■ Checkoutテスト構造の完全安定化
+
+- CheckoutFlowを中心とした業務フロー構造を維持・安定化
+- 正常系 / 異常系 / キャンセル系の3系統テストを統一構造で維持
+- prepareCheckoutによる前処理共通化を維持
+- UI操作をFlow経由に統一し、テストコードの簡潔化を実現
+- Checkout全シナリオの安定実行を確認
+
+---
+
+### ■ Flowレイヤーの統一運用確認
+
+- LoginFlow / CartFlow / CheckoutFlow / LogoutFlow の役割分離を維持
+- Flowは業務操作抽象化レイヤーとして単一責務を維持
+- Page Objectとの依存関係はFlow経由で統一
+- UI操作の直接呼び出しは排除済み状態を維持
+- Flowレイヤーの再利用性と安定性を確認
+
+---
+
+### ■ UIテスト実行基盤の安定化
+
+- tests/ui配下の全テストが安定実行されることを確認
+- UIテストの責務が「ユーザー操作検証」に統一されていることを維持
+- Login / Cart / Checkout / Logout の機能分割構造が安定して動作
+- Flow依存構造によるUIテストの可読性を維持
+
+---
+
+### ■ APIテスト基盤の安定確認
+
+- API Contractテスト（cart / checkout / login / logout / user）が安定稼働
+- MSWによるモック制御が全APIテストで一貫して動作
+- 成功系・失敗系・境界値テストが安定実行されることを確認
+- APIレイヤーの責務分離（helper / assertion / schema）を維持
+
+---
+
+### ■ Result（成果）
+
+- Cart / Checkout UIテストのFlow統一適用が安定
+- UIテスト（tests/ui）の全領域が安定実行状態を維持
+- Flowレイヤーの業務抽象化設計が全機能で統一完了
+- APIテスト基盤の安定性を維持
+- UI / API / MSW / Flow / Fixture の責務分離構造が確立状態で安定運用
+- テスト全体の再現性・保守性が高水準で維持されている状態を確認
+
+---
+
+### ■ Overall Status
+
+- Cart UIテスト：安定
+- Checkout UIテスト：安定
+- Flow統一適用：完了状態維持
+- APIテスト：安定
+- MSW統合：安定
+- UI / API / Flow 分離構造：維持
+- テスト全体基盤：安定稼働
+
+---
+
+### ■ Conclusion
+
+本対応により、E2Eテスト基盤はUI / API / Flow / MSW の分離設計を維持したまま、
+CartおよびCheckout領域の業務フロー安定化が完了した。
+
+特に以下の状態が確立されている：
+
+- Flowレイヤーを中心としたUI操作抽象化の統一運用
+- UIテストの直接操作排除による保守性向上
+- APIテストとUIテストの完全分離構造の維持
+- MSWによる安定したモック制御基盤の維持
+
+結果として、本プロジェクトのE2Eテスト基盤は
+「機能追加・修正に耐えうる安定したレイヤー分離構造」として継続運用可能な状態にある。
+
+---
+
 
 ## 2026-06-04
 

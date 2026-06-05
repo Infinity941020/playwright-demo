@@ -3,21 +3,21 @@
 Playwrightテスト機能（fixture版）
 ================================
 */
-import { test } from '../../fixtures/loginFixture';
+import { test } from '../../../fixtures/loginFixture';
 
 /*
 ================================
 CartFlow（業務フロー）
 ================================
 */
-import { CartFlow } from '../../flows/CartFlow';
+import { CartFlow } from '../../../flows/CartFlow';
 
 /*
 ================================
 cartHelper（Cart前準備共通化）
 ================================
 */
-import { prepareCart } from '../../utils/cartHelper';
+import { prepareCart } from '../../../utils/cartHelper';
 
 /*
 ================================
@@ -28,7 +28,7 @@ import {
   expectSingleCartItem,
   expectMultipleCartItems,
   expectEmptyCart
-} from '../../utils/cartAssertions';
+} from '../../../utils/uiAssertions/cartAssertions';
 
 /*
 ================================
@@ -38,7 +38,7 @@ Cart Badge Assertions
 import {
   expectCartBadgeCount,
   expectCartBadgeHidden
-} from '../../utils/cartBadgeAssertions';
+} from '../../../utils/uiAssertions/cartBadgeAssertions';
 
 /*
 ================================

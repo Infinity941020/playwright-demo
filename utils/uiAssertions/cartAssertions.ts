@@ -1,12 +1,14 @@
 // CartFlow
-import { CartFlow } from '../flows/CartFlow';
+import { CartFlow } from '../../flows/CartFlow';
 
 /*
 ================================
-Cart Item Assertions
+Cart Assertions（Flow統一版）
 ================================
 責務：
-- カート内商品件数検証
+- カート状態のUI検証
+- Flow経由で状態を確認
+- specからUI詳細を隠蔽
 ================================
 */
 

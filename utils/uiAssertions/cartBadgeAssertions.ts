@@ -1,5 +1,5 @@
 // CartFlow
-import { CartFlow } from '../flows/CartFlow';
+import { CartFlow } from '../../flows/CartFlow';
 
 /*
 ================================

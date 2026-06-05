@@ -1,18 +1,11 @@
 // Playwright fixture（ログイン状態共通）
-import { test } from '../../fixtures/loginFixture';
+import { test } from '../../../fixtures/loginFixture';
 
 // CheckoutFlow（統一レイヤー・業務フロー操作）
-import { CheckoutFlow } from '../../flows/CheckoutFlow';
+import { CheckoutFlow } from '../../../flows/CheckoutFlow';
 
 // checkoutHelper（Checkout前準備共通化）
-import { prepareCheckout } from '../../utils/checkoutHelper';
-
-/*
-================================
-Checkout Assertions
-================================
-*/
-import { expectCheckoutComplete } from '../../utils/checkoutAssertions';
+import { prepareCheckout } from '../../../utils/checkoutHelper';
 
 /*
 ================================

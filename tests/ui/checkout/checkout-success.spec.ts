@@ -1,17 +1,17 @@
 // Playwrightのテスト機能（ログイン状態はfixtureで管理）
-import { test } from '../../fixtures/loginFixture';
+import { test } from '../../../fixtures/loginFixture';
 
 // CheckoutFlow（新統一レイヤー・業務フロー操作）
-import { CheckoutFlow } from '../../flows/CheckoutFlow';
+import { CheckoutFlow } from '../../../flows/CheckoutFlow';
 
 // checkoutHelper（Checkout前準備共通化）
-import { prepareCheckout } from '../../utils/checkoutHelper';
+import { prepareCheckout } from '../../../utils/checkoutHelper';
 
 // checkoutAssertions（Checkout完了検証）
-import { expectCheckoutComplete } from '../../utils/checkoutAssertions';
+import { expectCheckoutComplete } from '../../../utils/uiAssertions/checkoutAssertions';
 
 // チェックアウト入力データ（テストデータ集約）
-import { checkoutData } from '../../data/checkoutData';
+import { checkoutData } from '../../../data/checkoutData';
 
 /*
 ================================
