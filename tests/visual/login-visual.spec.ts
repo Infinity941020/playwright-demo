@@ -19,6 +19,7 @@ test('visual: login page', async ({ page }) => {
   // ■ Visual Regression検証
   // 初回生成されたSnapshotと比較し、
   // 画面表示に差分がないことを確認
+  // Snapshot名は固定管理する
   // ================================
-  await expect(page).toHaveScreenshot();
+  await expect(page).toHaveScreenshot('login-page.png');
 });

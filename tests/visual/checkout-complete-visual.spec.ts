@@ -52,5 +52,5 @@ test('visual: checkout complete page', async ({ page }) => {
   // 初回生成されたSnapshotと比較し、
   // 画面表示に差分がないことを確認
   // ================================
-  await expect(page).toHaveScreenshot();
+  await expect(page).toHaveScreenshot('checkout-complete-page.png');
 });
