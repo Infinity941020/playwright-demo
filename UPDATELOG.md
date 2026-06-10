@@ -1,5 +1,119 @@
 # UPDATE LOG
 ---
+## 2026-06-10
+
+### ■ Before
+
+- E2Eテスト基盤（Playwright + TypeScript）は安定稼働状態を維持していた
+- UI / API / MSW / Flow / Fixture / Assertions を分離したテストアーキテクチャは確立済みだった
+- UIテストおよびAPIテストはCI環境を含め安定実行状態を維持していた
+- GitHub WikiおよびREADMEの構造整理は完了していた
+- Visual Regression Testingは未導入であり、画面表示差分を自動検知する仕組みは存在していなかった
+- UI品質確認は機能テスト中心となっており、レイアウト崩れや意図しない画面変更を検知する仕組みが不足していた
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase21：Visual Regression Testing導入
+
+---
+
+### ■ Visual Regression Testing基盤構築
+
+- Playwright標準のVisual Regression機能を採用
+- Snapshot比較による画面差分検知方式を導入
+- Visualテスト専用ディレクトリ（tests/visual）を整備
+- UI機能テストとは独立したVisualテスト構成を採用
+- Snapshot管理方式を確立
+
+---
+
+### ■ Visualテスト実装
+
+以下の主要画面に対してVisual Regressionテストを実装
+
+- Login（ログイン画面）
+- Inventory（商品一覧画面）
+- Cart（カート画面）
+- Checkout Step One（購入情報入力画面）
+- Checkout Step Two（購入確認画面）
+- Checkout Complete（購入完了画面）
+
+各画面についてSnapshot生成および差分比較検証を実施
+
+---
+
+### ■ Snapshot運用確認
+
+- 初回実行によるSnapshot生成を確認
+- 再実行による差分比較Passを確認
+- Snapshotベースでの画面比較が正常動作することを確認
+- Visualテストが既存UIテストへ影響しないことを確認
+
+---
+
+### ■ GitHub Wiki整備
+
+- Visual Regression Testingページを新規作成
+- Visualテストの目的・設計方針を整理
+- Snapshot運用ルールを整理
+- 差分発生時の対応方針を整理
+- UI Test Specificationsからの参照導線を追加
+
+---
+
+### ■ README整備
+
+- Visual Regression Testing対応内容をREADMEへ追記
+- 対象画面を明記
+- Visualテストの目的および役割を整理
+- Wikiとの参照導線を追加
+
+---
+
+### ■ Result（成果）
+
+- Visual Regression Testing基盤を新規導入
+- 主要6画面のVisualテスト実装が完了
+- Snapshot比較による画面差分検知が可能となった
+- UI機能テストとVisualテストの役割分離を実現
+- GitHub WikiおよびREADMEへの反映が完了
+- UI / API / Visual の3層テスト構成が確立
+
+---
+
+### ■ Overall Status
+
+- UIテスト基盤：安定
+- APIテスト基盤：安定
+- Visual Regression：導入完了
+- Snapshot運用：確立
+- GitHub Wiki整備：完了
+- README整備：完了
+- CI構成：安定
+- テスト全体基盤：安定稼働
+
+---
+
+### ■ Conclusion
+
+本対応により、Visual Regression Testingが正式に導入された。
+
+特に以下の点が改善された：
+
+- Snapshot比較による画面差分検知の実現
+- UI機能テストでは検知できないレイアウト変更の検出
+- Visual品質確認の自動化
+- UI / API / Visual の役割分離による品質保証範囲の拡張
+- WikiおよびREADMEを含めた運用ルールの整備
+
+結果として、本プロジェクトは
+「UI機能テスト・APIテスト・Visual Regression Testing」を備えた
+より実務運用に近い総合的な自動テスト基盤へ発展した。
+
+---
+
 ## 2026-06-09
 
 ### ■ Before
