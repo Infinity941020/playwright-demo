@@ -72,6 +72,23 @@
 
 ---
 
+## ■ CI構成の一時調整（Visual Regression除外）
+
+- CI（GitHub Actions）においてVisual Regressionテストを一時的に除外
+- CI安定性確保を優先し、UI機能テストおよびAPIテストのみ実行対象とした
+- Visual Regressionはローカル環境での検証対象として運用
+- Snapshot差分によるCI不安定化リスクを回避する構成に変更
+
+---
+
+### ■ CI実行結果確認
+
+- UIテストおよびAPIテストがCI上で全件Passすることを確認
+- Visual Regressionテストを除外した状態での安定動作を確認
+- テスト基盤としてのCIパイプライン安定性を維持
+
+---
+
 ### ■ Result（成果）
 
 - Visual Regression Testing基盤を新規導入
