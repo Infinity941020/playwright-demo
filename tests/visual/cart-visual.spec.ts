@@ -29,11 +29,24 @@ test('visual: cart page', async ({ page }) => {
   await page.locator('[data-test="login-button"]').click();
 
   // ================================
-  // ■ カート画面表示
+  // ■ カート追加 & 遷移
   // ================================
   await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
 
   await page.locator('.shopping_cart_link').click();
+
+  // ================================
+  // ■ 安定化（Visual差分対策）
+  // ================================
+
+  // ページロード完了待ち
+  await page.waitForLoadState('networkidle');
+
+  // カートUIが描画されていることを保証
+  await expect(page.locator('.shopping_cart_link')).toBeVisible();
+
+  // レンダリング安定化（微妙なレイアウトズレ防止）
+  await page.waitForTimeout(300);
 
   // ================================
   // ■ Visual Regression検証
