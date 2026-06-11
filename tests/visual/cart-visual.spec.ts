@@ -37,8 +37,9 @@ test('visual: cart page', async ({ page }) => {
 
   // ================================
   // ■ Visual Regression検証
-  // 初回生成されたSnapshotと比較し、
-  // 画面表示に差分がないことを確認
   // ================================
-  await expect(page).toHaveScreenshot('cart-page.png');
+  await expect(page).toHaveScreenshot('cart-page.png', {
+    threshold: 0.02,
+    animations: 'disabled',
+  });
 });
