@@ -25,8 +25,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
-        run: npx playwright test
+      - name: Generate Visual Snapshots
+        run: npx playwright test --update-snapshots
 
       - name: Upload Playwright Artifacts
         if: always()
@@ -36,4 +36,5 @@ jobs:
           path: |
             playwright-report
             test-results
+            tests/visual/__snapshots__
           retention-days: 7
