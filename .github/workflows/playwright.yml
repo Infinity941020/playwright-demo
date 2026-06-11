@@ -25,8 +25,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Generate Visual Snapshots
-        run: npx playwright test --update-snapshots
+      - name: Run Playwright tests
+        run: npx playwright test
 
       - name: Upload Playwright Artifacts
         if: always()
