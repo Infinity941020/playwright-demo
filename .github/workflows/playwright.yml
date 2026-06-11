@@ -26,4 +26,4 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npx playwright test --grep-invert visual
+        run: npx playwright test
