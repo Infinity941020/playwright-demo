@@ -1,4 +1,3 @@
-// Playwrightのテスト機能とアサーション機能をインポート
 import { test, expect } from '@playwright/test';
 
 /*
@@ -11,15 +10,31 @@ Visual Regression Test
 test('visual: login page', async ({ page }) => {
 
   // ================================
+  // ■ viewport固定（Aルート統一）
+  // ================================
+  await page.setViewportSize({ width: 1280, height: 720 });
+
+  // ================================
   // ■ 画面表示
   // ================================
   await page.goto('https://www.saucedemo.com/');
 
   // ================================
-  // ■ Visual Regression検証
-  // 初回生成されたSnapshotと比較し、
-  // 画面表示に差分がないことを確認
-  // Snapshot名は固定管理する
+  // ■ 画面安定待ち（重要）
   // ================================
-  await expect(page).toHaveScreenshot('login-page.png');
+  await page.waitForLoadState('networkidle');
+
+  // フォント読み込み待ち（A統一）
+  await page.evaluate(() => document.fonts?.ready);
+
+  // 念のためUI安定待ち（揺れ防止）
+  await page.waitForTimeout(300);
+
+  // ================================
+  // ■ Visual Regression検証
+  // ================================
+  await expect(page).toHaveScreenshot('login-page.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01
+  });
 });

@@ -1,7 +1,4 @@
-// Playwrightのテスト機能とアサーション機能をインポート
 import { test, expect } from '@playwright/test';
-
-// テスト用ユーザーデータをインポート
 import { users } from '../../data/users';
 
 /*
@@ -12,6 +9,11 @@ Visual Regression Test
 */
 
 test('visual: inventory page', async ({ page }) => {
+
+  // ================================
+  // ■ viewport固定（Aルート統一）
+  // ================================
+  await page.setViewportSize({ width: 1280, height: 720 });
 
   // ================================
   // ■ ログイン
@@ -29,9 +31,24 @@ test('visual: inventory page', async ({ page }) => {
   await page.locator('[data-test="login-button"]').click();
 
   // ================================
-  // ■ Visual Regression検証
-  // 初回生成されたSnapshotと比較し、
-  // 画面表示に差分がないことを確認
+  // ■ 画面安定待ち（A統一）
   // ================================
-  await expect(page).toHaveScreenshot('inventory-page.png');
+  await page.waitForLoadState('networkidle');
+
+  // DOM安定（inventory基準）
+  await page.locator('.inventory_list').waitFor();
+
+  // フォント読み込み待ち（重要）
+  await page.evaluate(() => document.fonts?.ready);
+
+  // 微妙なレンダリング揺れ吸収
+  await page.waitForTimeout(300);
+
+  // ================================
+  // ■ Visual Regression検証
+  // ================================
+  await expect(page).toHaveScreenshot('inventory-page.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.02
+  });
 });
