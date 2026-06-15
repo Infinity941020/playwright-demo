@@ -322,8 +322,8 @@ npx playwright test tests/checkout --reporter=list
 
 ## CI（GitHub Actions）
 
-mainブランチへのpush / Pull Request時に  
-自動で全テストを実行し、品質確認を継続的に行える構成です。
+mainブランチへのpush / Pull Request時に、  
+GitHub Actionsにより自動でテストを実行し、継続的な品質確認を行える構成です。
 
 ---
 
@@ -336,10 +336,28 @@ mainブランチへのpush / Pull Request時に
 
 ### 自動実行内容
 
-- Node.jsセットアップ
-- 依存関係インストール
-- Playwrightブラウザセットアップ
-- 全テスト実行
+CIでは責務ごとにジョブを分離して実行しています。
+
+- UI Tests
+  - UI E2Eテスト実行
+- API Tests
+  - APIテスト実行
+- Visual Tests
+  - Visual Regressionテスト実行
+
+各ジョブは独立して実行されるため、失敗箇所の特定や保守性の向上を実現しています。
+
+---
+
+### CI設計方針
+
+本プロジェクトでは、READMEおよびテストアーキテクチャで採用している責務分離の考え方に合わせ、CIにおいても以下の単位でテストを分離しています。
+
+- UI
+- API
+- Visual Regression
+
+これにより、テスト運用性・可読性・障害解析性の向上を実現しています。
 
 ---
 
