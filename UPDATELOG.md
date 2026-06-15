@@ -1,5 +1,158 @@
 # UPDATE LOG
 ---
+## 2026-06-12
+
+### ■ Before
+
+- Visual Regression Testing基盤の導入は完了していた
+- 主要6画面に対するVisualテストは実装済みだった
+- ローカル環境ではVisual Regression Testingが正常動作していた
+- GitHub WikiおよびREADMEへのVisual Regression対応反映は完了していた
+- CI環境ではVisual Regression Testingを一時除外して運用していた
+- Docker環境でのVisual Regression実行は未検証だった
+- CI環境とローカル環境における描画差異要因は未整理だった
+- WikiおよびREADMEはVisual対応後の構成見直しが未実施だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Phase22：Docker環境対応およびVisual Regression安定化
+
+---
+
+### ■ Docker環境構築
+
+- Playwright実行用Docker環境を構築
+- Docker上でのテスト実行環境を整備
+- ローカル環境との差異確認を実施
+- Visual Regression Testing実行環境として利用可能な状態を構築
+
+---
+
+### ■ Docker環境でのVisual Regression調査
+
+- Docker環境におけるVisual Regression Testingを実施
+- ローカル環境では発生しないSnapshot差分を確認
+- CI環境との差異調査を実施
+- 描画差異発生箇所の切り分けを実施
+- Visual差分発生条件の調査を実施
+
+---
+
+### ■ Visual Regression安定化対応
+
+- 画面描画タイミングの見直しを実施
+- Visualテスト実行条件の見直しを実施
+- Snapshot比較前の安定化対応を実施
+- Docker環境・CI環境・ローカル環境の差異要因を整理
+- Visual Regression運用方針を再整理
+
+---
+
+### ■ GitHub Wiki整備
+
+#### Visual Regression Testing
+
+- Docker環境での検証結果を反映
+- 運用ルールを更新
+- CI環境を基準とした運用方針を整理
+- Snapshot管理方針を更新
+- 差分発生時の確認手順を整理
+
+#### Project Structure
+
+- 現在のディレクトリ構成に合わせて内容を更新
+- ディレクトリ責務を再整理
+- ドキュメント構成との整合性を確認
+
+#### API Testing Architecture
+
+- APIテスト構成説明を整理
+- ReqRes層とMSW層の責務を整理
+- API実行レイヤー説明を更新
+- ドキュメント全体との整合性を確認
+
+#### その他Wiki整理
+
+- Wikiページ間の参照導線を整理
+- 重複説明を削減
+- ドキュメント構成を最適化
+
+---
+
+### ■ READMEリファクタリング
+
+- README全体の構成を見直し
+- READMEは概要説明中心へ整理
+- 詳細設計はGitHub Wikiへ集約
+- Wikiとの責務分離を実施
+- 重複説明を削減
+- API関連説明を整理
+- Visual Regression関連説明を整理
+- ディレクトリ責務説明を整理
+- 今後の拡張予定を実装状況に合わせて更新
+- 継続改善セクションをREADME向け粒度へ最適化
+- README全体の保守性を向上
+
+---
+
+### ■ ドキュメントレビュー
+
+- Wiki全体の整合性確認を実施
+- READMEとの重複確認を実施
+- ドキュメント構成レビューを実施
+- 設計説明と実装状況の整合性を確認
+- レビュアーおよび採用担当視点で内容を見直し
+
+---
+
+### ■ Result（成果）
+
+- Docker環境でのPlaywright実行基盤を構築
+- Docker環境におけるVisual Regression差分調査を完了
+- CI環境を基準としたVisual Regression運用方針を確立
+- Visual Regression Testing運用ルールを強化
+- GitHub Wiki全体の構成整理が完了
+- Project Structureページを最新構成へ更新
+- API Testing Architectureページを最新構成へ更新
+- READMEのリファクタリングが完了
+- READMEとWikiの責務分離を実現
+- ドキュメント全体の保守性を向上
+
+---
+
+### ■ Overall Status
+
+- UIテスト基盤：安定
+- APIテスト基盤：安定
+- Visual Regression：安定運用可能
+- Docker環境：構築完了
+- CI運用方針：整理完了
+- GitHub Wiki整備：完了
+- README整備：完了
+- ドキュメント構成：最適化完了
+- テスト全体基盤：安定稼働
+
+---
+
+### ■ Conclusion
+
+本対応では、Visual Regression Testing導入後の運用安定化を目的として、Docker環境での検証およびドキュメント整備を実施した。
+
+特に以下の点が改善された：
+
+- Docker環境を利用したPlaywright実行基盤の整備
+- Visual Regressionにおける環境差異の調査および整理
+- CI環境を基準としたVisual運用ルールの確立
+- GitHub Wiki全体の構成最適化
+- READMEとWikiの責務分離
+- ドキュメント保守性の向上
+
+結果として、本プロジェクトはテスト実装だけでなく、運用ルール・実行環境・ドキュメント整備まで含めた、より実務運用を意識した自動テスト基盤へ発展した。
+
+---
+
 ## 2026-06-10
 
 ### ■ Before
