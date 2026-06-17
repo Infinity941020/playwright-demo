@@ -7,7 +7,8 @@
 - GitHub ActionsではUI / API / Visualテストを分離実行する構成へ改善済みだった
 - CI実行自体は安定していたが、各Jobで依存関係インストールやPlaywrightブラウザ準備処理が毎回発生していた
 - CI環境構築処理の効率化および長期運用を考慮した最適化余地が存在していた
-- README / WikiではCI構成を説明していたが、キャッシュ運用に関する設計説明は未整理だった
+- README / WikiではCI構成を説明していたが、キャッシュ運用やCI実行設定に関する設計説明は未整理だった
+- CI環境とローカル環境での実行目的（安定性優先 / デバッグ優先）の整理が不足していた
 
 ---
 
@@ -44,20 +45,56 @@
 
 ---
 
+## ■ Phase25：Playwright CI運用設計改善・ドキュメント整備
+
+---
+
+### ■ Playwright CI実行設定改善
+
+- CI環境とローカル環境でPlaywright設定を分離
+- CIでは安定性を優先した実行設定へ整理
+- ローカルではデバッグ効率を優先した設定へ整理
+
+対応内容：
+
+- retries設定追加
+- worker数制御
+- trace取得方針整理
+- video取得方針整理
+
+---
+
+### ■ CI実行安定化
+
+CI環境では以下を目的として設定を整理。
+
+- flaky test発生時の再試行
+- 過剰な並列実行による不安定化防止
+- 失敗時の原因解析情報取得
+
+ローカル環境では以下を目的として設定。
+
+- trace常時取得
+- video常時取得
+- 開発時デバッグ効率向上
+
+---
+
 ### ■ GitHub Actions動作確認
 
 - GitHub Actions上でUI Tests実行を確認
 - GitHub Actions上でAPI Tests実行を確認
 - GitHub Actions上でVisual Tests実行を確認
 - キャッシュ保存および再利用処理を確認
+- CI環境でPlaywright設定変更後の安定実行を確認
 
 #### 実行結果
 
-- UI Tests：30件 Pass
+- UI Tests：90件 Pass
 - API Tests：19件 Pass
 - Visual Tests：6件 Pass
 
-全55件のテストが正常終了することを確認
+全115件のテストが正常終了することを確認
 
 ---
 
@@ -65,9 +102,11 @@
 
 #### CI（GitHub Actions）
 
-- CI最適化内容を概要レベルで追記
-- キャッシュ導入によるCI運用改善内容を反映
-- READMEと実装構成の整合性を確保
+- CI実行構成を整理
+- UI / API / Visual分離実行について記載
+- キャッシュ導入によるCI最適化内容を反映
+- Playwright CI設定方針を概要レベルで追記
+- 実装構成とドキュメントの整合性を確保
 
 ---
 
@@ -77,7 +116,8 @@
 
 - CI実行最適化セクションを追加
 - npm cache / Playwright browser cacheの運用方針を整理
-- CI環境構築処理の効率化方針を記載
+- CI環境とローカル環境の設定差分を整理
+- retries / worker / trace / video設計方針を記載
 
 ---
 
@@ -86,9 +126,11 @@
 - GitHub Actionsの実行環境構築処理を最適化
 - npm dependency cacheおよびPlaywright browser cacheを導入
 - CI実行時の不要な再取得処理を削減
-- CI運用の安定性および保守性を向上
+- Playwright CI設定を安定運用向けに改善
+- CI / Local環境ごとの責務分離を実現
+- 失敗時解析性とCI実行安定性を向上
 - README / WikiとCI実装構成の整合性を確保
-- 全55件のテストがCI上で安定実行可能なことを確認
+- 全115件のテストがCI上で安定実行可能なことを確認
 
 ---
 
@@ -99,6 +141,7 @@
 - Visual Regression：安定
 - GitHub Actions：安定
 - CIキャッシュ運用：導入完了
+- Playwright CI実行設定：改善完了
 - README整備：完了
 - Wiki整備：完了
 - テスト全体基盤：安定稼働
@@ -107,17 +150,19 @@
 
 ### ■ Conclusion
 
-本対応では、GitHub ActionsのCI実行環境を分析し、依存関係およびPlaywrightブラウザ環境のキャッシュ導入による運用最適化を実施した。
+本対応では、Phase24で実施したGitHub Actions CI環境の高速化・最適化に加え、Phase25ではPlaywrightのCI運用設定およびドキュメント整備を実施した。
 
-特に以下の点が改善された：
+特に以下の点が改善された。
 
 - CI環境構築処理の効率化
 - 不要な依存取得処理の削減
 - Playwright実行環境の再利用性向上
-- CI運用の安定性・保守性向上
+- CI / Local環境ごとの実行目的整理
+- flaky testを考慮した安定実行設計
+- 失敗時解析性の向上
 - README / Wikiと実装構成の整合性向上
 
-結果として、本プロジェクトはテスト実装・CI構成・ドキュメント管理まで含めた、継続運用を意識した自動テスト基盤へ改善された。
+結果として、本プロジェクトはテスト実装・CI構成・運用設計・ドキュメント管理まで含めた、継続運用を意識した自動テスト基盤へ改善された。
 
 ---
 
