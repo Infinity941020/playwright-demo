@@ -4,69 +4,162 @@ const isCI = !!process.env.CI;
 
 /*
 ========================================
-Playwright Config (FINAL STABLE VERSION)
+Playwright Config (PROJECT SPLIT VERSION)
 ========================================
+
 目的：
-- OS依存snapshotを完全排除
-- ローカル / CI / Linux / Windows完全統一
-- Visual Regressionを単一baseline化
+- UI：Chromium / Firefox / WebKit対応
+- API：Chromium固定
+- Visual：Chromium固定
+- OS依存snapshot差異抑制
+- CI / Local環境統一
+- Visual Regression安定運用
+
 ========================================
 */
 
 export default defineConfig({
+
   testDir: './tests',
 
   retries: isCI ? 2 : 0,
+
   workers: isCI ? 2 : undefined,
+
   timeout: 30 * 1000,
 
-  /*
-  ========================================
-  ★ Visual Regressionの本丸修正
-  ========================================
-  OS依存のsnapshot分裂を防ぐ
-  ========================================
-  */
+
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/__snapshots__/{arg}.png',
 
+
   use: {
-    baseURL: 'https://www.saucedemo.com',
+
+    baseURL:
+      'https://www.saucedemo.com',
+
+    viewport: {
+      width: 1280,
+      height: 720,
+    },
+
+    deviceScaleFactor: 1,
+
+    actionTimeout: 0,
+
+    trace: isCI
+      ? 'retain-on-failure'
+      : 'on',
+
+    screenshot: 'off',
+
+    video: isCI
+      ? 'retain-on-failure'
+      : 'on',
+
+  },
+
+
+  reporter: isCI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+      ]
+    : [
+        ['html', { open: 'on-failure' }],
+      ],
+
+
+
+  projects: [
+
 
     /*
     ================================
-    Visual安定化（必須セット）
+    UI Tests
     ================================
     */
-    viewport: { width: 1280, height: 720 },
-    deviceScaleFactor: 1,
 
-    // アニメーション差分を防ぐ
-    actionTimeout: 0,
 
-    // CIログ安定化
-    trace: isCI ? 'retain-on-failure' : 'on',
-    screenshot: 'off',
-    video: isCI ? 'retain-on-failure' : 'on',
-  },
-
-  reporter: isCI
-    ? [['github'], ['html', { open: 'never' }]]
-    : [['html', { open: 'on-failure' }]],
-
-  /*
-  ========================================
-  ★ 重要：projectsは触らない（現状維持）
-  ========================================
-  理由：
-  - OS分岐の原因を増やさないため
-  - 今は単一Chromium運用で安定化優先
-  ========================================
-  */
-
-  projects: [
     {
-      name: 'chromium',
+      name: 'chromium-ui',
+
+      testMatch:
+        '**/tests/ui/**/*.spec.ts',
+
+      use: {
+        browserName: 'chromium',
+      },
+
     },
+
+
+    {
+      name: 'firefox-ui',
+
+      testMatch:
+        '**/tests/ui/**/*.spec.ts',
+
+      use: {
+        browserName: 'firefox',
+      },
+
+    },
+
+
+    {
+      name: 'webkit-ui',
+
+      testMatch:
+        '**/tests/ui/**/*.spec.ts',
+
+      use: {
+        browserName: 'webkit',
+      },
+
+    },
+
+
+    /*
+    ================================
+    API Tests
+    ================================
+    */
+
+
+    {
+      name: 'chromium-api',
+
+      testMatch:
+        '**/tests/api/**/*.spec.ts',
+
+      use: {
+        browserName: 'chromium',
+      },
+
+    },
+
+
+    /*
+    ================================
+    Visual Tests
+    ================================
+    */
+
+
+    {
+      name: 'chromium-visual',
+
+      testMatch:
+        '**/tests/visual/**/*.spec.ts',
+
+      use: {
+        browserName: 'chromium',
+      },
+
+    },
+
+
   ],
+
 });
