@@ -140,9 +140,17 @@ jobs:
     steps:
       - name: Send Slack Notification
         run: |
+          if [[ "${{ needs.ui-tests.result }}" == "failure" || \
+                "${{ needs.api-tests.result }}" == "failure" || \
+                "${{ needs.visual-tests.result }}" == "failure" ]]; then
+            STATUS="❌ Playwright CI Failed"
+          else
+            STATUS="✅ Playwright CI Success"
+          fi
+
           cat > payload.json <<EOF
           {
-            "text": "Playwright CI Result\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests: ${{ needs.ui-tests.result }}\nAPI Tests: ${{ needs.api-tests.result }}\nVisual Tests: ${{ needs.visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests: ${{ needs.ui-tests.result }}\nAPI Tests: ${{ needs.api-tests.result }}\nVisual Tests: ${{ needs.visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
 
