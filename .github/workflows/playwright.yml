@@ -125,3 +125,23 @@ jobs:
             test-results
             tests/visual/__snapshots__
           retention-days: 7
+
+  notify:
+    name: Slack Notification
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - ui-tests
+      - api-tests
+      - visual-tests
+
+    if: always()
+
+    steps:
+      - name: Send Slack Notification
+        run: |
+          curl -X POST \
+          -H 'Content-type: application/json' \
+          --data '{"text":"Playwright CI Notification Test"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
