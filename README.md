@@ -398,6 +398,29 @@ CI実行時の環境構築効率化を目的として、
 
 ---
 
+### Slack通知連携
+
+CI実行結果をSlackへ自動通知する仕組みを導入しています。
+
+GitHub Actionsの実行結果を集約し、
+UI / API / Visual Testsの各結果を1件の通知として確認できます。
+
+通知内容：
+
+- Repository
+- Branch
+- 実行ユーザー
+- UI Tests結果
+- API Tests結果
+- Visual Tests結果
+- GitHub Actions Workflow URL
+
+これにより、CI失敗時の早期検知および実行結果確認の効率化を実現しています。
+
+詳細な通知設計はGitHub Wikiを参照してください。
+
+---
+
 ## Playwright実行設定
 
 本プロジェクトではCIとローカルで実行設定を切り替え、
@@ -438,7 +461,6 @@ CI環境では安定実行を重視し、
 
 - APIテスト対象範囲の拡張
 - テストデータ管理改善
-- CI通知連携
 - ブラウザ並列実行最適化
 
 継続運用を前提として改善を続けています。
