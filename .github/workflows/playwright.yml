@@ -128,7 +128,6 @@ jobs:
 
   notify:
     name: Slack Notification
-
     runs-on: ubuntu-latest
 
     needs:
@@ -141,7 +140,13 @@ jobs:
     steps:
       - name: Send Slack Notification
         run: |
+          cat > payload.json <<EOF
+          {
+            "text": "Playwright CI Result\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests: ${{ needs.ui-tests.result }}\nAPI Tests: ${{ needs.api-tests.result }}\nVisual Tests: ${{ needs.visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+
           curl -X POST \
-          -H 'Content-type: application/json' \
-          --data '{"text":"Playwright CI Notification Test"}' \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+            -H "Content-type: application/json" \
+            --data @payload.json \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
