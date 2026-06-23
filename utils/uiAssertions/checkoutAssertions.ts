@@ -1,5 +1,5 @@
 // CheckoutFlow（業務フロー操作）
-import { CheckoutFlow } from '../flows/CheckoutFlow';
+import { CheckoutFlow } from '../../flows/CheckoutFlow';
 
 /*
 ================================
