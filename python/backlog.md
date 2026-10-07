@@ -12,6 +12,9 @@
 ## Stage 2-1 で扱うもの
 
 - 見た目の比較テスト（Visual Regression）
+- CIで、同じブランチに新しい push があったら古い実行を自動でキャンセルする設定
+  （GitHub Actions の concurrency と cancel-in-progress）。
+  CIのファイルはTS版と共通のため、Python版をCIに組み込むときに合わせて入れる
 
 ## 全画面の移植後に整理するもの
 
