@@ -6,12 +6,8 @@
   TS版にも同時に反映する前提とする。
 - 商品詳細画面（inventory-item.html）の中身の検証。
   Products画面からの遷移までは TC-PROD-009/010 で検証済み。
-
-## Cart画面の移植時に扱うもの
-
-- 全商品を追加してバッジ＝件数になることのテスト（TS版 cart-badge.spec.ts ②）
-- 画面遷移の確認（expect_on_cart_page など）を InventoryPage から CartPage へ移すかどうか
-- バッジの確認関数の置き場所（現在は inventory_assertions.py。TS版は cartBadgeAssertions.ts）
+- カートが空の状態で Checkout に進めることの扱い。
+  意図された仕様か不具合か判断できないため保留（cart_spec.md「本仕様の対象外」参照）。
 
 ## Stage 2-1 で扱うもの
 
@@ -27,3 +23,8 @@
   （LoginPage.expect_on_inventory_page()、logged_page 内、InventoryPage.expect_on_page()）
 - Login画面のエラー文言がテストファイル内に直接書かれている。文言データの置き場所を決める
 - 並列実行（pytest-xdist）を導入する場合、storage_state ファイルの書き込み競合に注意する
+
+## TS版の修正候補
+
+- Wiki「Cart仕様」のテスト件数の記載（カート機能4件・バッジ検証4件）が、
+  実態（cart.spec.ts 3件・cart-badge.spec.ts 5件）と違う
