@@ -25,6 +25,5 @@
   - 一部に CSS クラス（img.inventory_item_img、.inventory_list）
 - 商品一覧画面の表示確認が3か所に分かれている
   （LoginPage.expect_on_inventory_page()、logged_page 内、InventoryPage.expect_on_page()）
-- tests/ui/login/test_logged_page_fixture.py が URL を直接書いている（論点10）
 - Login画面のエラー文言がテストファイル内に直接書かれている。文言データの置き場所を決める
 - 並列実行（pytest-xdist）を導入する場合、storage_state ファイルの書き込み競合に注意する
