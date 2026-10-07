@@ -16,5 +16,9 @@ def expect_login_error(login_flow: LoginFlow) -> None:
     login_flow.expect_login_error()
 
 
+def expect_login_error_message(login_flow: LoginFlow, message: str) -> None:
+    login_flow.expect_login_error_message(message)
+
+
 def expect_on_login_page(login_flow: LoginFlow) -> None:
     login_flow.expect_on_login_page()
