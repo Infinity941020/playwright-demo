@@ -50,6 +50,13 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ---
 
+## Python版（移植中）
+
+本ポートフォリオを Playwright + Python（pytest）へ移植しています。
+進捗・設計判断の記録は [python/README.md](python/README.md) を参照してください。
+
+---
+
 ## 設計思想（概要）
 
 状態変化を基準としたテスト設計と、UI / API責務分離を軸としたアーキテクチャ
