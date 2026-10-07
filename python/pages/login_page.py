@@ -40,10 +40,6 @@ class LoginPage:
         self.enter_password(password)
         self.click_login()
 
-    def expect_error_visible(self) -> None:
-        """エラー表示検証。"""
-        expect(self.error_message_locator).to_be_visible()
-
     def expect_error_message(self, message: str) -> None:
         """エラー文言検証。"""
         expect(self.error_message_locator).to_have_text(message)

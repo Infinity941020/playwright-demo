@@ -91,5 +91,6 @@ class TestLoginFailure:
         # 業務操作（パスワード未入力でログイン）
         login_flow.login(username, "")
 
-        # 検証（業務レベル）
+        # 検証（業務レベル）：ログイン失敗を確認したうえで入力値を確認する
+        expect_login_error_message(login_flow, _PASSWORD_REQUIRED_MESSAGE)
         expect_username_retained(login_flow, username)

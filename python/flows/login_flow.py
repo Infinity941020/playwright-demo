@@ -25,10 +25,6 @@ class LoginFlow:
 
     # 検証（業務レベル）
 
-    def expect_login_error(self) -> None:
-        """ログイン失敗検証。"""
-        self._login_page.expect_error_visible()
-
     def expect_login_error_message(self, message: str) -> None:
         """ログイン画面のエラー文言検証。"""
         self._login_page.expect_error_message(message)
