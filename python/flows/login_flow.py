@@ -20,6 +20,7 @@ class LoginFlow:
     def login(self, username: str, password: str) -> None:
         """ログイン実行（業務操作）。"""
         self._login_page.goto()
+        self._login_page.expect_on_login_page()
         self._login_page.login(username, password)
 
     # 検証（業務レベル）

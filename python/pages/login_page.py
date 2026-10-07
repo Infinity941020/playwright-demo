@@ -22,9 +22,8 @@ class LoginPage:
         self.error_message_locator: Locator = page.locator('[data-test="error"]')
 
     def goto(self) -> None:
-        """ログイン画面へ遷移する。"""
+        """ログイン画面へ遷移する（表示確認は呼び出し側で expect_on_login_page() を呼ぶ）。"""
         self.page.goto(URLS["login"])
-        expect(self.login_button).to_be_visible()
 
     def enter_username(self, username: str) -> None:
         self.username_input.fill(username)

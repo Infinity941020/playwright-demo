@@ -13,6 +13,7 @@ from typing import Iterator
 
 import pytest
 from playwright.sync_api import Browser, Page, expect
+from pytest_playwright import CreateContextCallback
 
 from data.users import USERS
 from pages.login_page import LoginPage
@@ -31,6 +32,7 @@ def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
 
     login_page = LoginPage(page)
     login_page.goto()
+    login_page.expect_on_login_page()
     login_page.login(USERS["standard"]["username"], USERS["standard"]["password"])
     login_page.expect_on_inventory_page()
 
@@ -41,18 +43,22 @@ def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
 
 
 @pytest.fixture
-def logged_page(browser: Browser, standard_user_storage_state: Path) -> Iterator[Page]:
+def logged_page(
+    new_context: CreateContextCallback, standard_user_storage_state: Path
+) -> Iterator[Page]:
     """standard_userでログイン済みのPageを返す。
+
+    pytest-playwrightのnew_context fixture経由で生成するため、
+    --screenshot / --tracing / --video 等の設定が適用される。
+    contextのクローズもnew_context fixture側で行われる。
 
     storage_stateはCookie/localStorageのみを復元し、遷移先URLまでは
     復元しないため、生成直後に商品一覧ページへ明示的に遷移させる。
     """
-    context = browser.new_context(storage_state=str(standard_user_storage_state))
+    context = new_context(storage_state=str(standard_user_storage_state))
     page = context.new_page()
 
     page.goto(URLS["inventory"])
     expect(page.locator(".inventory_list")).to_be_visible()
 
     yield page
-
-    context.close()
