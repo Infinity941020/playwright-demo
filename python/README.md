@@ -116,7 +116,6 @@ TS版にあって、Python版ではまだ実装していないものです。
 - APIテスト（モックの実装方式は、API層の移植着手時に決める。外部の実APIには接続しない方針。詳細は [CLAUDE.md](../CLAUDE.md)）
 - 見た目の比較テスト（Visual Regression）
 - CI（GitHub Actions）への組み込み
-- Checkout・Logout 画面のテスト
 
 ---
 
