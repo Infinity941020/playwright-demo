@@ -9,22 +9,15 @@ TS版との差異について行った意思決定も記録しており、その
 
 ---
 
-## 進捗（2026-10-07 時点）
+## テスト規模
 
-| 画面 | テストケース数 | 状態 | 仕様書・テストケース |
-|---|---|---|---|
-| Login | 8件（＋補助テスト1件） | 完了 | [仕様書](specs/login_spec.md) ／ [テストケース](specs/login_testcases.md) |
-| Products | 14件 | 完了 | [仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md) |
-| Cart | 11件 | 完了 | [仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md) |
-| Checkout Step One | － | 未着手 | － |
-| Checkout Step Two | － | 未着手 | － |
-| Checkout Complete | － | 未着手 | － |
-| Logout | － | 未着手 | － |
+- Login：8件＋補助テスト1件（[仕様書](specs/login_spec.md) ／ [テストケース](specs/login_testcases.md)）
+- Products：14件（[仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md)）
+- Cart：11件（[仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md)）
+- 合計：34件（テストケース33件＋補助テスト1件）
 
-- 合計：34件（テストケース33件＋補助テスト1件）。すべてPass（2026-10-07、ローカル環境で確認）
-- 補助テストは、ログイン状態を再利用する fixture（logged_page）の動作確認用で、テストケースの件数には含めていません
-- Login は 2026-07-30 に Stage 0（パイロット）として実装し、2026-10-07 にテストケースとの突合に基づいて修正しました
-- Products・Cart は 2026-10-07 に実装しました
+※補助テストは、ログイン状態を再利用する fixture（logged_page）の動作確認用で、テストケースの件数には含めていません。
+※最新の状況・作業履歴は [UPDATELOG.md](UPDATELOG.md) を参照してください。
 
 ---
 
@@ -189,5 +182,6 @@ pytest --tracing retain-on-failure
 | [CLAUDE.md](../CLAUDE.md) | Claude Code への指示（移植方針・APIテストの通信方針・実装依頼時の運用ルール） |
 | [decisions.md](decisions.md) | TS版との設計差異に関する意思決定の記録 |
 | [backlog.md](backlog.md) | 今後の作業候補 |
+| [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |
 | [specs/](specs/) | 画面ごとの仕様書・テストケース |
 | [TS版 README](../README.md) | 移植元の TypeScript 版ポートフォリオ |

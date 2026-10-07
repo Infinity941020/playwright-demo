@@ -26,6 +26,7 @@
   （LoginPage.expect_on_inventory_page()、logged_page 内、InventoryPage.expect_on_page()）
 - Login画面のエラー文言がテストファイル内に直接書かれている。文言データの置き場所を決める
 - 並列実行（pytest-xdist）を導入する場合、storage_state ファイルの書き込み競合に注意する
+- README を最終的に TS版と別のまま整えるか、TS版と統合するかを決める
 
 ## TS版の修正候補
 
