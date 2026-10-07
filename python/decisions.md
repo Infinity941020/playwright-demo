@@ -61,17 +61,25 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   projectsに正式配線すれば同じ恩恵を得られるが、本プロジェクトの
   スコープ外）
 - 決定日: 2026-07-30
+- 追記（2026-10-07）: logged_page を pytest-playwright の new_context
+  fixture 経由で生成する形に変更した。--screenshot / --tracing / --video
+  等の設定が logged_page を使うテストにも適用されるようにするため。
 
 ## 論点2: ロケータのキャッシュ有無が不統一
 
-- 分類: ①
-- 判断: 既存踏襲（案A: TS版のLoginPageと同じくキャッシュ派で実装）
-- 理由: 既存との差分最小化を優先。全体的な統一（都度生成派への統一 or
-  キャッシュ派への統一）は、Stage 1で全画面が出揃った後の
-  リファクタリングとして先送りする。
-- 影響範囲: Python版LoginPage相当クラスのロケータ定義方法
-- TS逆輸入候補: なし（差分最小化が目的のため、TS側への影響なし）
-- 決定日: 2026-07-30
+- 分類: ②
+- 判断: 変更（Python版は全Page Objectを「__init__ でまとめて定義する方式」
+  で統一する）
+- 理由: 2026-07-30時点ではLoginPageのみ既存踏襲とし、統一は先送り
+  していた。Products画面の実装にあたり、Python版の中で書き方を揃える
+  ため統一を決定した。PlaywrightのLocatorは遅延評価のため性能面の不利は
+  なく、Pythonの Page Object では一般的な書き方である（判断基準3）。
+  商品ごとに変わる部品は、商品名を受け取るメソッドで扱う。
+- 影響範囲: Python版の全Page Object
+- TS逆輸入候補: あり（TS版は都度生成派が多数のため、統一する場合は
+  InventoryPage / CartPage / CheckoutPage / HeaderComponent の書き換えが
+  必要）
+- 決定日: 2026-07-30（初回）／2026-10-07（更新）
 
 ## 論点3: コンストラクタスタイルの不統一（TS特有）
 
@@ -199,3 +207,47 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: Claude Codeへの実装依頼手順（全画面共通）
 - TS逆輸入候補: なし
 - 決定日: 2026-07-30
+
+## 論点12: Products画面を独立した画面として扱う
+
+- 分類: ②
+- 判断: 変更
+- 理由: TS版ではProducts画面を独立したドメインとして扱っておらず、
+  カート関連の挙動はWiki「Cart仕様」の一部だった。ソート・画面遷移・
+  未ログイン時のアクセス制御は未検証だった。Python版は画面単位で
+  「仕様書→観点→テストケース」を作る進め方のため、Products画面を
+  独立させ、検証範囲を広げた（18観点・14件）。全商品を追加して
+  バッジ＝件数を確認するテストは、TS版と同じくCart側で扱う。
+- 影響範囲: python/specs/products_*.md、pages/inventory_page.py、
+  pages/header_component.py、flows/inventory_flow.py、tests/ui/inventory/
+- TS逆輸入候補: 検討（TS版のWikiの対象ドメインにProductsを追加するか
+  どうかを含む）
+- 決定日: 2026-10-07
+
+## 論点13: goto() と expect_on_xxx() の使い分け
+
+- 分類: ②
+- 判断: 変更
+- 理由: TS版では InventoryPage.goto() が「表示確認のみ（移動しない）」、
+  CartPage.goto() が「移動する」と、同じ名前で意味が異なっていた。
+  Python版では goto() を「移動のみ」、表示確認を expect_on_xxx() に
+  統一する。goto() に表示確認を含めると、未ログイン時のテスト
+  （TC-PROD-014）が成立しないという実害もあった。既存の
+  LoginPage.goto() も同じ考え方に合わせて変更した。
+- 影響範囲: pages/login_page.py、pages/inventory_page.py、
+  flows/login_flow.py、fixtures/login_fixture.py（今後の全Page Object）
+- TS逆輸入候補: あり
+- 決定日: 2026-10-07
+
+## 論点14: 依存パッケージの管理方法
+
+- 分類: ②
+- 判断: requirements.txt＋venv で管理し、直接使うパッケージは
+  バージョンを固定（==）する
+- 理由: 依存パッケージが少なく、Poetry等の専用ツールを入れるほどの
+  規模ではない。CIへの組み込み時もそのまま使える（判断基準3）。
+  最新版に上げたうえで Stage 0 のテストが全件Passすることを確認して
+  から固定した。
+- 影響範囲: python/requirements.txt
+- TS逆輸入候補: なし
+- 決定日: 2026-10-07
