@@ -106,7 +106,3 @@ class InventoryPage:
     def expect_on_product_detail_page(self, product_id: int) -> None:
         """商品詳細画面への遷移確認（画面の中身は対象外）。"""
         expect(self.page).to_have_url(f"{URLS['inventory_item']}?id={product_id}")
-
-    def expect_on_cart_page(self) -> None:
-        """カート画面への遷移確認。"""
-        expect(self.page).to_have_url(URLS["cart"])

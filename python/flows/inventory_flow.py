@@ -3,13 +3,14 @@
 責務:
     - 業務単位の操作のみ提供
     - specからUI詳細を隠蔽
-    - InventoryPage / HeaderComponent依存をFlowで吸収
+    - InventoryPage / HeaderComponent / CartPage依存をFlowで吸収
 """
 
 from typing import Literal
 
 from playwright.sync_api import Page
 
+from pages.cart_page import CartPage
 from pages.header_component import HeaderComponent
 from pages.inventory_page import InventoryPage
 
@@ -18,6 +19,8 @@ class InventoryFlow:
     def __init__(self, page: Page) -> None:
         self._inventory_page = InventoryPage(page)
         self._header = HeaderComponent(page)
+        # 遷移先（カート画面）の表示確認用
+        self._cart_page = CartPage(page)
 
     # 業務操作
 
@@ -83,4 +86,4 @@ class InventoryFlow:
         self._inventory_page.expect_on_product_detail_page(product_id)
 
     def expect_on_cart_page(self) -> None:
-        self._inventory_page.expect_on_cart_page()
+        self._cart_page.expect_on_page()
