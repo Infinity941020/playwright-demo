@@ -48,6 +48,10 @@ class LoginPage:
         """エラー文言検証。"""
         expect(self.error_message_locator).to_have_text(message)
 
+    def expect_username_value(self, username: str) -> None:
+        """ユーザー名入力欄の値検証。"""
+        expect(self.username_input).to_have_value(username)
+
     def expect_on_inventory_page(self) -> None:
         """ログイン成功後（商品一覧ページ）。"""
         expect(self.page).to_have_url(re.compile(r"inventory\.html"))

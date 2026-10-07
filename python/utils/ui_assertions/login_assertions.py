@@ -22,3 +22,7 @@ def expect_login_error_message(login_flow: LoginFlow, message: str) -> None:
 
 def expect_on_login_page(login_flow: LoginFlow) -> None:
     login_flow.expect_on_login_page()
+
+
+def expect_username_retained(login_flow: LoginFlow, username: str) -> None:
+    login_flow.expect_username_retained(username)

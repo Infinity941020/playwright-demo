@@ -33,6 +33,10 @@ class LoginFlow:
         """ログイン画面のエラー文言検証。"""
         self._login_page.expect_error_message(message)
 
+    def expect_username_retained(self, username: str) -> None:
+        """ログイン失敗後のユーザー名入力値保持検証。"""
+        self._login_page.expect_username_value(username)
+
     def expect_login_success(self) -> None:
         """ログイン成功検証。"""
         self._login_page.expect_on_inventory_page()

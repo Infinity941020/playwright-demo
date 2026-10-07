@@ -8,7 +8,7 @@ from utils.ui_assertions.login_assertions import expect_login_success
 
 
 def test_login_success_shows_inventory(page: Page) -> None:
-    """ログイン成功して商品一覧が表示されること。"""
+    """TC-LOGIN-001: 正しいユーザー名・パスワードでログインできること。"""
     login_flow = LoginFlow(page)
 
     # 業務操作（ログイン実行）

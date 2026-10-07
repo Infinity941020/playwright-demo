@@ -7,8 +7,10 @@
 
 from playwright.sync_api import Page, expect
 
+from utils.urls import URLS
+
 
 def test_logged_page_starts_on_inventory_page(logged_page: Page) -> None:
-    """logged_pageは、事前ログイン操作なしで商品一覧ページに到達していること。"""
-    expect(logged_page).to_have_url("https://www.saucedemo.com/inventory.html")
+    """TC対象外（logged_page fixture の動作確認用）: 事前ログイン操作なしで商品一覧ページに到達していること。"""
+    expect(logged_page).to_have_url(URLS["inventory"])
     expect(logged_page.locator(".inventory_list")).to_be_visible()
