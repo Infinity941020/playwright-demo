@@ -51,18 +51,21 @@ python/
 ├── requirements.txt         # 依存パッケージ（バージョン固定）
 ├── data/
 │   ├── users.py             # ログインユーザー情報
-│   └── products.py          # 商品情報（商品名・価格・商品ID）とソート選択肢
+│   ├── products.py          # 商品情報（商品名・価格・商品ID）とソート選択肢
+│   └── checkout_data.py     # 購入者情報（Checkout画面の入力値）
 ├── fixtures/
 │   └── login_fixture.py     # storage_state の生成・再利用、logged_page
 ├── pages/                   # Page Object（要素取得・単体操作・画面レベルの検証）
 │   ├── login_page.py
 │   ├── inventory_page.py
 │   ├── cart_page.py
+│   ├── checkout_page.py
 │   └── header_component.py  # ヘッダー共通部品（カートアイコン・バッジ）
 ├── flows/                   # Flow（業務単位の操作と検証）
 │   ├── login_flow.py
 │   ├── inventory_flow.py
-│   └── cart_flow.py
+│   ├── cart_flow.py
+│   └── checkout_flow.py
 ├── utils/
 │   ├── urls.py              # URL定義（一元管理）
 │   └── ui_assertions/       # Specから呼ぶ検証関数（Flow経由）
@@ -71,7 +74,8 @@ python/
 │   └── ui/
 │       ├── login/
 │       ├── inventory/       # Products画面
-│       └── cart/
+│       ├── cart/
+│       └── checkout/
 ├── specs/                   # 画面ごとの仕様書・テストケース
 ├── decisions.md             # TS版との設計差異に関する意思決定の記録
 └── backlog.md               # 今後の作業候補
@@ -107,6 +111,7 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 | [論点12](decisions.md#論点12-products画面を独立した画面として扱う) Products画面を独立した画面として扱う | 仕様書・テストケースを独立させ、ソート・画面遷移・未ログイン時も検証 | 検討 |
 | [論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け) goto() と expect_on_xxx() の使い分け | goto() は移動のみ、表示確認は expect_on_xxx() に統一 | あり |
 | [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 検討 |
+| [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | あり |
 
 ---
 
