@@ -14,7 +14,8 @@ TS版との差異について行った意思決定も記録しており、その
 - Login：8件＋補助テスト1件（[仕様書](specs/login_spec.md) ／ [テストケース](specs/login_testcases.md)）
 - Products：14件（[仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md)）
 - Cart：11件（[仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md)）
-- 合計：34件（テストケース33件＋補助テスト1件）
+- Checkout Step One：13件（[仕様書](specs/checkout_step_one_spec.md) ／ [テストケース](specs/checkout_step_one_testcases.md)）
+- 合計：47件（テストケース46件＋補助テスト1件）
 
 ※補助テストは、ログイン状態を再利用する fixture（logged_page）の動作確認用で、テストケースの件数には含めていません。
 ※最新の状況・作業履歴は [UPDATELOG.md](UPDATELOG.md) を参照してください。

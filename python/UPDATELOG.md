@@ -1,5 +1,217 @@
 # UPDATE LOG（Python版）
 ---
+## 2026-11-08
+
+### ■ Before
+
+- Login（8件＋補助テスト1件）・Products（14件）・Cart（11件）の移植は完了していた
+- Checkout Step One 画面は未着手だった
+- Checkout Step One への遷移確認は、Cart画面の移植時に CartPage へ暫定で置いたままだった
+- ブランチの運用は決めておらず、すべて main に直接コミットしていた
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Stage 1：Checkout Step One 画面の移植
+
+---
+
+### ■ Checkout Step One 画面
+
+実機確認をもとに仕様書・テストケースを作成し、実装。
+
+- 仕様書：specs/checkout_step_one_spec.md
+- テストケース：specs/checkout_step_one_testcases.md（13件）
+- 入力チェック（未入力のエラー文言と優先順）、エラー表示の切り替わりと閉じ方、入力値の保持、
+  画面遷移、カートへの影響、未ログイン時のアクセス制御を対象とした
+- TS版では確認していなかったエラー文言まで確認した
+- CheckoutStepOnePage／CheckoutFlow／checkout_assertions／checkout_data を新規作成
+- 前提状態は Cart画面と同じく保存領域（localStorage）への直接書き込みで作り、
+  画面は URL で直接開く（論点15）
+
+確認結果：
+
+- 13件すべてPass
+- ロケータに使う data-test 属性は、実機で確認した値のみを使用
+
+---
+
+### ■ 判断できない挙動の扱い
+
+意図された仕様か不具合かを判断できない以下の4件は、仕様書に事実として記録し、テストの対象外とした。
+
+- 空白のみの入力が通る
+- 入力欄の Enter で Cancel が動く
+- エラー時に入力済みの欄も赤表示になる
+- カートが空でも進める
+
+Enter で Cancel が動くため、テストでは Continue を必ずボタンのクリックで押している。
+
+---
+
+### ■ Page Object の構成の決定
+
+- ファイルは TS版の CheckoutPage.ts と1対1で対応する checkout_page.py とし、
+  クラスは画面ごとに分けることを決定（論点16）
+- 今回は CheckoutStepOnePage のみを作成。CheckoutStepTwoPage・CheckoutCompletePage は次回以降に追加する
+- Step Two への遷移確認は、CheckoutStepTwoPage を作るまで CheckoutStepOnePage に置く（URLのみ確認）
+
+---
+
+### ■ Cart画面からの遷移確認の移動
+
+- Cart画面の移植時に暫定で CartPage に置いていた Step One への遷移確認を、
+  CheckoutStepOnePage.expect_on_page() へ移した
+- Cart のテスト（TC-CART-007）もこれを使う形に変更
+
+確認結果：
+
+- Cart の11件すべてPass
+
+---
+
+### ■ TS版の修正候補の記録
+
+以下を backlog.md に記録。TS版自体の修正は行っていない。
+
+- Checkout系テストの名前と中身の食い違い（checkout-success.spec.ts の ③〜⑥）
+- エラー文言の未確認（checkout-failure.spec.ts）
+- Wiki「Checkout仕様」と実装の食い違い
+
+---
+
+### ■ ブランチ運用の決定
+
+ブランチの運用を決めて CLAUDE.md に記載。
+
+- コードを含む変更：作業ブランチからプルリクエストで取り込む（作成・マージはユーザーが行う）
+- ドキュメントだけの変更：main に直接コミットする
+
+この運用で初めてのプルリクエスト（#1）を作成し、CI（UI・API・Visual のテストと Slack通知）が
+すべて成功したことを確認してからマージした。
+※ CI で実行しているのは TS版のテストで、Python版のテストはまだ CI に組み込んでいない。
+
+---
+
+### ■ Result（成果）
+
+- Checkout Step One 画面（13件）の移植を完了
+- Checkout の Page Object の構成を決定し、次の画面を同じファイルへ追加できる形にした
+- 判断できない挙動4件を、テストの対象外として仕様書に記録
+- ブランチの運用を決定し、最初のプルリクエストをマージ
+- テスト実行結果：47件すべてPass（85.10秒）
+  - Login：9件（テストケース8件＋補助テスト1件）
+  - Products：14件
+  - Cart：11件
+  - Checkout Step One：13件
+
+---
+
+### ■ Overall Status
+
+- Login：完了（8件＋補助テスト1件）
+- Products：完了（14件）
+- Cart：完了（11件）
+- Checkout Step One：完了（13件）
+- Checkout Step Two：未着手
+- Checkout Complete：未着手
+- Logout：未着手
+- APIテスト：未実装（通信方針のみ決定。モックの実装方式は API層の移植着手時に決定）
+- Visual Regression：未実装（Stage 2-1 で扱う予定）
+- CI組み込み：未実装
+
+---
+
+### ■ Conclusion
+
+本対応では、Checkout Step One 画面の移植を実施し、TS版では確認していなかったエラー文言や
+入力値の保持、カートへの影響まで検証範囲を広げた。意図された仕様か不具合かを判断できない
+挙動は、テストで固定せず、事実として仕様書に記録した。
+
+Page Object は、ファイルを TS版と1対1で対応させつつ、クラスを画面ごとに分ける構成とした。
+
+また、ブランチの運用を決め、コードを含む変更はプルリクエストで取り込む形に切り替えた。
+
+---
+
+## 2026-10-31
+
+### ■ Before
+
+- 2026-10-07 に Stage 2-1 の方針と今後の拡張候補を決めていたが、backlog.md には記録していなかった
+- 開発環境の移行後に、python/README.md のセットアップ手順で環境を再構築できるかは未確認だった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ 開発環境の移行
+
+---
+
+### ■ 新しいPCでの環境再構築
+
+開発環境を新しいPCに移行し、python/README.md のセットアップ手順で環境を再構築。
+
+確認結果：
+
+- Python 3.14.4 で再構築できることを確認
+- requirements.txt で固定したバージョンがそのまま入ることを確認
+- 全34件Pass
+
+---
+
+## ■ 方針の記録
+
+---
+
+### ■ backlog.md への記録
+
+2026-10-07 に決めた内容を backlog.md に記録。
+
+Stage 2-1 の方針：
+
+- APIテストは Python側のモックで実装する
+- Visual Regression は CI上で基準画像を生成して比較する
+
+今後の拡張候補：
+
+- 外部APIのテスト
+- 外部APIの仕様変更への対応フロー
+
+---
+
+### ■ Result（成果）
+
+- 新しいPCで、README の手順どおりに環境を再構築できることを確認
+- Stage 2-1 の方針と今後の拡張候補を backlog.md に記録
+- テスト実行結果：34件すべてPass
+
+---
+
+### ■ Overall Status
+
+- Login：完了（8件＋補助テスト1件）
+- Products：完了（14件）
+- Cart：完了（11件）
+- Checkout Step One：未着手
+- Checkout Step Two：未着手
+- Checkout Complete：未着手
+- Logout：未着手
+- APIテスト：未実装（通信方針のみ決定。モックの実装方式は API層の移植着手時に決定）
+- Visual Regression：未実装（Stage 2-1 で扱う予定）
+- CI組み込み：未実装
+
+---
+
+### ■ Conclusion
+
+本対応では、開発環境を新しいPCへ移行し、README のセットアップ手順と固定したバージョンで
+環境を再構築できることを確認した。あわせて、Stage 2-1 の方針と今後の拡張候補を backlog.md に記録した。
+
+---
+
 ## 2026-10-07
 
 ### ■ Before
