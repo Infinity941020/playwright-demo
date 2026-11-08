@@ -3,12 +3,13 @@
 責務:
     - 業務単位の操作のみ提供
     - specからUI詳細を隠蔽
-    - CartPage / HeaderComponent / InventoryPage依存をFlowで吸収
+    - CartPage / HeaderComponent / InventoryPage / CheckoutStepOnePage依存をFlowで吸収
 """
 
 from playwright.sync_api import Page
 
 from pages.cart_page import CartPage
+from pages.checkout_page import CheckoutStepOnePage
 from pages.header_component import HeaderComponent
 from pages.inventory_page import InventoryPage
 
@@ -19,6 +20,8 @@ class CartFlow:
         self._header = HeaderComponent(page)
         # 遷移先（商品一覧・商品詳細）の表示確認用
         self._inventory_page = InventoryPage(page)
+        # 遷移先（Checkout Step One）の表示確認用
+        self._checkout_step_one_page = CheckoutStepOnePage(page)
 
     # 業務操作
 
@@ -83,7 +86,7 @@ class CartFlow:
         self._inventory_page.expect_on_page()
 
     def expect_on_checkout_step_one_page(self) -> None:
-        self._cart_page.expect_on_checkout_step_one_page()
+        self._checkout_step_one_page.expect_on_page()
 
     def expect_on_product_detail_page(self, product_id: int) -> None:
         self._inventory_page.expect_on_product_detail_page(product_id)

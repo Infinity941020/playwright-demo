@@ -111,7 +111,3 @@ class CartPage:
 
     def expect_item_listed(self, product_name: str) -> None:
         expect(self._item(product_name)).to_have_count(1)
-
-    def expect_on_checkout_step_one_page(self) -> None:
-        """Checkout Step One画面への遷移確認（画面の中身は対象外）。"""
-        expect(self.page).to_have_url(URLS["checkout_step_one"])
