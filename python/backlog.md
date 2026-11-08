@@ -8,6 +8,8 @@
   Products画面からの遷移までは TC-PROD-009/010 で検証済み。
 - カートが空の状態で Checkout に進めることの扱い。
   意図された仕様か不具合か判断できないため保留（cart_spec.md「本仕様の対象外」参照）。
+  Checkout Step One で判断できなかった挙動（空白のみの入力が通る、入力欄の Enter で Cancel が動く、
+  エラー時に入力済みの欄も赤表示になる）も同じく保留中（checkout_step_one_spec.md「判断できない挙動」参照）。
 - 外部APIのテスト（優先度低）。
   モックと同じ確認内容で接続先だけ変えて動かし、失敗してもCIは止めない（参考情報として通知する）。
   使う外部API（ReqResの現状や代わり）は着手時に調べる。
@@ -42,3 +44,11 @@
 
 - Wiki「Cart仕様」のテスト件数の記載（カート機能4件・バッジ検証4件）が、
   実態（cart.spec.ts 3件・cart-badge.spec.ts 5件）と違う
+- checkout-success.spec.ts の ⑤「削除後購入」⑥「再追加後購入」は、削除・再追加をしておらず手順が②と同じ。
+  ③④も手順が①と同じ
+- checkout-failure.spec.ts はエラーが表示されていることのみを確認し、文言を確認していない
+- Wiki「Checkout仕様」と実装の食い違い：
+  - Step Two の Cancel の遷移先（Wiki は Cart、実際は inventory）
+  - キャンセル系の状態保持の検証（Wiki は検証するとしているがURLのみ）
+  - UI Assertions の範囲（Wiki は各ステップとしているが expectCheckoutComplete のみ）
+  - Page Object の例（Wiki の enterFirstName 等と実コードの fillInfo が異なる）

@@ -269,3 +269,22 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: 検討（TS版のテスト時間短縮と独立性の向上につながるが、
   内部キー名への依存が増える）
 - 決定日: 2026-10-07
+
+## 論点16: Checkout画面の Page Object の構成
+
+- 分類: ②
+- 判断: 変更（折衷案）。ファイルは TS版の CheckoutPage.ts と1対1で対応する
+  checkout_page.py を1つとし、クラスは画面ごとに分ける
+  （CheckoutStepOnePage／CheckoutStepTwoPage／CheckoutCompletePage）
+- 理由: TS版は Login・Products・Cart が1画面1クラスで、Checkout だけ3画面を
+  1クラスにまとめていた。Python版は1画面1クラスで統一する（判断基準1：多数派優先）。
+  一方で、ファイルは TS版と1対1で対応させ、見比べやすさと、将来TS版に反映するときの
+  手間の小ささを両立させた。
+- 影響範囲: pages/checkout_page.py（CheckoutStepOnePage。CheckoutStepTwoPage・
+  CheckoutCompletePage は次回以降に追加）、flows/checkout_flow.py、
+  utils/ui_assertions/checkout_assertions.py、data/checkout_data.py、
+  tests/ui/checkout/、pages/cart_page.py と flows/cart_flow.py
+  （CartPage.expect_on_checkout_step_one_page() を CheckoutStepOnePage.expect_on_page() へ移動）
+- TS逆輸入候補: あり（TS版も CheckoutPage.ts の中を画面ごとのクラスに分けるだけで
+  同じ構造にできる）
+- 決定日: 2026-11-08
