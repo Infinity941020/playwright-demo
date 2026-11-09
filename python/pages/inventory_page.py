@@ -44,6 +44,10 @@ class InventoryPage:
         """商品一覧画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
         self.page.goto(URLS["inventory"])
 
+    def goto_product_detail(self, product_id: int) -> None:
+        """商品詳細画面へURLで遷移する（表示確認は呼び出し側で行う）。"""
+        self.page.goto(f"{URLS['inventory_item']}?id={product_id}")
+
     def reload(self) -> None:
         self.page.reload()
 

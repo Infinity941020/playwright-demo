@@ -191,6 +191,48 @@ class CheckoutStepTwoPage:
         expect(self.tax).to_have_text(tax)
         expect(self.total).to_have_text(total)
 
-    def expect_on_checkout_complete_page(self) -> None:
-        """Checkout Complete画面への遷移確認（画面の中身は対象外）。"""
+
+class CheckoutCompletePage:
+    def __init__(self, page: Page) -> None:
+        self.page: Page = page
+        self.title: Locator = page.locator('[data-test="title"]')
+        self.header: Locator = page.locator('[data-test="complete-header"]')
+        self.text: Locator = page.locator('[data-test="complete-text"]')
+        self.image: Locator = page.locator('[data-test="pony-express"]')
+        self.back_home_button: Locator = page.locator('[data-test="back-to-products"]')
+        self.generate_pdf_button: Locator = page.locator('[data-test="generate-pdf-order"]')
+
+    # 単体操作
+
+    def goto(self) -> None:
+        """Checkout Complete画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        self.page.goto(URLS["complete"])
+
+    def click_back_home(self) -> None:
+        self.back_home_button.click()
+
+    # 画面レベルの検証
+
+    def expect_on_page(self) -> None:
+        """Checkout Complete画面表示確認。"""
         expect(self.page).to_have_url(URLS["complete"])
+        expect(self.back_home_button).to_be_visible()
+
+    def expect_page_layout(self) -> None:
+        """タイトル・見出し・本文・画像・ボタンの検証。
+
+        画像は表示と代替テキストで確認し、読み込みの完了は確認しない
+        （checkout_complete_testcases.md「実装時の注意」参照）。
+        """
+        expect(self.title).to_have_text("Checkout: Complete!")
+        expect(self.header).to_have_text("Thank you for your order!")
+        expect(self.text).to_have_text(
+            "Your order has been dispatched, "
+            "and will arrive just as fast as the pony can get there!"
+        )
+        expect(self.image).to_be_visible()
+        expect(self.image).to_have_attribute("alt", "Pony Express")
+        expect(self.back_home_button).to_be_visible()
+        expect(self.back_home_button).to_have_text("Back Home")
+        expect(self.generate_pdf_button).to_be_visible()
+        expect(self.generate_pdf_button).to_have_text("Generate PDF order")

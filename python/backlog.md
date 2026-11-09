@@ -14,6 +14,14 @@
   Step One を経由せずに購入まで完了できる、カートが空で $0 の購入ができる、空カートの小計だけが「$0」と表示される、
   購入完了後のブラウザの「戻る」で空の Step Two が表示される、Step One の入力値が Step Two に表示されない）も
   同じく保留中（checkout_step_two_spec.md「判断できない挙動」参照）。
+  Checkout Complete・Logout で判断できなかった挙動（購入せずに Complete 画面を直接開ける、
+  PDF出力ボタンが再読み込み等で消える、Complete の画像の読み込みの遅れ、Back Home 後の「戻る」で Complete に戻る、
+  ログアウトしてもカートが消えない（共用のPCでは、次の利用者に前の利用者のカートが見える）、
+  メニューの外側のクリックで閉じない、Products 画面で All Items を押してもメニューが開いたまま、
+  Reset App State で画面の表示が更新されない）も同じく保留中
+  （checkout_complete_spec.md・logout_spec.md「判断できない挙動」参照）。
+- Reset App State、Dynamic Catalog（Lazy Load・Spinner・Slider）、About、
+  PDF出力（ダウンロードとPDFの中身）のテスト。
 - 外部APIのテスト（優先度低）。
   モックと同じ確認内容で接続先だけ変えて動かし、失敗してもCIは止めない（参考情報として通知する）。
   使う外部API（ReqResの現状や代わり）は着手時に調べる。
@@ -59,3 +67,11 @@
 - CheckoutPage.expectOnStepTwo は定義のみで、どこからも呼ばれていない
 - Wiki「Flow-Layer設計」で CheckoutFlow の責務とされている「購入確認」に対応する確認コードがない
 - TS版は Step Two の表示と金額をコードでは確認していない（スクリーンショット比較のみ）
+- MenuPage が開閉の判定に isVisible を使っている（URL で開いた直後は、閉じていても true になる）
+- MenuPage.expectMenuOpened が定義のみで、どこからも呼ばれていない
+- LogoutFlow で openMenu を呼んだ後、menu.logout の中でも開く処理を行っている（重複）
+- Wiki「Flow-Layer設計」の LogoutFlow の例（loginPage.clickLogout）と実コード（MenuPage）の食い違い
+- Wiki「Page-Object設計」の HeaderComponent の説明（メニュー表示）と実コード（バッジの確認のみ）の食い違い
+- Wiki「Checkout仕様」の「購入完了画面が正常に表示されること」に対し、確認しているのは URL と見出しの表示のみ
+- Wiki「Logout仕様」の「ログイン状態が解除されること」に対応するテストがない
+- Complete 画面の Visual スナップショットのフッターが Twitter のアイコンで、実機は X のアイコン

@@ -70,6 +70,10 @@ def expect_on_checkout_complete_page(checkout_flow: CheckoutFlow) -> None:
     checkout_flow.expect_on_checkout_complete_page()
 
 
+def expect_checkout_complete_page_layout(checkout_flow: CheckoutFlow) -> None:
+    checkout_flow.expect_complete_page_layout()
+
+
 def expect_on_inventory_page(checkout_flow: CheckoutFlow) -> None:
     checkout_flow.expect_on_inventory_page()
 

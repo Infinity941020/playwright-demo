@@ -25,6 +25,10 @@ class LoginPage:
         """ログイン画面へ遷移する（表示確認は呼び出し側で expect_on_login_page() を呼ぶ）。"""
         self.page.goto(URLS["login"])
 
+    def go_back(self) -> None:
+        """ブラウザの「戻る」を押す。"""
+        self.page.go_back()
+
     def enter_username(self, username: str) -> None:
         self.username_input.fill(username)
 
@@ -44,9 +48,18 @@ class LoginPage:
         """エラー文言検証。"""
         expect(self.error_message_locator).to_have_text(message)
 
+    def expect_no_error(self) -> None:
+        """エラー表示がないこと。"""
+        expect(self.error_message_locator).to_have_count(0)
+
     def expect_username_value(self, username: str) -> None:
         """ユーザー名入力欄の値検証。"""
         expect(self.username_input).to_have_value(username)
+
+    def expect_inputs_empty(self) -> None:
+        """ユーザー名・パスワードの入力欄が空であること。"""
+        expect(self.username_input).to_have_value("")
+        expect(self.password_input).to_have_value("")
 
     def expect_on_inventory_page(self) -> None:
         """ログイン成功後（商品一覧ページ）。"""
