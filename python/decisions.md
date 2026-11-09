@@ -288,3 +288,16 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: あり（TS版も CheckoutPage.ts の中を画面ごとのクラスに分けるだけで
   同じ構造にできる）
 - 決定日: 2026-11-08
+
+## 論点17: メニューの開閉の判定方法
+
+- 分類: ②
+- 判断: 変更（TS版の MenuPage は表示されているかどうか〈isVisible〉で開閉を判定しているが、
+  Python版は aria-hidden 属性で判定する）
+- 理由: URL で開いた直後の画面では、閉じているメニューの Logout も「表示されている」と
+  判定されることを実機で確認した。表示の有無では開閉を正しく判定できないため
+  （判断基準4：テストの再現性）。
+- 影響範囲: pages/menu_page.py（MenuPage）、flows/logout_flow.py、
+  utils/ui_assertions/logout_assertions.py、tests/ui/logout/
+- TS逆輸入候補: あり
+- 決定日: 2026-11-09
