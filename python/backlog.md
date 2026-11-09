@@ -10,6 +10,10 @@
   意図された仕様か不具合か判断できないため保留（cart_spec.md「本仕様の対象外」参照）。
   Checkout Step One で判断できなかった挙動（空白のみの入力が通る、入力欄の Enter で Cancel が動く、
   エラー時に入力済みの欄も赤表示になる）も同じく保留中（checkout_step_one_spec.md「判断できない挙動」参照）。
+  Checkout Step Two で判断できなかった挙動（小計の桁あふれ（例：Item total: $59.980000000000004）、
+  Step One を経由せずに購入まで完了できる、カートが空で $0 の購入ができる、空カートの小計だけが「$0」と表示される、
+  購入完了後のブラウザの「戻る」で空の Step Two が表示される、Step One の入力値が Step Two に表示されない）も
+  同じく保留中（checkout_step_two_spec.md「判断できない挙動」参照）。
 - 外部APIのテスト（優先度低）。
   モックと同じ確認内容で接続先だけ変えて動かし、失敗してもCIは止めない（参考情報として通知する）。
   使う外部API（ReqResの現状や代わり）は着手時に調べる。
@@ -52,3 +56,6 @@
   - キャンセル系の状態保持の検証（Wiki は検証するとしているがURLのみ）
   - UI Assertions の範囲（Wiki は各ステップとしているが expectCheckoutComplete のみ）
   - Page Object の例（Wiki の enterFirstName 等と実コードの fillInfo が異なる）
+- CheckoutPage.expectOnStepTwo は定義のみで、どこからも呼ばれていない
+- Wiki「Flow-Layer設計」で CheckoutFlow の責務とされている「購入確認」に対応する確認コードがない
+- TS版は Step Two の表示と金額をコードでは確認していない（スクリーンショット比較のみ）
