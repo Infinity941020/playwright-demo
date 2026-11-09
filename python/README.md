@@ -15,7 +15,10 @@ TS版との差異について行った意思決定も記録しており、その
 - Products：14件（[仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md)）
 - Cart：11件（[仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md)）
 - Checkout Step One：13件（[仕様書](specs/checkout_step_one_spec.md) ／ [テストケース](specs/checkout_step_one_testcases.md)）
-- 合計：47件（テストケース46件＋補助テスト1件）
+- Checkout Step Two：14件（[仕様書](specs/checkout_step_two_spec.md) ／ [テストケース](specs/checkout_step_two_testcases.md)）
+- Checkout Complete：6件（[仕様書](specs/checkout_complete_spec.md) ／ [テストケース](specs/checkout_complete_testcases.md)）
+- Logout：10件（[仕様書](specs/logout_spec.md) ／ [テストケース](specs/logout_testcases.md)）
+- 合計：77件（テストケース76件＋補助テスト1件）
 
 ※補助テストは、ログイン状態を再利用する fixture（logged_page）の動作確認用で、テストケースの件数には含めていません。
 ※最新の状況・作業履歴は [UPDATELOG.md](UPDATELOG.md) を参照してください。
@@ -60,12 +63,14 @@ python/
 │   ├── inventory_page.py
 │   ├── cart_page.py
 │   ├── checkout_page.py
+│   ├── menu_page.py         # サイドメニュー（開閉・Logout・All Items）
 │   └── header_component.py  # ヘッダー共通部品（カートアイコン・バッジ）
 ├── flows/                   # Flow（業務単位の操作と検証）
 │   ├── login_flow.py
 │   ├── inventory_flow.py
 │   ├── cart_flow.py
-│   └── checkout_flow.py
+│   ├── checkout_flow.py
+│   └── logout_flow.py
 ├── utils/
 │   ├── urls.py              # URL定義（一元管理）
 │   └── ui_assertions/       # Specから呼ぶ検証関数（Flow経由）
@@ -75,7 +80,8 @@ python/
 │       ├── login/
 │       ├── inventory/       # Products画面
 │       ├── cart/
-│       └── checkout/
+│       ├── checkout/
+│       └── logout/          # Logout機能（左上のメニュー）
 ├── specs/                   # 画面ごとの仕様書・テストケース
 ├── decisions.md             # TS版との設計差異に関する意思決定の記録
 └── backlog.md               # 今後の作業候補
@@ -112,6 +118,7 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 | [論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け) goto() と expect_on_xxx() の使い分け | goto() は移動のみ、表示確認は expect_on_xxx() に統一 | あり |
 | [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 検討 |
 | [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | あり |
+| [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | あり |
 
 ---
 

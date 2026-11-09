@@ -1,5 +1,169 @@
 # UPDATE LOG（Python版）
 ---
+## 2026-11-09
+
+### ■ Before
+
+- Login（8件＋補助テスト1件）・Products（14件）・Cart（11件）・Checkout Step One（13件）の移植は完了していた
+- Checkout Step Two・Checkout Complete・Logout は未着手だった
+- Checkout Step Two への遷移確認は、Step One の移植時に CheckoutStepOnePage へ暫定で置いたままだった
+- Python版には、左上のメニューを扱うコードがなかった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Stage 1：Checkout Step Two・Complete・Logout の移植
+
+---
+
+### ■ Checkout Step Two 画面
+
+実機確認をもとに仕様書・テストケースを作成し、実装。
+
+- 仕様書：specs/checkout_step_two_spec.md
+- テストケース：specs/checkout_step_two_testcases.md（14件）
+- 小計・税・合計を、実機で確認した固定値で確認した（商品1件・2件・全6件）
+- 税率8%は商品の組み合わせ63通りで確認し、端数処理の方式（四捨五入か切り上げか）は、
+  画面操作で作れる状態では区別できないため規定しなかった
+- 前提状態は Step One を経由して作る（Step Two を直接開けることは判断できない挙動のため、依存しない）
+- TS版ではコードで確認していなかった Step Two の表示・金額、購入後にカートが空になること、
+  Cancel でカートが変わらないことを確認した
+- CheckoutStepTwoPage を新規作成し、CheckoutFlow／checkout_assertions に追加
+
+判断できない挙動6件は、仕様書に事実として記録し、テストの対象外とした。
+
+- 小計の桁あふれ（例：Item total: $59.980000000000004）
+- Step One を経由せずに購入まで完了できる
+- カートが空で $0 の購入ができる
+- 空カートの小計だけが「$0」と表示される
+- 購入完了後のブラウザの「戻る」で空の Step Two が表示される
+- Step One の入力値が Step Two に表示されない
+
+確認結果：
+
+- 14件すべてPass
+- 全6商品の各行の商品名・価格が、Products画面の表示および data/products.py と順番まで一致することを実機で確認
+
+---
+
+### ■ Checkout Complete 画面
+
+実機確認をもとに仕様書・テストケースを作成し、実装。
+
+- 仕様書：specs/checkout_complete_spec.md
+- テストケース：specs/checkout_complete_testcases.md（6件）
+- 前提状態は購入を完了して作る（購入せずに直接開けることは判断できない挙動のため、依存しない）
+- PDF出力ボタン（Generate PDF order）は、購入直後に表示されることのみを確認し、
+  ダウンロードと中身は今後の拡張候補とした
+- CheckoutCompletePage を新規作成し、CheckoutFlow／checkout_assertions に追加
+
+判断できない挙動4件は、仕様書に事実として記録し、テストの対象外とした。
+
+確認結果：
+
+- 6件すべてPass
+
+---
+
+### ■ Logout 機能（左上のメニュー）
+
+実機確認をもとに仕様書・テストケースを作成し、実装。
+
+- 仕様書：specs/logout_spec.md
+- テストケース：specs/logout_testcases.md（10件）
+- 範囲はメニューの開閉・Logout・All Items とし、Reset App State・Dynamic Catalog・About は今後の拡張候補とした
+- ログアウト後に、URL での直接アクセスやブラウザの「戻る」でログイン後の画面に入れないことを確認した（TS版にはなかった確認）
+- ログアウトしてもカートの中身が消えないなど、判断できない挙動は事実として記録し、テストの対象外とした
+- MenuPage／LogoutFlow／logout_assertions を新規作成
+- Login画面の状態（入力欄が空、エラーなし）の確認を、LoginPage／LoginFlow／login_assertions に追加
+
+確認結果：
+
+- 10件すべてPass
+- 不安定になりやすいブラウザの「戻る」（TC-LOGOUT-009）は、3回続けて実行し、毎回Passすることを確認
+
+---
+
+### ■ メニューの開閉の判定方法の決定
+
+- メニューの開閉は、表示の有無ではなく aria-hidden 属性で判定することを決定（論点17）
+- URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されることを実機で確認したため
+
+---
+
+### ■ 暫定の遷移確認の移動
+
+前の画面の移植時に暫定で置いていた遷移確認を、それぞれの画面のクラスへ移した。
+
+- Step Two への遷移確認：CheckoutStepOnePage から CheckoutStepTwoPage.expect_on_page() へ
+- Complete への遷移確認：CheckoutStepTwoPage から CheckoutCompletePage.expect_on_page() へ
+
+---
+
+### ■ 記録の更新
+
+以下を backlog.md に記録。TS版自体の修正は行っていない。
+
+- 今後の拡張候補（Reset App State、Dynamic Catalog、About、PDF出力）
+- 判断を保留している挙動（Step Two・Complete・Logout）
+- TS版の修正候補（Step Two の確認範囲、MenuPage の開閉の判定、LogoutFlow の重複処理、Wiki と実装の食い違いなど）
+
+あわせて、完了報告を入れ子にしない1つのコードブロックにまとめるルールを CLAUDE.md に追加した。
+
+---
+
+### ■ プルリクエスト
+
+プルリクエスト #2（Step Two）と #3（Complete・Logout）を、CI がすべて成功したことを確認してからマージした。
+※ CI で実行しているのは TS版のテストで、Python版のテストはまだ CI に組み込んでいない。
+
+---
+
+### ■ Result（成果）
+
+- Checkout Step Two（14件）・Checkout Complete（6件）・Logout（10件）の移植を完了
+- Stage 1（全画面の Python 移植）を完了
+- メニューの開閉の判定方法を決定し、URL で開いた直後でも正しく判定できるようにした
+- 判断できない挙動を、テストの対象外として仕様書に記録
+- テスト実行結果：77件すべてPass（149.39秒）
+  - Login：9件（テストケース8件＋補助テスト1件）
+  - Products：14件
+  - Cart：11件
+  - Checkout Step One：13件
+  - Checkout Step Two：14件
+  - Checkout Complete：6件
+  - Logout：10件
+
+---
+
+### ■ Overall Status
+
+- Login：完了（8件＋補助テスト1件）
+- Products：完了（14件）
+- Cart：完了（11件）
+- Checkout Step One：完了（13件）
+- Checkout Step Two：完了（14件）
+- Checkout Complete：完了（6件）
+- Logout：完了（10件）
+- APIテスト：未実装（通信方針のみ決定。モックの実装方式は API層の移植着手時に決定）
+- Visual Regression：未実装（Stage 2-1 で扱う予定）
+- CI組み込み：未実装
+
+---
+
+### ■ Conclusion
+
+本対応では、Checkout Step Two・Checkout Complete・Logout の移植を実施し、これで Stage 1（全画面の Python 移植）が完了した。
+
+Step Two では金額を実機で確認した固定値で確認し、Complete では文言・画像・ボタンまで確認するなど、
+TS版ではコードで確認していなかった範囲まで検証を広げた。Logout では、ログアウト後にログイン後の画面へ
+入れないことも確認した。意図された仕様か不具合かを判断できない挙動は、テストで固定せず、事実として仕様書に記録した。
+
+また、メニューの開閉は表示の有無では正しく判定できないことを実機で確認し、aria-hidden 属性で判定する方式とした。
+
+---
+
 ## 2026-11-08
 
 ### ■ Before
