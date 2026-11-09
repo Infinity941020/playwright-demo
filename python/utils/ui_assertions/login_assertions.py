@@ -22,3 +22,11 @@ def expect_on_login_page(login_flow: LoginFlow) -> None:
 
 def expect_username_retained(login_flow: LoginFlow, username: str) -> None:
     login_flow.expect_username_retained(username)
+
+
+def expect_no_login_error(login_flow: LoginFlow) -> None:
+    login_flow.expect_no_login_error()
+
+
+def expect_login_inputs_empty(login_flow: LoginFlow) -> None:
+    login_flow.expect_login_inputs_empty()

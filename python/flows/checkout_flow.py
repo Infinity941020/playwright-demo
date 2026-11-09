@@ -3,14 +3,14 @@
 責務:
     - 業務単位の操作のみ提供
     - specからUI詳細を隠蔽
-    - CheckoutStepOnePage / CheckoutStepTwoPage / CartPage / HeaderComponent /
-      InventoryPage依存をFlowで吸収
+    - CheckoutStepOnePage / CheckoutStepTwoPage / CheckoutCompletePage / CartPage /
+      HeaderComponent / InventoryPage依存をFlowで吸収
 """
 
 from playwright.sync_api import Page
 
 from pages.cart_page import CartPage
-from pages.checkout_page import CheckoutStepOnePage, CheckoutStepTwoPage
+from pages.checkout_page import CheckoutCompletePage, CheckoutStepOnePage, CheckoutStepTwoPage
 from pages.header_component import HeaderComponent
 from pages.inventory_page import InventoryPage
 
@@ -19,6 +19,7 @@ class CheckoutFlow:
     def __init__(self, page: Page) -> None:
         self._step_one_page = CheckoutStepOnePage(page)
         self._step_two_page = CheckoutStepTwoPage(page)
+        self._complete_page = CheckoutCompletePage(page)
         self._header = HeaderComponent(page)
         # 前提状態の作成と、遷移先（カート画面）の表示確認用
         self._cart_page = CartPage(page)
@@ -50,6 +51,21 @@ class CheckoutFlow:
         )
         self.proceed_to_overview_step()
         self._step_two_page.expect_on_page()
+
+    def open_complete_with(self, products: list[dict], checkout_info: dict) -> None:
+        """指定した商品がカートに入った状態から購入を完了し、Checkout Complete画面を開く。
+
+        Complete のURLを直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
+        前提状態の作成では使わない（checkout_complete_testcases.md「前提状態の作り方」参照）。
+        購入者情報は data/checkout_data.py の CHECKOUT_DATA を渡す。
+        """
+        self.open_step_two_with(products, checkout_info)
+        self.complete_purchase()
+        self._complete_page.expect_on_page()
+
+    def access_complete_directly(self) -> None:
+        """Checkout Complete画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        self._complete_page.goto()
 
     def access_step_one_directly(self) -> None:
         """Checkout Step One画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
@@ -91,6 +107,10 @@ class CheckoutFlow:
 
     def open_product_detail(self, product_name: str) -> None:
         self._step_two_page.click_product_name(product_name)
+
+    def back_home(self) -> None:
+        """Back Home を押して Products画面へ戻る。"""
+        self._complete_page.click_back_home()
 
     def open_cart(self) -> None:
         """カートアイコンからカート画面を開く。"""
@@ -145,7 +165,11 @@ class CheckoutFlow:
         self._step_two_page.expect_amounts(item_total, tax, total)
 
     def expect_on_checkout_complete_page(self) -> None:
-        self._step_two_page.expect_on_checkout_complete_page()
+        self._complete_page.expect_on_page()
+
+    def expect_complete_page_layout(self) -> None:
+        """タイトル・見出し・本文・画像・Back Home・Generate PDF order が表示されていること。"""
+        self._complete_page.expect_page_layout()
 
     def expect_on_inventory_page(self) -> None:
         self._inventory_page.expect_on_page()

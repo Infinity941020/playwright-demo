@@ -33,6 +33,14 @@ class LoginFlow:
         """ログイン失敗後のユーザー名入力値保持検証。"""
         self._login_page.expect_username_value(username)
 
+    def expect_no_login_error(self) -> None:
+        """ログイン画面にエラーが表示されていないこと。"""
+        self._login_page.expect_no_error()
+
+    def expect_login_inputs_empty(self) -> None:
+        """ユーザー名・パスワードの入力欄が空であること。"""
+        self._login_page.expect_inputs_empty()
+
     def expect_login_success(self) -> None:
         """ログイン成功検証。"""
         self._login_page.expect_on_inventory_page()

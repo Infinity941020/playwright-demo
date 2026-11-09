@@ -28,6 +28,10 @@ class InventoryFlow:
         """商品一覧画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
         self._inventory_page.goto()
 
+    def access_product_detail_directly(self, product_id: int) -> None:
+        """商品詳細画面のURLへ直接アクセスする（表示確認なし。ログアウト後の検証用）。"""
+        self._inventory_page.goto_product_detail(product_id)
+
     def reload_inventory(self) -> None:
         """商品一覧画面を再読み込みする。"""
         self._inventory_page.reload()
