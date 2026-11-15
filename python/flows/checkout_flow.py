@@ -26,7 +26,7 @@ class CheckoutFlow:
         # 遷移先（商品一覧・商品詳細）の表示確認用
         self._inventory_page = InventoryPage(page)
 
-    # 業務操作
+    # Step One: 業務操作
 
     def open_step_one_with(self, products: list[dict]) -> None:
         """指定した商品がカートに入った状態で、Checkout Step One画面をURLで直接開く。
@@ -38,47 +38,9 @@ class CheckoutFlow:
         self._step_one_page.goto()
         self._step_one_page.expect_on_page()
 
-    def open_step_two_with(self, products: list[dict], checkout_info: dict) -> None:
-        """指定した商品がカートに入った状態で、Step One を経由して Checkout Step Two画面を開く。
-
-        Step Two のURLを直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
-        前提状態の作成では使わない（checkout_step_two_testcases.md「前提状態の作り方」参照）。
-        購入者情報は data/checkout_data.py の CHECKOUT_DATA を渡す。
-        """
-        self.open_step_one_with(products)
-        self.fill_checkout_info(
-            checkout_info["first_name"], checkout_info["last_name"], checkout_info["postal_code"]
-        )
-        self.proceed_to_overview_step()
-        self._step_two_page.expect_on_page()
-
-    def open_complete_with(self, products: list[dict], checkout_info: dict) -> None:
-        """指定した商品がカートに入った状態から購入を完了し、Checkout Complete画面を開く。
-
-        Complete のURLを直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
-        前提状態の作成では使わない（checkout_complete_testcases.md「前提状態の作り方」参照）。
-        購入者情報は data/checkout_data.py の CHECKOUT_DATA を渡す。
-        """
-        self.open_step_two_with(products, checkout_info)
-        self.complete_purchase()
-        self._complete_page.expect_on_page()
-
-    def access_complete_directly(self) -> None:
-        """Checkout Complete画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
-        self._complete_page.goto()
-
     def access_step_one_directly(self) -> None:
         """Checkout Step One画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
         self._step_one_page.goto()
-
-    def access_step_two_directly(self) -> None:
-        """Checkout Step Two画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
-        self._step_two_page.goto()
-
-    def reload_step_two(self) -> None:
-        """Checkout Step Two画面を再読み込みする。"""
-        self._step_two_page.reload()
-        self._step_two_page.expect_on_page()
 
     def reload_step_one(self) -> None:
         """Checkout Step One画面を再読み込みする。"""
@@ -98,25 +60,7 @@ class CheckoutFlow:
     def close_error(self) -> None:
         self._step_one_page.close_error()
 
-    def complete_purchase(self) -> None:
-        """Finish を押して購入を確定する。"""
-        self._step_two_page.click_finish()
-
-    def cancel_from_step_two(self) -> None:
-        self._step_two_page.click_cancel()
-
-    def open_product_detail(self, product_name: str) -> None:
-        self._step_two_page.click_product_name(product_name)
-
-    def back_home(self) -> None:
-        """Back Home を押して Products画面へ戻る。"""
-        self._complete_page.click_back_home()
-
-    def open_cart(self) -> None:
-        """カートアイコンからカート画面を開く。"""
-        self._header.click_cart_icon()
-
-    # 検証（業務レベル）
+    # Step One: 検証（業務レベル）
 
     def expect_on_step_one_page(self) -> None:
         self._step_one_page.expect_on_page()
@@ -134,8 +78,42 @@ class CheckoutFlow:
     def expect_info_values(self, first_name: str, last_name: str, postal_code: str) -> None:
         self._step_one_page.expect_info_values(first_name, last_name, postal_code)
 
-    def expect_badge_count(self, count: int) -> None:
-        self._header.expect_badge_count(count)
+    # Step Two: 業務操作
+
+    def open_step_two_with(self, products: list[dict], checkout_info: dict) -> None:
+        """指定した商品がカートに入った状態で、Step One を経由して Checkout Step Two画面を開く。
+
+        Step Two のURLを直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
+        前提状態の作成では使わない（checkout_step_two_testcases.md「前提状態の作り方」参照）。
+        購入者情報は data/checkout_data.py の CHECKOUT_DATA を渡す。
+        """
+        self.open_step_one_with(products)
+        self.fill_checkout_info(
+            checkout_info["first_name"], checkout_info["last_name"], checkout_info["postal_code"]
+        )
+        self.proceed_to_overview_step()
+        self._step_two_page.expect_on_page()
+
+    def access_step_two_directly(self) -> None:
+        """Checkout Step Two画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        self._step_two_page.goto()
+
+    def reload_step_two(self) -> None:
+        """Checkout Step Two画面を再読み込みする。"""
+        self._step_two_page.reload()
+        self._step_two_page.expect_on_page()
+
+    def complete_purchase(self) -> None:
+        """Finish を押して購入を確定する。"""
+        self._step_two_page.click_finish()
+
+    def cancel_from_step_two(self) -> None:
+        self._step_two_page.click_cancel()
+
+    def open_product_detail(self, product_name: str) -> None:
+        self._step_two_page.click_product_name(product_name)
+
+    # Step Two: 検証（業務レベル）
 
     def expect_on_step_two_page(self) -> None:
         self._step_two_page.expect_on_page()
@@ -164,12 +142,48 @@ class CheckoutFlow:
     def expect_step_two_amounts(self, item_total: str, tax: str, total: str) -> None:
         self._step_two_page.expect_amounts(item_total, tax, total)
 
+    # Complete: 業務操作
+
+    def open_complete_with(self, products: list[dict], checkout_info: dict) -> None:
+        """指定した商品がカートに入った状態から購入を完了し、Checkout Complete画面を開く。
+
+        Complete のURLを直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
+        前提状態の作成では使わない（checkout_complete_testcases.md「前提状態の作り方」参照）。
+        購入者情報は data/checkout_data.py の CHECKOUT_DATA を渡す。
+        """
+        self.open_step_two_with(products, checkout_info)
+        self.complete_purchase()
+        self._complete_page.expect_on_page()
+
+    def access_complete_directly(self) -> None:
+        """Checkout Complete画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        self._complete_page.goto()
+
+    def back_home(self) -> None:
+        """Back Home を押して Products画面へ戻る。"""
+        self._complete_page.click_back_home()
+
+    # Complete: 検証（業務レベル）
+
     def expect_on_checkout_complete_page(self) -> None:
         self._complete_page.expect_on_page()
 
     def expect_complete_page_layout(self) -> None:
         """タイトル・見出し・本文・画像・Back Home・Generate PDF order が表示されていること。"""
         self._complete_page.expect_page_layout()
+
+    # 画面共通（ヘッダー）: 業務操作
+
+    def open_cart(self) -> None:
+        """カートアイコンからカート画面を開く。"""
+        self._header.click_cart_icon()
+
+    # 画面共通（ヘッダー）: 検証（業務レベル）
+
+    def expect_badge_count(self, count: int) -> None:
+        self._header.expect_badge_count(count)
+
+    # 遷移先: 検証（業務レベル）
 
     def expect_on_inventory_page(self) -> None:
         self._inventory_page.expect_on_page()

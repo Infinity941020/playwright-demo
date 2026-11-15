@@ -5,8 +5,7 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from utils.ui_assertions.cart_assertions import (
-    expect_cart_badge_count,
-    expect_cart_badge_hidden,
+    expect_badge_count,
     expect_cart_item_count,
     expect_cart_item_names_in_order,
     expect_cart_page_layout,
@@ -31,7 +30,7 @@ class TestCartRemove:
 
         # 検証（業務レベル）
         expect_cart_item_names_in_order(cart_flow, [backpack["name"], onesie["name"]])
-        expect_cart_badge_count(cart_flow, 2)
+        expect_badge_count(cart_flow, 2)
 
     def test_remove_last_item(self, logged_page: Page) -> None:
         """TC-CART-005: 最後の1件を Remove すると、商品の行とバッジがなくなること。"""
@@ -46,5 +45,5 @@ class TestCartRemove:
 
         # 検証（業務レベル）
         expect_cart_item_count(cart_flow, 0)
-        expect_cart_badge_hidden(cart_flow)
+        expect_badge_count(cart_flow, 0)
         expect_cart_page_layout(cart_flow)

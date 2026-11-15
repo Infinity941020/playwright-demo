@@ -28,12 +28,8 @@ def expect_in_cart(cart_flow: CartFlow, product_name: str) -> None:
     cart_flow.expect_in_cart(product_name)
 
 
-def expect_cart_badge_count(cart_flow: CartFlow, expected_count: int) -> None:
+def expect_badge_count(cart_flow: CartFlow, expected_count: int) -> None:
     cart_flow.expect_badge_count(expected_count)
-
-
-def expect_cart_badge_hidden(cart_flow: CartFlow) -> None:
-    cart_flow.expect_badge_count(0)
 
 
 def expect_on_inventory_page(cart_flow: CartFlow) -> None:

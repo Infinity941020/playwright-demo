@@ -5,7 +5,7 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from utils.ui_assertions.cart_assertions import (
-    expect_cart_badge_count,
+    expect_badge_count,
     expect_cart_item_count,
     expect_in_cart,
 )
@@ -30,4 +30,4 @@ class TestCartPersistence:
         expect_cart_item_count(cart_flow, 2)
         expect_in_cart(cart_flow, backpack["name"])
         expect_in_cart(cart_flow, bike_light["name"])
-        expect_cart_badge_count(cart_flow, 2)
+        expect_badge_count(cart_flow, 2)

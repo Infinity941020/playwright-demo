@@ -16,11 +16,14 @@ from playwright.sync_api import Locator, Page, expect
 class MenuPage:
     def __init__(self, page: Page) -> None:
         self.page: Page = page
+        # 開閉ボタン自体には data-test がないため、id で特定する
         self.menu_button: Locator = page.locator("#react-burger-menu-btn")
         self.close_button: Locator = page.locator("#react-burger-cross-btn")
         # メニュー領域には id・data-test がないため、CSS クラスで特定する
         self.menu_area: Locator = page.locator(".bm-menu-wrap")
-        # Dynamic Catalog の子項目（data-test が -link で終わる）は含まない
+        # data-test が -sidebar-link で終わる項目のみを対象とする。Dynamic Catalog を
+        # 開くと表示される子項目（dynamic-catalog-lazy-load-link 等）は末尾が
+        # -sidebar-link ではないため含まない
         self.menu_items: Locator = page.locator('[data-test$="-sidebar-link"]')
         self.all_items_link: Locator = page.locator('[data-test="inventory-sidebar-link"]')
         self.logout_link: Locator = page.locator('[data-test="logout-sidebar-link"]')

@@ -3,17 +3,20 @@
 責務:
     - 業務単位の操作のみ提供
     - specからUI詳細を隠蔽
-    - LoginPage依存をFlowで吸収
+    - LoginPage / InventoryPage依存をFlowで吸収
 """
 
 from playwright.sync_api import Page
 
+from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
 
 
 class LoginFlow:
     def __init__(self, page: Page) -> None:
         self._login_page = LoginPage(page)
+        # 遷移先（商品一覧）の表示確認用
+        self._inventory_page = InventoryPage(page)
 
     # 業務操作
 
@@ -42,8 +45,8 @@ class LoginFlow:
         self._login_page.expect_inputs_empty()
 
     def expect_login_success(self) -> None:
-        """ログイン成功検証。"""
-        self._login_page.expect_on_inventory_page()
+        """ログイン成功検証（商品一覧画面へ遷移していること）。"""
+        self._inventory_page.expect_on_page()
 
     def expect_on_login_page(self) -> None:
         """ログイン画面表示確認。"""

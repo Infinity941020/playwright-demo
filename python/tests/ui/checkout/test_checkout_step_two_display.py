@@ -6,7 +6,7 @@ from data.checkout_data import CHECKOUT_DATA
 from data.products import PRODUCTS
 from flows.checkout_flow import CheckoutFlow
 from utils.ui_assertions.checkout_assertions import (
-    expect_checkout_badge_count,
+    expect_badge_count,
     expect_checkout_step_two_page_layout,
     expect_step_two_item_names_in_order,
     expect_step_two_items_displayed,
@@ -27,7 +27,7 @@ class TestCheckoutStepTwoDisplay:
 
         # 検証（業務レベル）
         expect_checkout_step_two_page_layout(checkout_flow)
-        expect_checkout_badge_count(checkout_flow, 2)
+        expect_badge_count(checkout_flow, 2)
 
     def test_all_products_displayed_as_spec(self, logged_page: Page) -> None:
         """TC-CO2-002: 全商品をカートに入れたとき、全商品が仕様どおりに表示されること。"""

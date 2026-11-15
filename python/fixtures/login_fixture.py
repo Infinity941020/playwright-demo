@@ -12,12 +12,12 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
-from playwright.sync_api import Browser, Page, expect
+from playwright.sync_api import Browser, Page
 from pytest_playwright import CreateContextCallback
 
 from data.users import USERS
+from pages.inventory_page import InventoryPage
 from pages.login_page import LoginPage
-from utils.urls import URLS
 
 _STORAGE_STATE_PATH = Path(__file__).resolve().parent.parent / ".auth" / "standard_user.json"
 
@@ -34,7 +34,7 @@ def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
     login_page.goto()
     login_page.expect_on_login_page()
     login_page.login(USERS["standard"]["username"], USERS["standard"]["password"])
-    login_page.expect_on_inventory_page()
+    InventoryPage(page).expect_on_page()
 
     context.storage_state(path=str(_STORAGE_STATE_PATH))
     context.close()
@@ -58,7 +58,8 @@ def logged_page(
     context = new_context(storage_state=str(standard_user_storage_state))
     page = context.new_page()
 
-    page.goto(URLS["inventory"])
-    expect(page.locator(".inventory_list")).to_be_visible()
+    inventory_page = InventoryPage(page)
+    inventory_page.goto()
+    inventory_page.expect_on_page()
 
     yield page
