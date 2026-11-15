@@ -5,9 +5,9 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS, SORT_OPTIONS
 from flows.inventory_flow import InventoryFlow
 from utils.ui_assertions.inventory_assertions import (
-    expect_cart_badge_count,
-    expect_in_cart,
+    expect_badge_count,
     expect_product_names_in_order,
+    expect_remove_button_shown,
     expect_selected_sort,
 )
 
@@ -25,8 +25,8 @@ class TestInventoryPersistence:
         inventory_flow.reload_inventory()
 
         # 検証（業務レベル）
-        expect_in_cart(inventory_flow, backpack)
-        expect_cart_badge_count(inventory_flow, 1)
+        expect_remove_button_shown(inventory_flow, backpack)
+        expect_badge_count(inventory_flow, 1)
 
     def test_sort_reset_after_reload(self, logged_page: Page) -> None:
         """TC-PROD-013: 再読み込み後、ソートが Name (A to Z) に戻ること。"""

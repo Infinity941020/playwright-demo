@@ -223,6 +223,8 @@ class CheckoutCompletePage:
 
         画像は表示と代替テキストで確認し、読み込みの完了は確認しない
         （checkout_complete_testcases.md「実装時の注意」参照）。
+        ただし読み込み前の画像は高さ0のため、to_be_visible が実質的に
+        読み込みを待つ（最大5秒）。
         """
         expect(self.title).to_have_text("Checkout: Complete!")
         expect(self.header).to_have_text("Thank you for your order!")

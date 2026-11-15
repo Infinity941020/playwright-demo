@@ -6,7 +6,7 @@ from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from flows.inventory_flow import InventoryFlow
 from flows.logout_flow import LogoutFlow
-from utils.ui_assertions.inventory_assertions import expect_cart_badge_count, expect_in_cart
+from utils.ui_assertions.inventory_assertions import expect_badge_count, expect_remove_button_shown
 from utils.ui_assertions.logout_assertions import expect_menu_closed, expect_on_inventory_page
 
 
@@ -30,6 +30,6 @@ class TestLogoutAllItems:
         # 検証（業務レベル）
         expect_on_inventory_page(logout_flow)
         expect_menu_closed(logout_flow)
-        expect_cart_badge_count(inventory_flow, 2)
-        expect_in_cart(inventory_flow, backpack["name"])
-        expect_in_cart(inventory_flow, bike_light["name"])
+        expect_badge_count(inventory_flow, 2)
+        expect_remove_button_shown(inventory_flow, backpack["name"])
+        expect_remove_button_shown(inventory_flow, bike_light["name"])

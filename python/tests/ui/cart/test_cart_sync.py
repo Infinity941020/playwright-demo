@@ -5,7 +5,10 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from flows.inventory_flow import InventoryFlow
-from utils.ui_assertions.inventory_assertions import expect_in_cart, expect_not_in_cart
+from utils.ui_assertions.inventory_assertions import (
+    expect_add_to_cart_button_shown,
+    expect_remove_button_shown,
+)
 
 
 class TestCartSync:
@@ -26,5 +29,5 @@ class TestCartSync:
         cart_flow.continue_shopping()
 
         # 検証（業務レベル：Products画面のボタン表示）
-        expect_not_in_cart(inventory_flow, backpack["name"])
-        expect_in_cart(inventory_flow, bike_light["name"])
+        expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
+        expect_remove_button_shown(inventory_flow, bike_light["name"])

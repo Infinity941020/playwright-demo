@@ -6,8 +6,8 @@ from data.checkout_data import CHECKOUT_DATA
 from data.products import PRODUCTS
 from flows.checkout_flow import CheckoutFlow
 from utils.ui_assertions.checkout_assertions import (
+    expect_badge_count,
     expect_cart_item_count,
-    expect_checkout_badge_count,
     expect_in_cart,
 )
 
@@ -34,4 +34,4 @@ class TestCheckoutStepOneCart:
         expect_cart_item_count(checkout_flow, 2)
         expect_in_cart(checkout_flow, backpack["name"])
         expect_in_cart(checkout_flow, bike_light["name"])
-        expect_checkout_badge_count(checkout_flow, 2)
+        expect_badge_count(checkout_flow, 2)

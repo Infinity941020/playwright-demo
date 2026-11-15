@@ -24,20 +24,20 @@ def expect_selected_sort(inventory_flow: InventoryFlow, option_label: str) -> No
     inventory_flow.expect_selected_sort(option_label)
 
 
-def expect_in_cart(inventory_flow: InventoryFlow, product_name: str) -> None:
-    inventory_flow.expect_in_cart(product_name)
+def expect_remove_button_shown(inventory_flow: InventoryFlow, product_name: str) -> None:
+    inventory_flow.expect_remove_button_shown(product_name)
 
 
-def expect_not_in_cart(inventory_flow: InventoryFlow, product_name: str) -> None:
-    inventory_flow.expect_not_in_cart(product_name)
+def expect_add_to_cart_button_shown(inventory_flow: InventoryFlow, product_name: str) -> None:
+    inventory_flow.expect_add_to_cart_button_shown(product_name)
 
 
-def expect_cart_badge_count(inventory_flow: InventoryFlow, expected_count: int) -> None:
+def expect_badge_count(inventory_flow: InventoryFlow, expected_count: int) -> None:
     inventory_flow.expect_badge_count(expected_count)
 
 
-def expect_cart_badge_hidden(inventory_flow: InventoryFlow) -> None:
-    inventory_flow.expect_badge_count(0)
+def expect_on_inventory_page(inventory_flow: InventoryFlow) -> None:
+    inventory_flow.expect_on_inventory_page()
 
 
 def expect_on_product_detail_page(inventory_flow: InventoryFlow, product_id: int) -> None:

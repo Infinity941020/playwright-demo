@@ -30,7 +30,7 @@ def expect_checkout_info_values(
     checkout_flow.expect_info_values(first_name, last_name, postal_code)
 
 
-def expect_checkout_badge_count(checkout_flow: CheckoutFlow, expected_count: int) -> None:
+def expect_badge_count(checkout_flow: CheckoutFlow, expected_count: int) -> None:
     checkout_flow.expect_badge_count(expected_count)
 
 

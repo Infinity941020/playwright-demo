@@ -5,8 +5,7 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from utils.ui_assertions.cart_assertions import (
-    expect_cart_badge_count,
-    expect_cart_badge_hidden,
+    expect_badge_count,
     expect_cart_item_count,
     expect_cart_items_displayed,
     expect_cart_page_layout,
@@ -26,7 +25,7 @@ class TestCartDisplay:
         # 検証（業務レベル）
         expect_cart_page_layout(cart_flow)
         expect_cart_item_count(cart_flow, 0)
-        expect_cart_badge_hidden(cart_flow)
+        expect_badge_count(cart_flow, 0)
 
     def test_all_products_displayed_as_spec(self, logged_page: Page) -> None:
         """TC-CART-002: 全商品をカートに入れたとき、全商品が仕様どおりに表示されること。"""
@@ -38,4 +37,4 @@ class TestCartDisplay:
 
         # 検証（業務レベル）
         expect_cart_items_displayed(cart_flow, all_products)
-        expect_cart_badge_count(cart_flow, len(all_products))
+        expect_badge_count(cart_flow, len(all_products))

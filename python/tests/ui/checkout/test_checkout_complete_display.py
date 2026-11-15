@@ -6,7 +6,7 @@ from data.checkout_data import CHECKOUT_DATA
 from data.products import PRODUCTS
 from flows.checkout_flow import CheckoutFlow
 from utils.ui_assertions.checkout_assertions import (
-    expect_checkout_badge_count,
+    expect_badge_count,
     expect_checkout_complete_page_layout,
 )
 
@@ -25,4 +25,4 @@ class TestCheckoutCompleteDisplay:
 
         # 検証（業務レベル）
         expect_checkout_complete_page_layout(checkout_flow)
-        expect_checkout_badge_count(checkout_flow, 0)
+        expect_badge_count(checkout_flow, 0)

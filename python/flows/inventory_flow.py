@@ -25,11 +25,11 @@ class InventoryFlow:
     # 業務操作
 
     def access_inventory_directly(self) -> None:
-        """商品一覧画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        """商品一覧画面のURLを開く（表示確認なし）。"""
         self._inventory_page.goto()
 
     def access_product_detail_directly(self, product_id: int) -> None:
-        """商品詳細画面のURLへ直接アクセスする（表示確認なし。ログアウト後の検証用）。"""
+        """商品詳細画面のURLを開く（表示確認なし）。"""
         self._inventory_page.goto_product_detail(product_id)
 
     def reload_inventory(self) -> None:
@@ -75,16 +75,19 @@ class InventoryFlow:
     def expect_selected_sort(self, option_label: str) -> None:
         self._inventory_page.expect_selected_sort(option_label)
 
-    def expect_in_cart(self, product_name: str) -> None:
-        """カート追加済み（ボタンがRemove）であること。"""
+    def expect_remove_button_shown(self, product_name: str) -> None:
+        """指定した商品のボタンが Remove と表示されていること（カート追加済み）。"""
         self._inventory_page.expect_remove_button(product_name)
 
-    def expect_not_in_cart(self, product_name: str) -> None:
-        """カート未追加（ボタンがAdd to cart）であること。"""
+    def expect_add_to_cart_button_shown(self, product_name: str) -> None:
+        """指定した商品のボタンが Add to cart と表示されていること（カート未追加）。"""
         self._inventory_page.expect_add_to_cart_button(product_name)
 
     def expect_badge_count(self, count: int) -> None:
         self._header.expect_badge_count(count)
+
+    def expect_on_inventory_page(self) -> None:
+        self._inventory_page.expect_on_page()
 
     def expect_on_product_detail_page(self, product_id: int) -> None:
         self._inventory_page.expect_on_product_detail_page(product_id)

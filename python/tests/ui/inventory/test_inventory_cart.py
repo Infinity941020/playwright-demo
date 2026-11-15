@@ -5,10 +5,9 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.inventory_flow import InventoryFlow
 from utils.ui_assertions.inventory_assertions import (
-    expect_cart_badge_count,
-    expect_cart_badge_hidden,
-    expect_in_cart,
-    expect_not_in_cart,
+    expect_add_to_cart_button_shown,
+    expect_badge_count,
+    expect_remove_button_shown,
 )
 
 
@@ -24,8 +23,8 @@ class TestInventoryCart:
         inventory_flow.add_to_cart(backpack)
 
         # 検証（業務レベル）
-        expect_in_cart(inventory_flow, backpack)
-        expect_cart_badge_count(inventory_flow, 1)
+        expect_remove_button_shown(inventory_flow, backpack)
+        expect_badge_count(inventory_flow, 1)
 
     def test_remove_keeps_other_items(self, logged_page: Page) -> None:
         """TC-PROD-007: Remove を押すと、ボタンが戻り、バッジが1減り、他の商品は影響を受けないこと。"""
@@ -39,9 +38,9 @@ class TestInventoryCart:
         inventory_flow.remove_from_cart(backpack)
 
         # 検証（業務レベル）
-        expect_not_in_cart(inventory_flow, backpack)
-        expect_in_cart(inventory_flow, bike_light)
-        expect_cart_badge_count(inventory_flow, 1)
+        expect_add_to_cart_button_shown(inventory_flow, backpack)
+        expect_remove_button_shown(inventory_flow, bike_light)
+        expect_badge_count(inventory_flow, 1)
 
     def test_badge_hidden_when_cart_empty(self, logged_page: Page) -> None:
         """TC-PROD-008: カートが0件になると、バッジが表示されなくなること。"""
@@ -53,4 +52,4 @@ class TestInventoryCart:
         inventory_flow.remove_from_cart(backpack)
 
         # 検証（業務レベル）
-        expect_cart_badge_hidden(inventory_flow)
+        expect_badge_count(inventory_flow, 0)
