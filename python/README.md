@@ -11,6 +11,8 @@ TS版との差異について行った意思決定も記録しており、その
 
 ## テスト規模
 
+### 画面のテスト：77件（テストケース76件＋補助テスト1件）
+
 - Login：8件＋補助テスト1件（[仕様書](specs/login_spec.md) ／ [テストケース](specs/login_testcases.md)）
 - Products：14件（[仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md)）
 - Cart：11件（[仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md)）
@@ -18,7 +20,16 @@ TS版との差異について行った意思決定も記録しており、その
 - Checkout Step Two：14件（[仕様書](specs/checkout_step_two_spec.md) ／ [テストケース](specs/checkout_step_two_testcases.md)）
 - Checkout Complete：6件（[仕様書](specs/checkout_complete_spec.md) ／ [テストケース](specs/checkout_complete_testcases.md)）
 - Logout：10件（[仕様書](specs/logout_spec.md) ／ [テストケース](specs/logout_testcases.md)）
-- 合計：77件（テストケース76件＋補助テスト1件）
+
+### APIテスト：18件（[仕様書](specs/api_spec.md) ／ [テストケース](specs/api_testcases.md)）
+
+- Login API：2件
+- User API：2件
+- Cart API：6件
+- Checkout API：5件
+- Logout API：3件
+
+### 合計：95件（テストケース94件＋補助テスト1件）
 
 ※補助テストは、ログイン状態を再利用する fixture（logged_page）の動作確認用で、テストケースの件数には含めていません。
 ※最新の状況・作業履歴は [UPDATELOG.md](UPDATELOG.md) を参照してください。
@@ -31,6 +42,7 @@ TS版との差異について行った意思決定も記録しており、その
 - Page Object Model + Flow Layer など、責務分離を軸としたアーキテクチャ（TS版を踏襲）
 - Fixture / storage_state
 - Data-driven testing（pytest.mark.parametrize。ids にテストケースIDを付与）
+- APIテスト：Playwright の APIRequestContext、Python標準ライブラリ（http.server）によるモックサーバー
 
 ---
 
@@ -41,6 +53,11 @@ TS版との差異について行った意思決定も記録しており、その
 
 対象ユーザーは standard_user（ロック確認用の locked_out_user を含む）です。
 
+**モックAPI（APIテスト）**
+
+APIテストは、テストごとにローカル（127.0.0.1）で立ち上げるモックAPIを対象とします。
+外部の実APIには接続しません（[API仕様書](specs/api_spec.md)）。
+
 ---
 
 ## ディレクトリ構成
@@ -49,15 +66,21 @@ TS版の構成をミラーリングしています（`pages/`・`flows/`・`fixt
 
 ```text
 python/
-├── conftest.py              # fixtureモジュールの登録
+├── conftest.py              # fixtureモジュールの登録、APIの確認関数の assert の書き換えの登録
 ├── pytest.ini               # pytest設定（testpaths = tests）
 ├── requirements.txt         # 依存パッケージ（バージョン固定）
 ├── data/
 │   ├── users.py             # ログインユーザー情報
 │   ├── products.py          # 商品情報（商品名・価格・商品ID）とソート選択肢
-│   └── checkout_data.py     # 購入者情報（Checkout画面の入力値）
+│   ├── checkout_data.py     # 購入者情報（Checkout画面の入力値）
+│   └── api/                 # APIテストで使う値（api_users.py・api_carts.py・api_checkout.py）
 ├── fixtures/
-│   └── login_fixture.py     # storage_state の生成・再利用、logged_page
+│   ├── login_fixture.py     # storage_state の生成・再利用、logged_page
+│   └── api_fixture.py       # モックサーバーの起動・停止と APIRequestContext の準備（テストごと）
+├── mocks/                   # APIテスト用のモックサーバー
+│   ├── server.py            # 127.0.0.1 の空いているポートで起動・停止
+│   ├── handler_types.py     # リクエスト・レスポンス・ハンドラーの型
+│   └── handlers/            # API ごとの返事（login・user・cart・checkout・logout）
 ├── pages/                   # Page Object（要素取得・単体操作・画面レベルの検証）
 │   ├── login_page.py
 │   ├── inventory_page.py
@@ -73,16 +96,19 @@ python/
 │   └── logout_flow.py
 ├── utils/
 │   ├── urls.py              # URL定義（一元管理）
-│   └── ui_assertions/       # Specから呼ぶ検証関数（Flow経由）
+│   ├── ui_assertions/       # Specから呼ぶ検証関数（Flow経由）
+│   ├── api_helper.py        # API の呼び出し
+│   └── api_assertions/      # API ごとの確認関数
 ├── tests/
 │   ├── setup/               # TS版の auth.setup.ts 相当（fixtureに統合したため空）
-│   └── ui/
-│       ├── login/
-│       ├── inventory/       # Products画面
-│       ├── cart/
-│       ├── checkout/
-│       └── logout/          # Logout機能（左上のメニュー）
-├── specs/                   # 画面ごとの仕様書・テストケース
+│   ├── ui/
+│   │   ├── login/
+│   │   ├── inventory/       # Products画面
+│   │   ├── cart/
+│   │   ├── checkout/
+│   │   └── logout/          # Logout機能（左上のメニュー）
+│   └── api/                 # APIテスト（API ごとに1ファイル）
+├── specs/                   # 画面ごと・APIの仕様書・テストケース
 ├── README.md                # 本ファイル
 ├── UPDATELOG.md             # 作業履歴・最新の状況
 ├── decisions.md             # TS版との設計差異に関する意思決定の記録
@@ -102,6 +128,7 @@ python/
 - **Checkout の Page Object**：ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分けています（CheckoutStepOnePage／CheckoutStepTwoPage／CheckoutCompletePage）（[論点16](decisions.md#論点16-checkout画面の-page-object-の構成)）
 - **メニューの開閉の判定**：表示の有無ではなく aria-hidden 属性で判定します。URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるためです（[論点17](decisions.md#論点17-メニューの開閉の判定方法)）
 - **商品一覧画面の表示確認**：InventoryPage.expect_on_page() の1か所にまとめ、URL の完全一致と data-test で確認します。ログイン成功の確認や logged_page fixture もここを使います（[論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所)）
+- **APIテストのモック**：テストごとに 127.0.0.1 の空いているポートでモックサーバーを立ち上げ、状態がテストをまたがないようにしています。返事は TS版のモックと同じにしています（[論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所)）
 
 設計判断の背景・詳細は [decisions.md](decisions.md) にまとめています。
 
@@ -116,7 +143,7 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 |---|---|---|
 | [論点1](decisions.md#論点1-storagestate機構が未配線) storageState機構が未配線 | storage_state を正式に配線し、ログイン状態を再利用 | あり |
 | [論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一) ロケータのキャッシュ有無が不統一 | 全Page Objectで `__init__` にまとめて定義する方式に統一 | あり |
-| [論点5-a](decisions.md#論点5-a-resetxxxmockが未呼び出しテスト独立性の問題) モックのリセットが未呼び出し | autouse fixture でリセットする方針（API層は未実装） | あり |
+| [論点5-a](decisions.md#論点5-a-resetxxxmockが未呼び出しテスト独立性の問題) モックのリセットが未呼び出し | テストごとにモックサーバーを立ち上げ、状態がテストをまたがないようにした（論点19） | あり |
 | [論点5-b](decisions.md#論点5-b-utilsloginhelperts-等のデッドコード) loginHelper.ts 等のデッドコード | loginHelper.ts 相当は移植しない | あり |
 | [論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない) URL参照が徹底されていない | 最初から utils/urls.py の参照を徹底 | あり |
 | [論点12](decisions.md#論点12-products画面を独立した画面として扱う) Products画面を独立した画面として扱う | 仕様書・テストケースを独立させ、ソート・画面遷移・未ログイン時も検証 | 検討 |
@@ -125,6 +152,7 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 | [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | あり |
 | [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | あり |
 | [論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所) 商品一覧画面の表示確認の置き場所 | InventoryPage.expect_on_page() の1か所にまとめ、URL は完全一致、要素は data-test で確認する | あり |
+| [論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所) APIテストのモックの方式とファイルの置き場所 | 127.0.0.1 の空いているポートでモックサーバーを立ち上げる（TS版は MSW による通信の横取り）。API専用のファイルは専用のフォルダにまとめる | 検討 |
 
 ---
 
@@ -132,9 +160,8 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 
 TS版にあって、Python版ではまだ実装していないものです。
 
-- APIテスト（モックの実装方式は、API層の移植着手時に決める。外部の実APIには接続しない方針。詳細は [CLAUDE.md](../CLAUDE.md)）
-- 見た目の比較テスト（Visual Regression）
 - CI（GitHub Actions）への組み込み
+- 見た目の比較テスト（Visual Regression）
 
 ---
 
@@ -183,6 +210,12 @@ pytest
 
 ```bash
 pytest tests/ui/cart -v
+```
+
+### APIテストだけ実行
+
+```bash
+pytest tests/api -v
 ```
 
 ### 失敗時のトレースを残して実行
