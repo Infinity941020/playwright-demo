@@ -123,14 +123,20 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   本プロジェクトのスコープ外。Python版完了後、余力があれば
   別途検討する）
 - 決定日: 2026-07-30
+- 追記（2026-11-15）: TS版の改善案として挙げていた server.resetHandlers() では、
+  ハンドラーの中の変数（カートの中身など）は戻らないため、効果がないと考えられる。
+  状態を戻すには resetCartMock／resetCheckoutMock を呼ぶ必要がある
+  （2026-11-15 調査。TS版での実行による確認はしていない）。
+  Python版はテストごとにモックサーバーを立ち上げる方式で解決した（論点19）。
 
 ## 論点5-b: utils/loginHelper.ts 等のデッドコード
 
 - 分類: ①（loginHelper.ts部分）/②（apiConfig.ts, npm scripts部分）
 - 判断:
   - loginHelper.ts相当: 除外（Python版には移植しない）
-  - apiConfig.ts, npm scripts相当: 未定（API/Mock層のPython移植
-    フェーズで判断）
+  - apiConfig.ts相当: 移植しない（2026-11-15。使われておらず、中身も外部API
+    〈JSONPlaceholder・ReqRes〉を指しているため）
+  - npm scripts相当: 未定（API層の移植では判断していない）
 - 理由: loginHelper.tsはFlow/Page Objectを経由しない素のpage操作
   関数であり、LoginFlow/LoginPageに置き換わった後の残骸と判断できる。
   実装上の価値がなく、意図的な設計でもないため移植しない。
@@ -139,17 +145,18 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: Login画面実装（loginHelper.ts相当は作成しない）
 - TS逆輸入候補: あり（TS版でも不要コードとして削除する価値が
   あるが、本プロジェクトのスコープ外）
-- 決定日: 2026-07-30
+- 決定日: 2026-07-30（初回）／2026-11-15（更新：apiConfig.ts）
 
 ## 論点6: types/api.ts の型定義が実質使われていない
 
 - 分類: ②
-- 判断: 未定（API層のPython移植フェーズで判断）
-- 理由: Login画面の実装には影響しないAPI層の型設計方針のため、
-  該当フェーズまで判断を保留する。
-- 影響範囲: API層の型/モデル設計（pydantic導入可否を含む）
+- 判断: 変更（types/api.ts は移植しない。形をチェックする道具〈pydantic 等〉は導入せず、
+  返事の値を直接確かめる）
+- 理由: types/api.ts はどこからも使われていないため。APIテストの全件で値まで確かめるため、
+  形の確認も含まれる。TS版は zod を2つの API にしか使っておらず、Python版のほうが確認は強い。
+- 影響範囲: utils/api_assertions/（返事の値を直接確かめる確認関数）
 - TS逆輸入候補: 未定
-- 決定日: -
+- 決定日: 2026-11-15
 
 ## 論点7: Lint/Formatツールが一切導入されていない
 
@@ -173,12 +180,12 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 ## 論点9: zodスキーマ検証の適用範囲が不統一
 
 - 分類: ②
-- 判断: 未定（API層のPython移植フェーズで判断）
-- 理由: Login画面の実装には影響しないAPI層のスキーマ検証方針
-  のため、該当フェーズまで判断を保留する。
-- 影響範囲: API層のスキーマ検証設計（pydantic導入範囲）
+- 判断: 変更（形をチェックする道具〈zod・pydantic 等〉は導入せず、返事の値を直接確かめる）
+- 理由: APIテストの全件で値まで確かめるため、形の確認も含まれる。TS版は zod を2つの API
+  にしか使っておらず、Python版のほうが確認は強い。
+- 影響範囲: utils/api_assertions/（返事の値を直接確かめる確認関数）
 - TS逆輸入候補: 未定
-- 決定日: -
+- 決定日: 2026-11-15
 
 ## 論点10: utils/urls.ts の参照が徹底されていない
 
@@ -323,4 +330,28 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   flows/inventory_flow.py、fixtures/login_fixture.py、
   utils/ui_assertions/inventory_assertions.py、tests/ui/login/
 - TS逆輸入候補: あり
+- 決定日: 2026-11-15
+
+## 論点19: APIテストのモックの方式とファイルの置き場所
+
+- 分類: ②
+- 判断: 変更（TS版は MSW でテストのプロセスの中の通信を横取りする方式。Python版は
+  127.0.0.1 の空いているポートで小さなモックサーバーを立ち上げる方式）。ファイルは
+  画面のテストと分け、API専用のものは専用のフォルダ（mocks/、utils/api_assertions/、
+  data/api/、tests/api/）にまとめる
+- 理由: Python版の Playwright では、route による横取りが APIRequestContext の通信に
+  効かないことを実機で確認したため（2026-11-15）。標準ライブラリだけで作り、API ごとに
+  ファイルを分けて TS版の mocks/handlers/ と見比べられる形にした。テストごとにサーバーを
+  立ち上げ、状態が混ざらないようにした（論点5-a）。データは画面用と混ざらないよう
+  data/api/ に分けた（TS版は data/ の直下）。Visual Regression も同じ考え方で専用の
+  フォルダにまとめる。
+- 影響範囲: mocks/server.py、mocks/handler_types.py、
+  mocks/handlers/（login_handlers.py・user_handlers.py・cart_handlers.py・
+  checkout_handlers.py・logout_handlers.py）、fixtures/api_fixture.py、conftest.py、
+  utils/api_helper.py、utils/api_assertions/（common_assertions.py・login_assertions.py・
+  user_assertions.py・cart_assertions.py・checkout_assertions.py・logout_assertions.py）、
+  data/api/（api_users.py・api_carts.py・api_checkout.py）、
+  tests/api/（test_login_api.py・test_user_api.py・test_cart_api.py・
+  test_checkout_api.py・test_logout_api.py）
+- TS逆輸入候補: 検討（TS版も同じ方式・置き場所に揃えるかは、TS版への横展開のときに判断する）
 - 決定日: 2026-11-15

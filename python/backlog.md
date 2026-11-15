@@ -61,8 +61,8 @@
 
 ## Stage 2-1 で扱うもの
 
-- APIテストは Python側のモックで実装する（外部APIには戻さない。CLAUDE.md の通信方針どおり）。
-  モックの具体的な作り方は、Stage 2-1 の着手時に TS版の MSW 構成を調べてから決める
+- APIテスト：完了（2026-11-15）。127.0.0.1 で立ち上げるモックサーバーで18件を実装
+  （api_spec.md・api_testcases.md、decisions.md 論点19）
 - 見た目の比較テスト（Visual Regression）
   - CI上で基準画像を生成し、Artifactをダウンロードしてリポジトリに入れ、CI上で比較する
     （実行環境ごとに描画が微妙に異なるため。TS版で同じ手順で解決した実績あり）
@@ -119,3 +119,12 @@
 - Wiki「Checkout仕様」の「購入完了画面が正常に表示されること」に対し、確認しているのは URL と見出しの表示のみ
 - Wiki「Logout仕様」の「ログイン状態が解除されること」に対応するテストがない
 - Complete 画面の Visual スナップショットのフッターが Twitter のアイコンで、実機は X のアイコン
+- cart-api.spec.ts の「MSW動作確認（Cart追加）」はアサーションがなく、何も確かめていない
+- モックの状態がテストの間でリセットされていない（resetCartMock／resetCheckoutMock が未使用）
+- commonAssertions の expectCreatedResource、loginAssertions の expectLoginUnauthorized が未使用
+- checkoutAssertions.ts で STATUS.OK に 201 を入れている（名前と値が合っていない）
+- apiLogger は JSON 以外の返事で失敗する
+- apiConfig.ts・types/api.ts・data/apiUsers.ts の inputPatterns が未使用。コメントに ReqRes・JSONPlaceholder の記載が残る
+- Cart API のテストで、quantity 省略時に 1 になること、削除後の一覧、一覧の件数と中身を確認していない
+- Cart・Checkout のハンドラーは、本文が空のリクエストを読むと読み取りエラーになり、400 を返す分岐に届かない（500 になると考えられる）
+- Wiki の API 関連のページ（MSW構成、API-Test-Specifications、API-Assertions設計、各 API 仕様、Schema設計）と実装の食い違い
