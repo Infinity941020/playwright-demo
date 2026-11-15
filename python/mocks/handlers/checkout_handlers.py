@@ -1,0 +1,51 @@
+"""Checkout Mock Handlers（TS版 mocks/handlers/checkoutHandlers.ts に対応）
+
+呼び出し回数は、create_checkout_handlers() を呼ぶたびに 0 から数え直す。
+モックサーバーはテストごとに新しく立ち上げるため、回数はテストをまたがない
+（TS版の resetCheckoutMock に相当する処理は不要。decisions.md 論点5-a）。
+"""
+
+import time
+
+from mocks.handler_types import Handler, MockRequest, MockResponse
+
+
+def create_checkout_handlers() -> list[Handler]:
+    checkout_count = 0
+
+    def checkout(request: MockRequest) -> MockResponse:
+        nonlocal checkout_count
+        body = request.json()
+
+        checkout_count += 1
+
+        # 呼び出し回数の上限（TS版と同じ。判断できない挙動）
+        if checkout_count >= 1000:
+            return MockResponse(401, {"error": "unauthorized", "message": "mock auth error"})
+
+        # 本文なし（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
+        if body is None:
+            return MockResponse(400, {"error": "invalid payload"})
+
+        # 必須項目チェック（TS版の !body.xxx と同じく、0 も未指定とみなす）
+        if (
+            not isinstance(body, dict)
+            or not body.get("cartId")
+            or not body.get("userId")
+            or not body.get("totalPrice")
+        ):
+            return MockResponse(400, {"error": "invalid payload"})
+
+        return MockResponse(
+            201,
+            {
+                "success": True,
+                # 呼び出した時刻（ミリ秒）（TS版の Date.now() と同じ。判断できない挙動）
+                "checkoutId": int(time.time() * 1000),
+                "cartId": body["cartId"],
+                "userId": body["userId"],
+                "totalPrice": body["totalPrice"],
+            },
+        )
+
+    return [Handler("POST", "/api/checkout", checkout)]
