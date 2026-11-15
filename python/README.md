@@ -83,6 +83,8 @@ python/
 │       ├── checkout/
 │       └── logout/          # Logout機能（左上のメニュー）
 ├── specs/                   # 画面ごとの仕様書・テストケース
+├── README.md                # 本ファイル
+├── UPDATELOG.md             # 作業履歴・最新の状況
 ├── decisions.md             # TS版との設計差異に関する意思決定の記録
 └── backlog.md               # 今後の作業候補
 ```
@@ -95,8 +97,11 @@ python/
 - **ログイン状態の再利用**：standard_user の storage_state をセッションごとに1回だけ生成し、logged_page fixture で各テストに渡します。ログイン状態を引き継がない確認（未ログイン時のアクセス）は、通常の page を使います（[論点1](decisions.md#論点1-storagestate機構が未配線)）
 - **goto() と expect_on_page() の使い分け**：goto() は移動のみ、画面の表示確認は expect_on_xxx() で行います（[論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け)）
 - **ロケータの定義**：`__init__` でまとめて定義し、商品ごとに変わる部品は商品名を受け取るメソッドで扱います（[論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一)）
-- **カートの前提状態**：Cart画面のテストは、「追加した順」を確かめる TC-CART-003 を除き、ブラウザの保存領域（localStorage）への直接書き込みで前提状態を作ります。書き込み処理は1か所（CartPage.set_cart_contents）にまとめています（[論点15](decisions.md#論点15-cart画面テストの前提状態の作り方)）
+- **カートの前提状態**：Cart・Checkout・Logout のテストは、カートに商品が入った状態を、ブラウザの保存領域（localStorage）への直接書き込みで作ります（Cart画面の「追加した順」を確かめる TC-CART-003 を除く）。書き込み処理は1か所（CartPage.set_cart_contents）にまとめています（[論点15](decisions.md#論点15-cart画面テストの前提状態の作り方)）
 - **URLの一元管理**：URL は原則として utils/urls.py から参照します（[論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない)）
+- **Checkout の Page Object**：ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分けています（CheckoutStepOnePage／CheckoutStepTwoPage／CheckoutCompletePage）（[論点16](decisions.md#論点16-checkout画面の-page-object-の構成)）
+- **メニューの開閉の判定**：表示の有無ではなく aria-hidden 属性で判定します。URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるためです（[論点17](decisions.md#論点17-メニューの開閉の判定方法)）
+- **商品一覧画面の表示確認**：InventoryPage.expect_on_page() の1か所にまとめ、URL の完全一致と data-test で確認します。ログイン成功の確認や logged_page fixture もここを使います（[論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所)）
 
 設計判断の背景・詳細は [decisions.md](decisions.md) にまとめています。
 
@@ -119,6 +124,7 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 | [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 検討 |
 | [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | あり |
 | [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | あり |
+| [論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所) 商品一覧画面の表示確認の置き場所 | InventoryPage.expect_on_page() の1か所にまとめ、URL は完全一致、要素は data-test で確認する | あり |
 
 ---
 
@@ -191,7 +197,7 @@ pytest --tracing retain-on-failure
 
 | ファイル | 内容 |
 |---|---|
-| [CLAUDE.md](../CLAUDE.md) | Claude Code への指示（移植方針・APIテストの通信方針・実装依頼時の運用ルール） |
+| [CLAUDE.md](../CLAUDE.md) | Claude Code への指示（移植方針・APIテストの通信方針・実装依頼時の運用ルール・ブランチとマージの運用・完了報告の形式） |
 | [decisions.md](decisions.md) | TS版との設計差異に関する意思決定の記録 |
 | [backlog.md](backlog.md) | 今後の作業候補 |
 | [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |

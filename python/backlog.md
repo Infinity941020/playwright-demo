@@ -6,20 +6,6 @@
   TS版にも同時に反映する前提とする。
 - 商品詳細画面（inventory-item.html）の中身の検証。
   Products画面からの遷移までは TC-PROD-009/010 で検証済み。
-- カートが空の状態で Checkout に進めることの扱い。
-  意図された仕様か不具合か判断できないため保留（cart_spec.md「本仕様の対象外」参照）。
-  Checkout Step One で判断できなかった挙動（空白のみの入力が通る、入力欄の Enter で Cancel が動く、
-  エラー時に入力済みの欄も赤表示になる）も同じく保留中（checkout_step_one_spec.md「判断できない挙動」参照）。
-  Checkout Step Two で判断できなかった挙動（小計の桁あふれ（例：Item total: $59.980000000000004）、
-  Step One を経由せずに購入まで完了できる、カートが空で $0 の購入ができる、空カートの小計だけが「$0」と表示される、
-  購入完了後のブラウザの「戻る」で空の Step Two が表示される、Step One の入力値が Step Two に表示されない）も
-  同じく保留中（checkout_step_two_spec.md「判断できない挙動」参照）。
-  Checkout Complete・Logout で判断できなかった挙動（購入せずに Complete 画面を直接開ける、
-  PDF出力ボタンが再読み込み等で消える、Complete の画像の読み込みの遅れ、Back Home 後の「戻る」で Complete に戻る、
-  ログアウトしてもカートが消えない（共用のPCでは、次の利用者に前の利用者のカートが見える）、
-  メニューの外側のクリックで閉じない、Products 画面で All Items を押してもメニューが開いたまま、
-  Reset App State で画面の表示が更新されない）も同じく保留中
-  （checkout_complete_spec.md・logout_spec.md「判断できない挙動」参照）。
 - Reset App State、Dynamic Catalog（Lazy Load・Spinner・Slider）、About、
   PDF出力（ダウンロードとPDFの中身）のテスト。
 - 外部APIのテスト（優先度低）。
@@ -27,6 +13,50 @@
   使う外部API（ReqResの現状や代わり）は着手時に調べる。
 - 外部APIの仕様変更への対応フロー：
   テスト失敗の通知で自動検知 → AIが原因調査と修正案の作成 → プルリクエストの作成・push・マージは人が行う。
+
+## 判断を保留している挙動
+
+実機で確認したが、意図された仕様か不具合かを判断できないため、テスト対象に含めず保留している挙動。
+詳細は各仕様書の「判断できない挙動」（Cart は「本仕様の対象外」）を参照。
+
+### Login（login_spec.md）
+
+- エラー時に、入力済みの欄も含めた両方の入力欄が赤表示になる
+- 空白のみのユーザー名が未入力扱いにならない（認証情報不一致のエラーになる）
+- ログイン済みでも Login画面の URL を開くと Login画面が表示される（ログイン状態は残っている）
+
+### Cart（cart_spec.md）
+
+- カートが空の状態で Checkout に進める
+
+### Checkout Step One（checkout_step_one_spec.md）
+
+- 空白のみの入力が通る
+- 入力欄の Enter で Cancel が動く
+- エラー時に入力済みの欄も赤表示になる
+
+### Checkout Step Two（checkout_step_two_spec.md）
+
+- 小計の桁あふれ（例：Item total: $59.980000000000004）
+- Step One を経由せずに購入まで完了できる
+- カートが空で $0 の購入ができる
+- 空カートの小計だけが「$0」と表示される
+- 購入完了後のブラウザの「戻る」で空の Step Two が表示される
+- Step One の入力値が Step Two に表示されない
+
+### Checkout Complete（checkout_complete_spec.md）
+
+- 購入せずに Complete 画面を直接開ける
+- PDF出力ボタンが再読み込み等で消える
+- Complete の画像の読み込みの遅れ
+- Back Home 後の「戻る」で Complete に戻る
+
+### Logout（logout_spec.md）
+
+- ログアウトしてもカートが消えない（共用のPCでは、次の利用者に前の利用者のカートが見える）
+- メニューの外側のクリックで閉じない
+- Products 画面で All Items を押してもメニューが開いたまま
+- Reset App State で画面の表示が更新されない
 
 ## Stage 2-1 で扱うもの
 
@@ -36,21 +66,34 @@
   - CI上で基準画像を生成し、Artifactをダウンロードしてリポジトリに入れ、CI上で比較する
     （実行環境ごとに描画が微妙に異なるため。TS版で同じ手順で解決した実績あり）
   - Python版の Playwright には画像比較の標準機能がないため、比較の仕組みを用意する
-- CIで、同じブランチに新しい push があったら古い実行を自動でキャンセルする設定
-  （GitHub Actions の concurrency と cancel-in-progress）。
-  CIのファイルはTS版と共通のため、Python版をCIに組み込むときに合わせて入れる
+- Python版のテストを CI に組み込む（今は CI で動いているのは TS版のテストだけ）。
+  同じブランチに新しい push があったら古い実行を自動でキャンセルする設定
+  （GitHub Actions の concurrency と cancel-in-progress）もこのときに入れる
+  （CIのファイルはTS版と共通のため）
+- テストの接続先と URL の管理（今は utils/urls.py に絶対URLを固定。pytest-base-url は未使用）
+- エラー文言をまとめるかどうか：今はテストファイルに直接書く運用で、別ファイル間で同じ文言が
+  2組重複している（'/inventory.html' の未ログインエラー、Postal Code is required）。
+  API層のエラー文言と合わせて、まとめるかどうかを決める
+- Lint／Format ツールの導入（論点7）、商品データなどの型（論点6・9）
+- 並列実行（pytest-xdist）を導入する場合の storage_state ファイルの書き込みの競合
 
 ## 全画面の移植後に整理するもの
 
-- ロケータの書き方が混在している
-  - 新規の Page Object は data-test 属性
-  - LoginPage は id（#user-name 等）
-  - 一部に CSS クラス（img.inventory_item_img、.inventory_list）
-- 商品一覧画面の表示確認が3か所に分かれている
-  （LoginPage.expect_on_inventory_page()、logged_page 内、InventoryPage.expect_on_page()）
-- Login画面のエラー文言がテストファイル内に直接書かれている。文言データの置き場所を決める
-- 並列実行（pytest-xdist）を導入する場合、storage_state ファイルの書き込み競合に注意する
-- README を最終的に TS版と別のまま整えるか、TS版と統合するかを決める
+- InventoryPage の商品画像の確認が CSS クラス（img.inventory_item_img）のまま残っている。
+  data-test の有無を実機で確かめ、あれば置き換える
+  （ロケータの書き方の混在のうち、LoginPage の id と .inventory_list はプルリクエスト #4 で解消済み。
+  MenuPage の開閉ボタンの id とメニュー領域の CSS クラスは、data-test がないためそのまま使う）
+
+## TS版への横展開のときに扱うもの
+
+- README・UPDATELOG の TS版／Python版の統一：方針は Stage 2-1 の終わりに決め、
+  作業は TS版への横展開のときに行う
+- Wiki：TS版の記載の修正（「TS版の修正候補」の Wiki 関連の項目）は TS版のコードと一緒に直す。
+  Python版の内容を Wiki に載せるかどうかは、Stage 2-1 の終わりに README と一緒に方針を決める
+- TS版を typescript/ フォルダへ移し、python/ と対称な構成にする案：
+  極力 Python版と同じ形・構成にしたい意向。実施するかどうかは、影響範囲（import、
+  tsconfig.json・playwright.config.ts・package.json のパス、CI の設定）を調べたうえで、
+  TS版への横展開のときに最終判断する
 
 ## TS版の修正候補
 

@@ -269,6 +269,12 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: 検討（TS版のテスト時間短縮と独立性の向上につながるが、
   内部キー名への依存が増える）
 - 決定日: 2026-10-07
+- 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
+  直接書き込み）で前提状態を作っている。Checkout は CheckoutFlow.open_step_one_with
+  （と、それを経由する open_step_two_with・open_complete_with）、Logout は
+  CartFlow.open_cart_with を使う。書き込み処理は引き続き CartPage.set_cart_contents の
+  1か所のみ。これにより、影響範囲に flows/checkout_flow.py、tests/ui/checkout/、
+  tests/ui/logout/ の該当テストが加わる。
 
 ## 論点16: Checkout画面の Page Object の構成
 
@@ -288,6 +294,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: あり（TS版も CheckoutPage.ts の中を画面ごとのクラスに分けるだけで
   同じ構造にできる）
 - 決定日: 2026-11-08
+- 追記（2026-11-15）: Checkout Step Two・Checkout Complete の移植で CheckoutStepTwoPage・
+  CheckoutCompletePage を追加し、3クラス（CheckoutStepOnePage／CheckoutStepTwoPage／
+  CheckoutCompletePage）とも pages/checkout_page.py に実装済み。
 
 ## 論点17: メニューの開閉の判定方法
 
@@ -301,3 +310,17 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   utils/ui_assertions/logout_assertions.py、tests/ui/logout/
 - TS逆輸入候補: あり
 - 決定日: 2026-11-09
+
+## 論点18: 商品一覧画面の表示確認の置き場所
+
+- 分類: ②
+- 判断: 変更（TS版は LoginPage.expectOnInventoryPage など複数の場所で商品一覧画面の
+  表示を確認しているが、Python版は InventoryPage.expect_on_page() の1か所にまとめる）
+- 理由: Stage 2-0 の棚卸しで、同じ確認が4か所に分かれ、確認の条件（URLの部分一致と
+  完全一致、CSSクラスと data-test）もばらばらであることがわかったため。1か所にまとめ、
+  URLは完全一致、要素は data-test で確認する形に揃えた（論点2・10）。
+- 影響範囲: pages/inventory_page.py、pages/login_page.py、flows/login_flow.py、
+  flows/inventory_flow.py、fixtures/login_fixture.py、
+  utils/ui_assertions/inventory_assertions.py、tests/ui/login/
+- TS逆輸入候補: あり
+- 決定日: 2026-11-15
