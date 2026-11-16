@@ -26,6 +26,11 @@ class LoginFlow:
         self._login_page.expect_on_login_page()
         self._login_page.login(username, password)
 
+    def open_login_page(self) -> None:
+        """ログイン画面を開いて表示を確認する（ログインはしない）。"""
+        self._login_page.goto()
+        self._login_page.expect_on_login_page()
+
     # 検証（業務レベル）
 
     def expect_login_error_message(self, message: str) -> None:

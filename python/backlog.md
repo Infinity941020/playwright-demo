@@ -62,6 +62,10 @@
   - CI上で基準画像を生成し、Artifactをダウンロードしてリポジトリに入れ、CI上で比較する
     （実行環境ごとに描画が微妙に異なるため。TS版で同じ手順で解決した実績あり）
   - Python版の Playwright には画像比較の標準機能がないため、比較の仕組みを用意する
+  - 比較の仕組み（Pillow）とテスト6件は実装済み（2026-11-16、visual_spec.md・visual_testcases.md、
+    decisions.md 論点21）。基準画像を CI で作ってリポジトリに入れ、マージした後に完了にする
+  - フッターの年（「© 2026 Sauce Labs」）が変わると画像が変わり、基準画像の作り直しが必要になる
+    （TS版も同じ）
 - CI への組み込み：完了（2026-11-16）。既存の playwright.yml に Python版の画面・APIテストの
   ジョブを追加し、ジョブの表示名と古い実行の自動キャンセル（concurrency）を設定
   （decisions.md 論点20）
@@ -143,3 +147,5 @@ Stage 2-1 と TS版への横展開が終わった後に、任意で取り組む�
 - Cart・Checkout のハンドラーは、本文が空のリクエストを読むと読み取りエラーになり、400 を返す分岐に届かない（500 になると考えられる）
 - Wiki の API 関連のページ（MSW構成、API-Test-Specifications、API-Assertions設計、各 API 仕様、Schema設計）と実装の食い違い
 - CI の Node.js が 18（サポート終了済み）
+- Visual のテストで固定の待ち（waitForTimeout 300）を使っている
+- Visual のテストで、各テストが画面からログインしている（保存したログイン状態を使っていない）

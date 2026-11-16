@@ -214,6 +214,48 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+  python-visual-tests:
+    name: Visual Tests (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: python/requirements.txt
+
+      - name: Restore Playwright Browser Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
+
+      - name: Install dependencies
+        working-directory: python
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        working-directory: python
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run Visual Tests
+        working-directory: python
+        run: pytest tests/visual -m visual
+
+      - name: Upload Visual Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-visual-artifacts
+          path: python/test-results
+          retention-days: 7
+          if-no-files-found: ignore
+
   notify:
     name: Slack Notification
     runs-on: ubuntu-latest
@@ -224,6 +266,7 @@ jobs:
       - visual-tests
       - python-ui-tests
       - python-api-tests
+      - python-visual-tests
 
     if: always()
 
@@ -234,7 +277,8 @@ jobs:
                 "${{ needs.api-tests.result }}" == "failure" || \
                 "${{ needs.visual-tests.result }}" == "failure" || \
                 "${{ needs.python-ui-tests.result }}" == "failure" || \
-                "${{ needs.python-api-tests.result }}" == "failure" ]]; then
+                "${{ needs.python-api-tests.result }}" == "failure" || \
+                "${{ needs.python-visual-tests.result }}" == "failure" ]]; then
             STATUS="❌ Playwright CI Failed"
           else
             STATUS="✅ Playwright CI Success"
@@ -242,7 +286,7 @@ jobs:
 
           cat > payload.json <<EOF
           {
-            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }}\nAPI Tests (TS): ${{ needs.api-tests.result }}\nVisual Tests (TS): ${{ needs.visual-tests.result }}\nUI Tests (Python): ${{ needs.python-ui-tests.result }}\nAPI Tests (Python): ${{ needs.python-api-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }}\nAPI Tests (TS): ${{ needs.api-tests.result }}\nVisual Tests (TS): ${{ needs.visual-tests.result }}\nUI Tests (Python): ${{ needs.python-ui-tests.result }}\nAPI Tests (Python): ${{ needs.python-api-tests.result }}\nVisual Tests (Python): ${{ needs.python-visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
 
