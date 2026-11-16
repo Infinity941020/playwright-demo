@@ -1,7 +1,7 @@
 """API の呼び出し
 
 責務:
-    - API ごとのリクエストの送信（TS版 utils/apiHelper.ts の executeXxxApi に対応）
+    - API ごとにリクエストを送る（TS版 utils/apiHelper.ts の executeXxxApi に対応）
 
 接続先（ホスト・ポート）は APIRequestContext の base_url で決まる（fixtures/api_fixture.py）。
 payload に None を渡すと、本文なしで送る。
@@ -19,7 +19,7 @@ def execute_login_api(request: APIRequestContext, payload: dict) -> APIResponse:
     return request.post(f"{_BASE_PATH}/login", data=payload)
 
 
-# User API（参照専用）
+# User API（情報を取得するだけで、変更はしない）
 
 
 def execute_get_user_api(request: APIRequestContext, user_id: int) -> APIResponse:

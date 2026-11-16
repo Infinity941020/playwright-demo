@@ -10,21 +10,21 @@ from utils.api_assertions.checkout_assertions import (
 )
 from utils.api_helper import execute_checkout_api
 
-# エラー文言（api_spec.md「Checkout API」の表のとおり）
+# エラーの文言は、api_spec.md「Checkout API」の表と同じにする
 _INVALID_PAYLOAD_MESSAGE = "invalid payload"
 
 
 class TestCheckoutApi:
-    """Checkout API の確認"""
+    """Checkout API を確かめる。"""
 
     def test_checkout_success(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CHECKOUT-001: 正しい内容で購入すると、送った内容が返ること。"""
         payload = API_CHECKOUT["valid_checkout"]
 
-        # 操作
+        # API を呼び出す
         response = execute_checkout_api(api_request_context, payload)
 
-        # 検証
+        # 結果を検証する
         expect_checkout_success(
             response, payload["cartId"], payload["userId"], payload["totalPrice"]
         )
@@ -48,8 +48,8 @@ class TestCheckoutApi:
         self, api_request_context: APIRequestContext, payload: dict | None
     ) -> None:
         """TC-API-CHECKOUT-002〜005: 必須項目のどれかがない、または本文がないと、400 とエラーが返ること。"""
-        # 操作（None のときは本文なしで送る）
+        # API を呼び出す（payload が None のときは、本文なしで送る）
         response = execute_checkout_api(api_request_context, payload)
 
-        # 検証
+        # 結果を検証する
         expect_checkout_bad_request(response, _INVALID_PAYLOAD_MESSAGE)

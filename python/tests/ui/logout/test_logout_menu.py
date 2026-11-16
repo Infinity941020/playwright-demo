@@ -12,16 +12,16 @@ _MENU_ITEMS = ["All Items", "Dynamic Catalog", "About", "Logout", "Reset App Sta
 
 
 class TestLogoutMenu:
-    """メニューの表示・開閉確認"""
+    """メニューの表示と開閉を確かめる。"""
 
     def test_menu_items_displayed_in_order(self, logged_page: Page) -> None:
         """TC-LOGOUT-001: メニューを開くと、5つの項目が仕様どおりの並び順で表示されること。"""
         logout_flow = LogoutFlow(logged_page)
 
-        # 業務操作（メニューを開く。logged_page は Products画面を開いた状態で始まる）
+        # メニューを開く（logged_page は Products画面を開いた状態で始まる）
         logout_flow.open_menu()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_menu_items(logout_flow, _MENU_ITEMS)
 
     @pytest.mark.parametrize(
@@ -35,9 +35,9 @@ class TestLogoutMenu:
         """TC-LOGOUT-002/003: ×ボタン・Esc キーを押すと、メニューが閉じること。"""
         logout_flow = LogoutFlow(logged_page)
 
-        # 業務操作（メニューを開いて閉じる）
+        # メニューを開いてから閉じる
         logout_flow.open_menu()
         close_menu(logout_flow)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_menu_closed(logout_flow)

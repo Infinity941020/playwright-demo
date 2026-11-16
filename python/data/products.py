@@ -35,7 +35,7 @@ PRODUCTS = {
     },
 }
 
-# ソート選択肢（画面の表示文言）
+# ソートの選択肢を、画面に表示される文言で定義する
 SORT_OPTIONS = {
     "name_asc": "Name (A to Z)",
     "name_desc": "Name (Z to A)",

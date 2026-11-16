@@ -1,4 +1,4 @@
-"""テストで使用する共通URL定義"""
+"""テストで使う URL をまとめて定義する"""
 
 URLS = {
     "login": "https://www.saucedemo.com/",

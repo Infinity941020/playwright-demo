@@ -1,8 +1,8 @@
-"""logged_page fixture（storage_state再利用）の動作確認
+"""logged_page fixture（保存したログイン状態の再利用）の動作を確かめるテスト
 
-論点1（storageState未配線）の決定に基づき、storage_stateの再利用が
-実際に機能していることを検証する。ログイン済みの状態を前提とする
-各画面のテストは、この fixture を使用している。
+論点1（TS版では storageState の仕組みが使われていなかった件）の決定に基づき、
+保存したログイン状態（storage_state）の再利用が実際に機能していることを検証する。
+ログイン済みの状態から始める各画面のテストは、この fixture を使っている。
 """
 
 from playwright.sync_api import Page
@@ -12,11 +12,11 @@ from utils.ui_assertions.inventory_assertions import expect_on_inventory_page
 
 
 class TestLoggedPageFixture:
-    """logged_page fixture の動作確認"""
+    """logged_page fixture の動作を確かめる。"""
 
     def test_logged_page_starts_on_inventory_page(self, logged_page: Page) -> None:
-        """TC対象外（logged_page fixture の動作確認用）: 事前ログイン操作なしで商品一覧ページに到達していること。"""
+        """テストケース外（fixture の動作確認用）: ログインの操作をしなくても、商品一覧画面が開いていること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_inventory_page(inventory_flow)

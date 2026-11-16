@@ -23,7 +23,7 @@ from mocks.handlers.user_handlers import create_user_handlers
 
 class MockServer:
     def __init__(self) -> None:
-        # Handler統合（インスタンスごとに新しい状態で作る）
+        # 各 API のハンドラーをまとめて登録する（インスタンスごとに新しい状態で作る）
         self._handlers: list[Handler] = [
             *create_login_handlers(),
             *create_user_handlers(),
@@ -36,7 +36,7 @@ class MockServer:
 
     @property
     def base_url(self) -> str:
-        """接続先（例：http://127.0.0.1:50123）。start() の後に使う。"""
+        """接続先（例：http://127.0.0.1:50123）を返す。start() の後に使う。"""
         if self._server is None:
             raise RuntimeError("MockServer is not started")
         host, port = self._server.server_address[:2]
@@ -68,7 +68,7 @@ class MockServer:
                 except Exception as error:
                     # ハンドラー内の例外（JSON として読めない本文など）は 500 を返す
                     return MockResponse(500, {"error": f"{type(error).__name__}: {error}"})
-        # 登録されていないメソッド・パス
+        # 登録されていないメソッド・パスには、404 を返す
         return MockResponse(404, {"error": "no mock handler"})
 
     def _create_request_handler(self) -> type[BaseHTTPRequestHandler]:

@@ -13,16 +13,16 @@ from utils.ui_assertions.cart_assertions import (
 
 
 class TestCartDisplay:
-    """カート画面の表示確認"""
+    """カート画面の表示を確かめる。"""
 
     def test_empty_cart_displayed(self, logged_page: Page) -> None:
         """TC-CART-001: カートが空のとき、空の状態の表示になること。"""
         cart_flow = CartFlow(logged_page)
 
-        # 前提状態（カートは空）
+        # 前提状態を作る（カートは空にする）
         cart_flow.open_cart_with([])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_cart_page_layout(cart_flow)
         expect_cart_item_count(cart_flow, 0)
         expect_badge_count(cart_flow, 0)
@@ -32,9 +32,9 @@ class TestCartDisplay:
         cart_flow = CartFlow(logged_page)
         all_products = list(PRODUCTS.values())
 
-        # 前提状態（全6商品を「表示商品」の表の順でカートに入れる）
+        # 前提状態を作る（全6商品を「表示商品」の表の順にカートに入れる）
         cart_flow.open_cart_with(all_products)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_cart_items_displayed(cart_flow, all_products)
         expect_badge_count(cart_flow, len(all_products))

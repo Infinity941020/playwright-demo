@@ -10,7 +10,7 @@ pytestmark = pytest.mark.visual
 
 
 class TestLoginVisual:
-    """Login画面の見た目の確認"""
+    """Login画面の見た目を確かめる。"""
 
     def test_login_page_matches_snapshot(self, page: Page) -> None:
         """TC-VIS-001: Login画面の見た目が、基準画像と一致すること。
@@ -19,8 +19,8 @@ class TestLoginVisual:
         """
         login_flow = LoginFlow(page)
 
-        # 前提状態（Login画面を開いて表示を確認）
+        # 前提状態を作る（Login画面を開き、表示を確かめる）
         login_flow.open_login_page()
 
-        # 検証（見た目）
+        # 見た目を基準画像と比べて検証する
         expect_screenshot_matches(page, "login-page.png", max_diff_ratio=0.01)

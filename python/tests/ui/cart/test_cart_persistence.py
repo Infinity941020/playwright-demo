@@ -12,7 +12,7 @@ from utils.ui_assertions.cart_assertions import (
 
 
 class TestCartPersistence:
-    """再読み込み後の状態保持確認"""
+    """再読み込みした後も、状態が保持されることを確かめる。"""
 
     def test_cart_kept_after_reload(self, logged_page: Page) -> None:
         """TC-CART-010: 再読み込み後も、カートの内容が保持されること。"""
@@ -20,13 +20,13 @@ class TestCartPersistence:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light])
 
-        # 業務操作（再読み込み）
+        # 画面を再読み込みする
         cart_flow.reload_cart()
 
-        # 検証（業務レベル：並び順は TC-CART-003 で確認するため問わない）
+        # 結果を検証する（並び順は TC-CART-003 で確かめるため、ここでは問わない）
         expect_cart_item_count(cart_flow, 2)
         expect_in_cart(cart_flow, backpack["name"])
         expect_in_cart(cart_flow, bike_light["name"])

@@ -1,11 +1,11 @@
-"""ログインfixture
+"""ログイン状態を用意する fixture
 
 責務:
-    - standard_userのstorage_stateをセッション内で1回だけ生成する
-    - ログイン済みPageをテストへ提供する
+    - standard_user でログインした状態（storage_state）を、テストの実行全体で1回だけ作る
+    - ログイン済みの Page をテストへ渡す
 
-論点1（storageState未配線）の決定に基づき、TS版とは異なりstorage_state
-を正式に配線する。詳細は python/decisions.md の論点1を参照。
+論点1（TS版では storageState の仕組みが使われていなかった件）の決定に基づき、TS版とは異なり、
+保存したログイン状態（storage_state）を実際にテストで使う。詳細は python/decisions.md の論点1を参照。
 """
 
 from pathlib import Path
@@ -24,7 +24,7 @@ _STORAGE_STATE_PATH = Path(__file__).resolve().parent.parent / ".auth" / "standa
 
 @pytest.fixture(scope="session")
 def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
-    """standard_userでログイン済みのstorage_stateをセッション内で1回だけ生成する。"""
+    """standard_user でログインした状態（storage_state）を、テストの実行全体で1回だけ作る。"""
     _STORAGE_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     context = browser.new_context()
@@ -46,7 +46,7 @@ def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
 def logged_page(
     new_context: CreateContextCallback, standard_user_storage_state: Path
 ) -> Iterator[Page]:
-    """standard_userでログイン済みのPageを返す。
+    """standard_user でログイン済みの Page を返す。
 
     pytest-playwrightのnew_context fixture経由で生成するため、
     --screenshot / --tracing / --video 等の設定が適用される。

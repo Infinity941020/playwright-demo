@@ -11,7 +11,7 @@ from utils.ui_assertions.logout_assertions import expect_menu_closed, expect_on_
 
 
 class TestLogoutAllItems:
-    """All Items の確認"""
+    """All Items の動作を確かめる。"""
 
     def test_all_items_from_cart(self, logged_page: Page) -> None:
         """TC-LOGOUT-010: Cart画面で All Items を押すと、Products画面へ遷移し、カートが変わらないこと。"""
@@ -21,13 +21,13 @@ class TestLogoutAllItems:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light])
 
-        # 業務操作（メニューを開いて All Items）
+        # メニューを開いて All Items を押す
         logout_flow.open_all_items()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_inventory_page(logout_flow)
         expect_menu_closed(logout_flow)
         expect_badge_count(inventory_flow, 2)

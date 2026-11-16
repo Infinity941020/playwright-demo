@@ -12,16 +12,16 @@ from utils.ui_assertions.checkout_assertions import (
 
 
 class TestCheckoutStepOneDisplay:
-    """Checkout Step One画面の表示確認"""
+    """Checkout Step One画面の表示を確かめる。"""
 
     def test_page_displayed_as_spec(self, logged_page: Page) -> None:
         """TC-CO1-001: 画面が仕様どおりに表示されること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack のみ）
+        # 前提状態を作る（カートには Backpack のみを入れる）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_checkout_step_one_page_layout(checkout_flow)
         expect_badge_count(checkout_flow, 1)
         expect_no_checkout_error(checkout_flow)

@@ -19,7 +19,7 @@ from utils.ui_assertions.login_assertions import (
 
 
 def _stay_on_products_page(page: Page) -> None:
-    """Products画面のまま（logged_page は Products画面を開いた状態で始まる）。"""
+    """何もせず、Products画面のままにする（logged_page は Products画面を開いた状態で始まる）。"""
 
 
 def _open_cart_page(page: Page) -> None:
@@ -31,7 +31,7 @@ def _open_complete_page(page: Page) -> None:
 
 
 class TestLogoutSuccess:
-    """ログアウト確認"""
+    """ログアウトを確かめる。"""
 
     @pytest.mark.parametrize(
         "open_start_page",
@@ -45,13 +45,13 @@ class TestLogoutSuccess:
         logout_flow = LogoutFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # 前提状態（Products／Cart／Complete のいずれかの画面を開く）
+        # 前提状態を作る（Products・Cart・Complete のいずれかの画面を開く）
         open_start_page(logged_page)
 
-        # 業務操作（メニューから Logout）
+        # メニューから Logout を押す
         logout_flow.logout()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_inputs_empty(login_flow)
         expect_no_login_error(login_flow)

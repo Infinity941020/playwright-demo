@@ -1,22 +1,22 @@
 """ログインユーザー情報"""
 
 USERS = {
-    # 正常ログイン可能ユーザー
+    # ログインに成功するユーザーを定義する
     "standard": {
         "username": "standard_user",
         "password": "secret_sauce",
     },
-    # ログイン不可（ロック済み）ユーザー
+    # ロックされていて、ログインできないユーザーを定義する
     "locked": {
         "username": "locked_out_user",
         "password": "secret_sauce",
     },
-    # 異常系テスト用（ユーザー名のみ誤り）
+    # 異常系のテストに使う（ユーザー名だけが誤り）
     "wrong_username_only": {
         "username": "wrong_user",
         "password": "secret_sauce",
     },
-    # 異常系テスト用（パスワードのみ誤り）
+    # 異常系のテストに使う（パスワードだけが誤り）
     "wrong_password_only": {
         "username": "standard_user",
         "password": "wrong_pass",

@@ -12,7 +12,7 @@ from utils.ui_assertions.checkout_assertions import expect_on_cart_page, expect_
 
 
 class TestCheckoutCompleteNavigation:
-    """画面遷移確認"""
+    """画面遷移を確かめる。"""
 
     @pytest.mark.parametrize(
         ("press_button", "expect_destination"),
@@ -31,11 +31,11 @@ class TestCheckoutCompleteNavigation:
         """TC-CO3-002/003: Back Home・カートアイコンを押すと、それぞれの画面へ遷移すること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack をカートに入れて購入を完了）
+        # 前提状態を作る（Backpack をカートに入れ、購入を完了する）
         checkout_flow.open_complete_with([PRODUCTS["backpack"]], CHECKOUT_DATA)
 
-        # 業務操作（ボタン押下）
+        # ボタンを押す
         press_button(checkout_flow)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_destination(checkout_flow)

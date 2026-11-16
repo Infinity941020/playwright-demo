@@ -10,7 +10,7 @@ _NOT_LOGGED_IN_MESSAGE = "Epic sadface: You can only access '/cart.html' when yo
 
 
 class TestCartAuth:
-    """未ログイン時のアクセス確認"""
+    """未ログイン時のアクセスを確かめる。"""
 
     def test_redirect_to_login_when_not_logged_in(self, page: Page) -> None:
         """TC-CART-011: 未ログインで直接アクセスすると、Login画面へ戻されること。
@@ -20,9 +20,9 @@ class TestCartAuth:
         cart_flow = CartFlow(page)
         login_flow = LoginFlow(page)
 
-        # 業務操作（未ログインで直接アクセス）
+        # ログインせずに、画面の URL を直接開く
         cart_flow.access_cart_directly()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _NOT_LOGGED_IN_MESSAGE)

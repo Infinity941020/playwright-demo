@@ -1,9 +1,9 @@
-"""Checkout画面のUI操作（Page Object）
+"""Checkout画面の Page Object
 
 責務:
-    - 要素取得
-    - 単体操作
-    - 画面レベルの検証
+    - 画面の要素（ロケータ）を定義する
+    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
+    - 画面の表示や状態を検証する
 
 TS版の pages/CheckoutPage.ts と1対1で対応するファイルで、クラスは画面ごとに分ける
 （decisions.md 論点16）。
@@ -28,10 +28,10 @@ class CheckoutStepOnePage:
         self.error_message_locator: Locator = page.locator('[data-test="error"]')
         self.error_close_button: Locator = page.locator('[data-test="error-button"]')
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def goto(self) -> None:
-        """Checkout Step One画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        """Checkout Step One画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["checkout_step_one"])
 
     def reload(self) -> None:
@@ -57,15 +57,15 @@ class CheckoutStepOnePage:
     def close_error(self) -> None:
         self.error_close_button.click()
 
-    # 画面レベルの検証
+    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
-        """Checkout Step One画面表示確認。"""
+        """Checkout Step One画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["checkout_step_one"])
         expect(self.continue_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・3つの入力欄（プレースホルダー）・ボタンの検証。"""
+        """タイトル・3つの入力欄（プレースホルダー）・ボタンを検証する。"""
         expect(self.title).to_have_text("Checkout: Your Information")
         expect(self.first_name_input).to_be_visible()
         expect(self.first_name_input).to_have_attribute("placeholder", "First Name")
@@ -80,15 +80,15 @@ class CheckoutStepOnePage:
         expect(self.continue_button).to_have_value("Continue")
 
     def expect_error_message(self, message: str) -> None:
-        """エラー文言検証。"""
+        """エラーの文言を検証する。"""
         expect(self.error_message_locator).to_have_text(message)
 
     def expect_no_error(self) -> None:
-        """エラー表示がないこと。"""
+        """エラーが表示されていないことを確かめる。"""
         expect(self.error_message_locator).to_have_count(0)
 
     def expect_info_values(self, first_name: str, last_name: str, postal_code: str) -> None:
-        """3つの入力欄の値検証。"""
+        """3つの入力欄の値を検証する。"""
         expect(self.first_name_input).to_have_value(first_name)
         expect(self.last_name_input).to_have_value(last_name)
         expect(self.postal_code_input).to_have_value(postal_code)
@@ -113,7 +113,7 @@ class CheckoutStepTwoPage:
         self.cancel_button: Locator = page.locator('[data-test="cancel"]')
         self.finish_button: Locator = page.locator('[data-test="finish"]')
 
-    # 商品ごとに変わる部品（商品名で特定する）
+    # 商品ごとに変わる要素は、商品名で特定する。
 
     def _item(self, product_name: str) -> Locator:
         """商品名に完全一致する行を返す。"""
@@ -122,10 +122,10 @@ class CheckoutStepTwoPage:
             has=self.page.locator('[data-test="inventory-item-name"]', has_text=name_pattern)
         )
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def goto(self) -> None:
-        """Checkout Step Two画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        """Checkout Step Two画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["checkout_step_two"])
 
     def reload(self) -> None:
@@ -140,15 +140,15 @@ class CheckoutStepTwoPage:
     def click_product_name(self, product_name: str) -> None:
         self._item(product_name).locator('[data-test="inventory-item-name"]').click()
 
-    # 画面レベルの検証
+    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
-        """Checkout Step Two画面表示確認。"""
+        """Checkout Step Two画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["checkout_step_two"])
         expect(self.finish_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・一覧の見出し・支払い／配送情報・金額の見出し・ボタンの検証。"""
+        """タイトル・一覧の見出し・支払い／配送情報・金額の見出し・ボタンを検証する。"""
         expect(self.title).to_have_text("Checkout: Overview")
         expect(self.quantity_label).to_have_text("QTY")
         expect(self.description_label).to_have_text("Description")
@@ -166,7 +166,7 @@ class CheckoutStepTwoPage:
         expect(self.items).to_have_count(count)
 
     def expect_all_item_elements_visible(self) -> None:
-        """全行に「数量（1）／商品名／説明／価格」が表示されていること。"""
+        """全行に「数量（1）／商品名／説明／価格」が表示されていることを確かめる。"""
         for item in self.items.all():
             expect(item.locator('[data-test="item-quantity"]')).to_have_text("1")
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()
@@ -179,14 +179,14 @@ class CheckoutStepTwoPage:
         )
 
     def expect_item_names(self, product_names: list[str]) -> None:
-        """商品名の並び順検証。"""
+        """商品名が指定した順に並んでいることを確かめる。"""
         expect(self.item_names).to_have_text(product_names)
 
     def expect_item_listed(self, product_name: str) -> None:
         expect(self._item(product_name)).to_have_count(1)
 
     def expect_amounts(self, item_total: str, tax: str, total: str) -> None:
-        """小計・税・合計の表示文言の検証（完全一致）。"""
+        """小計・税・合計の表示文言を、完全一致で検証する。"""
         expect(self.item_total).to_have_text(item_total)
         expect(self.tax).to_have_text(tax)
         expect(self.total).to_have_text(total)
@@ -202,24 +202,24 @@ class CheckoutCompletePage:
         self.back_home_button: Locator = page.locator('[data-test="back-to-products"]')
         self.generate_pdf_button: Locator = page.locator('[data-test="generate-pdf-order"]')
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def goto(self) -> None:
-        """Checkout Complete画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        """Checkout Complete画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["complete"])
 
     def click_back_home(self) -> None:
         self.back_home_button.click()
 
-    # 画面レベルの検証
+    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
-        """Checkout Complete画面表示確認。"""
+        """Checkout Complete画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["complete"])
         expect(self.back_home_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・見出し・本文・画像・ボタンの検証。
+        """タイトル・見出し・本文・画像・ボタンを検証する。
 
         画像は表示と代替テキストで確認し、読み込みの完了は確認しない
         （checkout_complete_testcases.md「実装時の注意」参照）。

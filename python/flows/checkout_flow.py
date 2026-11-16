@@ -1,10 +1,10 @@
 """CheckoutFlow
 
 責務:
-    - 業務単位の操作のみ提供
-    - specからUI詳細を隠蔽
-    - CheckoutStepOnePage / CheckoutStepTwoPage / CheckoutCompletePage / CartPage /
-      HeaderComponent / InventoryPage依存をFlowで吸収
+    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
+    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
+    - CheckoutStepOnePage・CheckoutStepTwoPage・CheckoutCompletePage・CartPage・
+      HeaderComponent・InventoryPage の呼び出しは Flow の中で行う
 """
 
 from playwright.sync_api import Page
@@ -21,12 +21,12 @@ class CheckoutFlow:
         self._step_two_page = CheckoutStepTwoPage(page)
         self._complete_page = CheckoutCompletePage(page)
         self._header = HeaderComponent(page)
-        # 前提状態の作成と、遷移先（カート画面）の表示確認用
+        # 前提状態を作るためと、操作の後に移るカート画面の表示を確かめるために使う
         self._cart_page = CartPage(page)
-        # 遷移先（商品一覧・商品詳細）の表示確認用
+        # 操作の後に移る商品一覧画面・商品詳細画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
 
-    # Step One: 業務操作
+    # Step One画面を操作する。
 
     def open_step_one_with(self, products: list[dict]) -> None:
         """指定した商品がカートに入った状態で、Checkout Step One画面をURLで直接開く。
@@ -39,7 +39,7 @@ class CheckoutFlow:
         self._step_one_page.expect_on_page()
 
     def access_step_one_directly(self) -> None:
-        """Checkout Step One画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        """Checkout Step One画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""
         self._step_one_page.goto()
 
     def reload_step_one(self) -> None:
@@ -51,7 +51,7 @@ class CheckoutFlow:
         self._step_one_page.fill_info(first_name, last_name, postal_code)
 
     def proceed_to_overview_step(self) -> None:
-        """Continue を押す（入力チェックのエラー時は画面遷移しない）。"""
+        """Continue を押す（入力チェックでエラーになったときは、画面は移らない）。"""
         self._step_one_page.click_continue()
 
     def cancel_from_step_one(self) -> None:
@@ -60,13 +60,13 @@ class CheckoutFlow:
     def close_error(self) -> None:
         self._step_one_page.close_error()
 
-    # Step One: 検証（業務レベル）
+    # Step One画面の状態を検証する。
 
     def expect_on_step_one_page(self) -> None:
         self._step_one_page.expect_on_page()
 
     def expect_step_one_page_layout(self) -> None:
-        """タイトル・3つの入力欄（プレースホルダー）・Cancel・Continue が表示されていること。"""
+        """タイトル・3つの入力欄（プレースホルダー）・Cancel・Continue が表示されていることを確かめる。"""
         self._step_one_page.expect_page_layout()
 
     def expect_error_message(self, message: str) -> None:
@@ -78,7 +78,7 @@ class CheckoutFlow:
     def expect_info_values(self, first_name: str, last_name: str, postal_code: str) -> None:
         self._step_one_page.expect_info_values(first_name, last_name, postal_code)
 
-    # Step Two: 業務操作
+    # Step Two画面を操作する。
 
     def open_step_two_with(self, products: list[dict], checkout_info: dict) -> None:
         """指定した商品がカートに入った状態で、Step One を経由して Checkout Step Two画面を開く。
@@ -95,7 +95,7 @@ class CheckoutFlow:
         self._step_two_page.expect_on_page()
 
     def access_step_two_directly(self) -> None:
-        """Checkout Step Two画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        """Checkout Step Two画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""
         self._step_two_page.goto()
 
     def reload_step_two(self) -> None:
@@ -113,17 +113,17 @@ class CheckoutFlow:
     def open_product_detail(self, product_name: str) -> None:
         self._step_two_page.click_product_name(product_name)
 
-    # Step Two: 検証（業務レベル）
+    # Step Two画面の状態を検証する。
 
     def expect_on_step_two_page(self) -> None:
         self._step_two_page.expect_on_page()
 
     def expect_step_two_page_layout(self) -> None:
-        """タイトル・見出し・支払い／配送情報・金額の見出し・Cancel・Finish が表示されていること。"""
+        """タイトル・見出し・支払い／配送情報・金額の見出し・Cancel・Finish が表示されていることを確かめる。"""
         self._step_two_page.expect_page_layout()
 
     def expect_step_two_items_displayed(self, products: list[dict]) -> None:
-        """Step Two の商品の表示検証（行数・各行の表示項目・商品名と価格の組み合わせ）。"""
+        """Step Two の商品の表示を検証する（行数、各行の表示項目、商品名と価格の組み合わせ）。"""
         self._step_two_page.expect_item_count(len(products))
         self._step_two_page.expect_all_item_elements_visible()
         for product in products:
@@ -136,13 +136,13 @@ class CheckoutFlow:
         self._step_two_page.expect_item_count(count)
 
     def expect_step_two_item_listed(self, product_name: str) -> None:
-        """Step Two に指定した商品の行があること（並び順は問わない）。"""
+        """Step Two に指定した商品の行があることを確かめる（並び順は問わない）。"""
         self._step_two_page.expect_item_listed(product_name)
 
     def expect_step_two_amounts(self, item_total: str, tax: str, total: str) -> None:
         self._step_two_page.expect_amounts(item_total, tax, total)
 
-    # Complete: 業務操作
+    # Complete画面を操作する。
 
     def open_complete_with(self, products: list[dict], checkout_info: dict) -> None:
         """指定した商品がカートに入った状態から購入を完了し、Checkout Complete画面を開く。
@@ -156,34 +156,34 @@ class CheckoutFlow:
         self._complete_page.expect_on_page()
 
     def access_complete_directly(self) -> None:
-        """Checkout Complete画面のURLへ直接アクセスする（表示確認なし。未ログイン時の検証用）。"""
+        """Checkout Complete画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""
         self._complete_page.goto()
 
     def back_home(self) -> None:
         """Back Home を押して Products画面へ戻る。"""
         self._complete_page.click_back_home()
 
-    # Complete: 検証（業務レベル）
+    # Complete画面の状態を検証する。
 
     def expect_on_checkout_complete_page(self) -> None:
         self._complete_page.expect_on_page()
 
     def expect_complete_page_layout(self) -> None:
-        """タイトル・見出し・本文・画像・Back Home・Generate PDF order が表示されていること。"""
+        """タイトル・見出し・本文・画像・Back Home・Generate PDF order が表示されていることを確かめる。"""
         self._complete_page.expect_page_layout()
 
-    # 画面共通（ヘッダー）: 業務操作
+    # 各画面に共通のヘッダーを操作する。
 
     def open_cart(self) -> None:
         """カートアイコンからカート画面を開く。"""
         self._header.click_cart_icon()
 
-    # 画面共通（ヘッダー）: 検証（業務レベル）
+    # 各画面に共通のヘッダーの状態を検証する。
 
     def expect_badge_count(self, count: int) -> None:
         self._header.expect_badge_count(count)
 
-    # 遷移先: 検証（業務レベル）
+    # 操作の後に移った先の画面を検証する。
 
     def expect_on_inventory_page(self) -> None:
         self._inventory_page.expect_on_page()
@@ -198,5 +198,5 @@ class CheckoutFlow:
         self._cart_page.expect_item_count(count)
 
     def expect_in_cart(self, product_name: str) -> None:
-        """カート内に指定した商品の行があること（並び順は問わない）。"""
+        """カート内に指定した商品の行があることを確かめる（並び順は問わない）。"""
         self._cart_page.expect_item_listed(product_name)

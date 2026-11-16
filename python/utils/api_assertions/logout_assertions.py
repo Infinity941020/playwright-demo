@@ -10,18 +10,18 @@ _STATUS_UNAUTHORIZED = 401
 
 
 def expect_logout_success(response: APIResponse) -> None:
-    """ログアウト成功（200、success が true）。"""
+    """ログアウトが成功したことを確かめる（200、success が true）。"""
     expect_status(response, _STATUS_OK)
     assert response.json()["success"] is True
 
 
 def expect_logout_unauthorized(response: APIResponse, error: str) -> None:
-    """未認証（401、error が期待値と一致）。"""
+    """認証されていないとして拒否されたことを確かめる（401、error が期待値と一致）。"""
     expect_status(response, _STATUS_UNAUTHORIZED)
     assert response.json()["error"] == error
 
 
 def expect_logout_bad_request(response: APIResponse, error: str) -> None:
-    """不正リクエスト（400、error が期待値と一致）。"""
+    """リクエストが不正として拒否されたことを確かめる（400、error が期待値と一致）。"""
     expect_status(response, _STATUS_BAD_REQUEST)
     assert response.json()["error"] == error

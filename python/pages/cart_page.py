@@ -1,9 +1,9 @@
-"""カート画面のUI操作（Page Object）
+"""カート画面の Page Object
 
 責務:
-    - 要素取得
-    - 単体操作
-    - 画面レベルの検証
+    - 画面の要素（ロケータ）を定義する
+    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
+    - 画面の表示や状態を検証する
 """
 
 import json
@@ -27,7 +27,7 @@ class CartPage:
         self.cart_items: Locator = page.locator('[data-test="inventory-item"]')
         self.item_names: Locator = self.cart_items.locator('[data-test="inventory-item-name"]')
 
-    # 商品ごとに変わる部品（商品名で特定する）
+    # 商品ごとに変わる要素は、商品名で特定する。
 
     def _item(self, product_name: str) -> Locator:
         """商品名に完全一致するカート内の行を返す。"""
@@ -39,19 +39,19 @@ class CartPage:
     def _remove_button(self, product_name: str) -> Locator:
         return self._item(product_name).get_by_role("button", name="Remove", exact=True)
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def goto(self) -> None:
-        """カート画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        """カート画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["cart"])
 
     def reload(self) -> None:
         self.page.reload()
 
     def set_cart_contents(self, product_ids: list[int]) -> None:
-        """カートの中身を、ブラウザの保存領域へ直接書き込む（テストの前提状態作成用）。
+        """カートの中身を、ブラウザの保存領域（localStorage）へ直接書き込む（テストの前提状態を作るために使う）。
 
-        SauceDemo内部の localStorage キー「cart-contents」（商品IDの配列）に依存する。
+        SauceDemo が内部で使う localStorage のキー「cart-contents」（商品IDの配列）を前提にしている。
         キー名や形式が変わった場合はこのメソッドのみを修正する。
         localStorage はサイトごとに分かれるため、saucedemo.com のページを
         開いた状態で呼び出すこと（logged_page は商品一覧を開いた状態で始まる）。
@@ -73,15 +73,15 @@ class CartPage:
     def click_product_name(self, product_name: str) -> None:
         self._item(product_name).locator('[data-test="inventory-item-name"]').click()
 
-    # 画面レベルの検証
+    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
-        """カート画面表示確認。"""
+        """カート画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["cart"])
         expect(self.continue_shopping_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """商品の有無に関係なく表示される項目（タイトル・見出し・ボタン）の検証。"""
+        """商品の有無に関係なく表示される項目（タイトル・見出し・ボタン）を検証する。"""
         expect(self.title).to_have_text("Your Cart")
         expect(self.quantity_label).to_have_text("QTY")
         expect(self.description_label).to_have_text("Description")
@@ -92,7 +92,7 @@ class CartPage:
         expect(self.cart_items).to_have_count(count)
 
     def expect_all_item_elements_visible(self) -> None:
-        """全行に「数量（1）／商品名／説明／価格／Removeボタン」が表示されていること。"""
+        """全行に「数量（1）／商品名／説明／価格／Removeボタン」が表示されていることを確かめる。"""
         for item in self.cart_items.all():
             expect(item.locator('[data-test="item-quantity"]')).to_have_text("1")
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()
@@ -106,7 +106,7 @@ class CartPage:
         )
 
     def expect_item_names(self, product_names: list[str]) -> None:
-        """商品名の並び順検証。"""
+        """商品名が指定した順に並んでいることを確かめる。"""
         expect(self.item_names).to_have_text(product_names)
 
     def expect_item_listed(self, product_name: str) -> None:

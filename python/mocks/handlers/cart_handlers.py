@@ -19,18 +19,18 @@ def create_cart_handlers() -> list[Handler]:
         nonlocal next_id
         body = request.json()
 
-        # 本文なし（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
+        # 本文がない場合（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
         if body is None:
             return MockResponse(400, {"error": "invalid payload"})
 
-        # productId 未指定（TS版の !body.productId と同じく、0 も未指定とみなす）
+        # productId が指定されていない場合（TS版の !body.productId と同じく、0 も指定なしとみなす）
         if not isinstance(body, dict) or not body.get("productId"):
             return MockResponse(400, {"error": "invalid payload"})
 
         item = {
             "id": next_id,
             "productId": body["productId"],
-            # quantity 未指定時は 1（TS版の ?? 1 と同じく、null も未指定とみなす）
+            # quantity が指定されていなければ 1 にする（TS版の ?? 1 と同じく、null も指定なしとみなす）
             "quantity": body["quantity"] if body.get("quantity") is not None else 1,
         }
         next_id += 1
@@ -39,7 +39,7 @@ def create_cart_handlers() -> list[Handler]:
 
     def delete_cart(request: MockRequest) -> MockResponse:
         cart_id = to_number(request.params["id"])
-        # 存在しない id でも 200 を返す（TS版と同じ。判断できない挙動）
+        # 存在しない id でも 200 を返す（TS版と同じ。意図された仕様か不具合かを判断できない挙動）
         cart[:] = [item for item in cart if item["id"] != cart_id]
         return MockResponse(200, {"success": True})
 

@@ -19,7 +19,7 @@ from utils.ui_assertions.inventory_assertions import (
 
 
 class TestCheckoutStepTwoState:
-    """Finish・Cancel・再読み込み後の状態確認"""
+    """Finish・Cancel・再読み込みの後の状態を確かめる。"""
 
     def test_cart_emptied_after_finish(self, logged_page: Page) -> None:
         """TC-CO2-011: Finish を押すと、カートが空になること。"""
@@ -28,19 +28,19 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # 業務操作（Finish）
+        # Finish を押す
         checkout_flow.complete_purchase()
 
-        # 検証（業務レベル：バッジが表示されない）
+        # バッジが表示されないことを検証する
         expect_badge_count(checkout_flow, 0)
 
-        # 業務操作（Products画面をURLで開く。Complete画面の操作は Complete画面の仕様で扱う）
+        # Products画面を URL で開く（Complete画面での操作は、Complete画面の仕様で扱う）
         inventory_flow.access_inventory_directly()
 
-        # 検証（業務レベル：Products画面のボタン表示）
+        # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_add_to_cart_button_shown(inventory_flow, bike_light["name"])
 
@@ -51,13 +51,13 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # 業務操作（Cancel）
+        # Cancel を押す
         checkout_flow.cancel_from_step_two()
 
-        # 検証（業務レベル：Products画面のボタン表示とバッジ）
+        # Products画面のボタンの表示とバッジを検証する
         expect_remove_button_shown(inventory_flow, backpack["name"])
         expect_remove_button_shown(inventory_flow, bike_light["name"])
         expect_badge_count(checkout_flow, 2)
@@ -68,13 +68,13 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # 業務操作（再読み込み）
+        # 画面を再読み込みする
         checkout_flow.reload_step_two()
 
-        # 検証（業務レベル：並び順は TC-CO2-003 で確認するため問わない）
+        # 結果を検証する（並び順は TC-CO2-003 で確かめるため、ここでは問わない）
         expect_step_two_item_count(checkout_flow, 2)
         expect_step_two_item_listed(checkout_flow, backpack["name"])
         expect_step_two_item_listed(checkout_flow, bike_light["name"])

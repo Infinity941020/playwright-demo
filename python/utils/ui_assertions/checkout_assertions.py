@@ -1,8 +1,8 @@
 """Checkout UI Assertions
 
 責務:
-    - Checkout画面のUI検証
-    - Flow経由で業務レベル検証を実施
+    - Checkout画面の表示や状態を検証する関数を提供する
+    - 検証は Flow を通して行う（テストから Page Object を直接呼ばない）
 """
 
 from flows.checkout_flow import CheckoutFlow

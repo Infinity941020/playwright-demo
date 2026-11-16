@@ -11,14 +11,14 @@ pytestmark = pytest.mark.visual
 
 
 class TestCartVisual:
-    """Cart画面の見た目の確認"""
+    """Cart画面の見た目を確かめる。"""
 
     def test_cart_page_matches_snapshot(self, logged_page: Page) -> None:
         """TC-VIS-003: Cart画面の見た目が、基準画像と一致すること。"""
         cart_flow = CartFlow(logged_page)
 
-        # 前提状態（Backpack をカートに入れて Cart画面を開く）
+        # 前提状態を作る（Backpack をカートに入れ、Cart画面を開く）
         cart_flow.open_cart_with([PRODUCTS["backpack"]])
 
-        # 検証（見た目）
+        # 見た目を基準画像と比べて検証する
         expect_screenshot_matches(logged_page, "cart-page.png", max_diff_ratio=0.01)
