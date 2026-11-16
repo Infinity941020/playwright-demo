@@ -86,10 +86,17 @@
 
 ## TS版への横展開のときに扱うもの
 
-- README・UPDATELOG の TS版／Python版の統一：方針は Stage 2-1 の終わりに決め、
-  作業は TS版への横展開のときに行う
-- Wiki：TS版の記載の修正（「TS版の修正候補」の Wiki 関連の項目）は TS版のコードと一緒に直す。
-  Python版の内容を Wiki に載せるかどうかは、Stage 2-1 の終わりに README と一緒に方針を決める
+- README・UPDATELOG：最終的に TS版・Python版で1つのファイルにする（2026-11-16 決定）。
+  まとめる作業は、TS版への横展開がすべて完了した後に行う
+  （横展開で TS版の構成が変わるため、構成が固まってから1回でまとめる）
+  - それまでは、TS版の変更はリポジトリ直下の UPDATELOG.md、Python版の変更は python/UPDATELOG.md に書く
+  - TS版の今後の回の見出しは、Python版と同じ「## 日付（Stage〇〇：項目名）」の形にする
+  - UPDATELOG は、TS版の記録が 2026-07-16 まで、Python版が 2026-07-30 からで日付が重ならないため、
+    Python版の回を TS版の回の上に積む形でまとめられる見込み
+- Wiki：TS版の記載の修正（「TS版の修正候補」の Wiki 関連の項目）は、TS版のコードと一緒に直す。
+  横展開で TS版を Python版に揃えると設計はほぼ共通になるため、Wiki は版ごとに分けず両版共通の内容とし、
+  README・UPDATELOG を1つにまとめるときに、必要な箇所に Python版と TS版の違い
+  （言語の書き方、API のモック、画像比較など）を追記する（2026-11-16 決定）
 - TS版を typescript/ フォルダへ移し、python/ と対称な構成にする案：
   極力 Python版と同じ形・構成にしたい意向。実施するかどうかは、影響範囲（import、
   tsconfig.json・playwright.config.ts・package.json のパス、CI の設定）を調べたうえで、

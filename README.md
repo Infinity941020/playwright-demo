@@ -50,10 +50,11 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ---
 
-## Python版（移植中）
+## Python版
 
-本ポートフォリオを Playwright + Python（pytest）へ移植しています。
-進捗・設計判断の記録は [python/README.md](python/README.md) を参照してください。
+本ポートフォリオを Playwright + Python（pytest）へ移植し、全画面の移植と、
+APIテスト・見た目の比較テスト・CI への組み込みまで完了しています。
+詳細・設計判断の記録は [python/README.md](python/README.md) を参照してください。
 
 ---
 
@@ -126,10 +127,12 @@ npx playwright test tests/ui/checkout/checkout-success.spec.ts --reporter=list
 
 ## CI（GitHub Actions）
 
-mainブランチへのpush / Pull Request時に、UI / API / Visual Regression の
-3ジョブを自動実行し、継続的な品質確認を行っています。
+mainブランチへのpush / Pull Request時に、TS版の3ジョブ（UI / API / Visual Regression）と
+Python版の3ジョブ（UI / API / Visual Regression）の計6ジョブを自動実行し、継続的な品質確認を行っています。
 
 実行結果はSlackへ自動通知されます。
+
+Python版の CI の詳細は [python/README.md の「CI」](python/README.md#ci) を参照してください。
 
 CIの詳細設定（retry / worker制御 / キャッシュ戦略等）は
 [CI設計（GitHub Wiki）](https://github.com/Infinity941020/playwright-demo/wiki/CI%E8%A8%AD%E8%A8%88%EF%BC%88GitHub-Actions%E3%80%80Playwright%E9%81%8B%E7%94%A8%EF%BC%89)
