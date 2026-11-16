@@ -62,10 +62,11 @@
   - CI上で基準画像を生成し、Artifactをダウンロードしてリポジトリに入れ、CI上で比較する
     （実行環境ごとに描画が微妙に異なるため。TS版で同じ手順で解決した実績あり）
   - Python版の Playwright には画像比較の標準機能がないため、比較の仕組みを用意する
-- Python版のテストを CI に組み込む（今は CI で動いているのは TS版のテストだけ）。
-  同じブランチに新しい push があったら古い実行を自動でキャンセルする設定
-  （GitHub Actions の concurrency と cancel-in-progress）もこのときに入れる
-  （CIのファイルはTS版と共通のため）
+- CI への組み込み：完了（2026-11-16）。既存の playwright.yml に Python版の画面・APIテストの
+  ジョブを追加し、ジョブの表示名と古い実行の自動キャンセル（concurrency）を設定
+  （decisions.md 論点20）
+- ドキュメント（*.md）だけの push で CI を動かさない設定（paths-ignore）。
+  TS版の CI の動きも変わるため、影響を確かめてから入れる
 - テストの接続先と URL の管理（今は utils/urls.py に絶対URLを固定。pytest-base-url は未使用）
 - エラー文言をまとめるかどうか：今はテストファイルに直接書く運用で、別ファイル間で同じ文言が
   2組重複している（'/inventory.html' の未ログインエラー、Postal Code is required）。
@@ -138,3 +139,4 @@ Stage 2-1 と TS版への横展開が終わった後に、任意で取り組む�
 - Cart API のテストで、quantity 省略時に 1 になること、削除後の一覧、一覧の件数と中身を確認していない
 - Cart・Checkout のハンドラーは、本文が空のリクエストを読むと読み取りエラーになり、400 を返す分岐に届かない（500 になると考えられる）
 - Wiki の API 関連のページ（MSW構成、API-Test-Specifications、API-Assertions設計、各 API 仕様、Schema設計）と実装の食い違い
+- CI の Node.js が 18（サポート終了済み）

@@ -355,3 +355,31 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   test_checkout_api.py・test_logout_api.py）
 - TS逆輸入候補: 検討（TS版も同じ方式・置き場所に揃えるかは、TS版への横展開のときに判断する）
 - 決定日: 2026-11-15
+
+## 論点20: CI の構成
+
+- 分類: ②
+- 判断: 変更（TS版の CI の設定ファイルに Python版のジョブを追加し、あわせて表示名と
+  古い実行の自動キャンセルを設定する）
+  1. 設定ファイル：既存の .github/workflows/playwright.yml に Python版のジョブ
+     （python-ui-tests・python-api-tests）を追加する（別ファイルは作らない）
+  2. ジョブの表示名：TS版・Python版の両方に付ける（UI Tests (TS)／API Tests (TS)／
+     Visual Tests (TS)／UI Tests (Python)／API Tests (Python)）。ジョブID（ui-tests など）は
+     変えない。Slack 通知の Results も同じ名前で5つのジョブを並べる
+  3. 古い実行の自動キャンセル：ワークフロー全体に concurrency を設定し、プルリクエストでは
+     古い実行を止め、main への push では止めない
+     （cancel-in-progress: ${{ github.event_name == 'pull_request' }}）
+  4. ドキュメント（*.md）だけの push で CI を動かさない設定（paths-ignore）：今回は入れない
+     （backlog.md に候補として記録）
+- 理由:
+  1. 結果を見る場所（GitHub の画面・Slack の通知）を1つにするため
+  2. TS版のジョブは表示名だけを変え、手順・コマンド・キャッシュ・Artifact には触れないことで、
+     TS版への影響を最小にするため。ジョブIDを変えないため、needs や通知の参照も変わらない
+  3. プルリクエストは最新の push の結果だけ確認すれば十分だが、main はマージごとの結果を
+     残したいため
+  4. 1つのプルリクエストは1つの目的に絞るため（paths-ignore は TS版の CI の動きも変わるため、
+     影響を確かめてから別に入れる）
+- 影響範囲: .github/workflows/playwright.yml（TS版のジョブの表示名、python-ui-tests・
+  python-api-tests の追加、concurrency、Slack Notification の needs・失敗の判定・Results）
+- TS逆輸入候補: なし（TS版と共通のファイルで、すでに両方に効くため）
+- 決定日: 2026-11-16
