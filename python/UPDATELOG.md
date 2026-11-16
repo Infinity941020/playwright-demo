@@ -1,5 +1,106 @@
 # UPDATE LOG（Python版）
 ---
+## 2026-11-16（Stage 2-1：Visual Regression）
+
+### ■ Before
+
+- Stage 2-1 の APIテスト・CI組み込みが完了していた
+- 見た目の比較テスト（Visual Regression）は TS版にだけあり（6画面）、Python版にはなかった
+- Python版の Playwright には、TS版の toHaveScreenshot に当たる画像比較の機能がない
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Stage 2-1：Visual Regression
+
+---
+
+### ■ 方式の決定（decisions.md 論点21）
+
+- 比較の仕組みは Pillow で自作した（外部の Visual 用プラグインは使わない）
+- 基準画像がない場合は、今の画像を保存してテストを失敗させる。基準画像は CI（Linux）で作ったものだけを使う
+- 普段の pytest では実行せず、pytest tests/visual -m visual と明示したときだけ実行する
+- 固定の待ちは使わず、画面の表示確認・フォントの読み込み完了・画像の読み込み完了を待ってから撮影する
+
+---
+
+### ■ 仕様書・テストケース
+
+- 仕様書：specs/visual_spec.md
+- テストケース：specs/visual_testcases.md（TC-VIS-001〜006）
+- 対象・基準画像のファイル名・許容値は TS版と同じ（Products 2%、ほかは 1%）
+- 前提状態は TS版のような画面からのログインではなく、Python版の決定事項
+  （logged_page、カートの書き込み、Step One 経由）に合わせた
+- Claude Code の指摘で、visual_spec.md の撮影の条件に画素の密度（deviceScaleFactor 1）を追加
+
+---
+
+### ■ 実装
+
+- utils/visual_assertions/（撮影前の待ち・撮影・比較・失敗時の保存）、tests/visual/（画面ごとに6ファイル）
+- Login画面を開いて表示を確認するだけの操作がなかったため、LoginFlow に open_login_page() を追加
+  （Claude Code が実装前に止めて提案。flows/ への変更はこれだけ）
+- pytest.ini で普段の pytest からは除外し、pytest tests/visual -m visual で実行
+- Pillow 13.0.0 を requirements.txt に追加
+- CI に Visual Tests (Python) を追加し、Slack 通知は6つの結果にした
+- 比較の仕組みの動作確認（一時的な確認）：同じ画像は成功、一部を塗った画像は違う画素の割合が
+  手で数えた値と一致し、許容値を超えると失敗、大きさの違う画像は失敗
+
+---
+
+### ■ 基準画像の作成（2段階）
+
+- プルリクエスト #7 の1回目の CI で、Visual Tests (Python) だけが「基準画像がない」で6件失敗（想定どおり）
+- Artifact（python-visual-artifacts）から6枚を取り出し、中身を確認したうえで
+  tests/visual/__snapshots__/ に置いた（ba713d8）
+- 2回目の CI で7つのチェックがすべて成功
+
+---
+
+### ■ プルリクエスト
+
+- コミット：75e2d50／d8919ba／653a5b1／ba713d8
+- プルリクエスト #7 をマージした（7c3a306）
+
+---
+
+### ■ Result（成果）
+
+- プルリクエスト #7 の2回目の CI：7つのチェックがすべて成功
+  - Visual Tests (Python)：6 passed（4.87秒）
+  - Slack 通知に6つのジョブの結果（すべて success）が表示された
+- マージ後の main の CI も7つのジョブがすべて成功
+- 手元での実行：pytest で 95 passed、6 deselected（177.40秒）。Visual は除外され、今までの95件に影響なし
+- CI の Python は 3.14.10、手元は 3.14.4（どちらも 3.14 系）
+
+---
+
+### ■ Overall Status
+
+- Login：完了（8件＋補助テスト1件）
+- Products：完了（14件）
+- Cart：完了（11件）
+- Checkout Step One：完了（13件）
+- Checkout Step Two：完了（14件）
+- Checkout Complete：完了（6件）
+- Logout：完了（10件）
+- Stage 2-0（全体の整理）：完了
+- APIテスト：完了（18件）
+- CI組み込み：完了
+- Visual Regression：完了（6件）
+- Stage 2-1（基盤の仕上げ）：完了
+
+---
+
+### ■ Conclusion
+
+本対応では、Visual Regression を追加し、Stage 2-1 の3項目（APIテスト・CI組み込み・Visual Regression）がすべて完了した。
+
+次は Stage 2-1 の締めとして、README・UPDATELOG・Wiki の TS版との統一方針を決め、その後 TS版への横展開に進む。
+
+---
+
 ## 2026-11-16（Stage 2-1：CI組み込み）
 
 ### ■ Before

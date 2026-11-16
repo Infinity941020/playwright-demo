@@ -58,12 +58,8 @@
 
 - APIテスト：完了（2026-11-15）。127.0.0.1 で立ち上げるモックサーバーで18件を実装
   （api_spec.md・api_testcases.md、decisions.md 論点19）
-- 見た目の比較テスト（Visual Regression）
-  - CI上で基準画像を生成し、Artifactをダウンロードしてリポジトリに入れ、CI上で比較する
-    （実行環境ごとに描画が微妙に異なるため。TS版で同じ手順で解決した実績あり）
-  - Python版の Playwright には画像比較の標準機能がないため、比較の仕組みを用意する
-  - 比較の仕組み（Pillow）とテスト6件は実装済み（2026-11-16、visual_spec.md・visual_testcases.md、
-    decisions.md 論点21）。基準画像を CI で作ってリポジトリに入れ、マージした後に完了にする
+- 見た目の比較テスト（Visual Regression）：完了（2026-11-16）。Pillow で自作した比較の仕組みで6件を実装し、
+  CI で作った基準画像をリポジトリに入れた（visual_spec.md・visual_testcases.md、decisions.md 論点21）
   - フッターの年（「© 2026 Sauce Labs」）が変わると画像が変わり、基準画像の作り直しが必要になる
     （TS版も同じ）
 - CI への組み込み：完了（2026-11-16）。既存の playwright.yml に Python版の画面・APIテストの
