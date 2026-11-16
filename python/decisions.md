@@ -383,3 +383,36 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   python-api-tests の追加、concurrency、Slack Notification の needs・失敗の判定・Results）
 - TS逆輸入候補: なし（TS版と共通のファイルで、すでに両方に効くため）
 - 決定日: 2026-11-16
+
+## 論点21: Visual Regression の方式
+
+- 分類: ②
+- 判断: 変更（TS版は Playwright 標準の toHaveScreenshot で比べる。Python版の Playwright には
+  この機能がないため、比べる仕組みを自作する）
+  1. 比較の仕組み：Pillow で自作する（外部の Visual 用プラグインは使わない）。
+     赤・緑・青の差の最大値が 51（255 × 0.2）を超えた画素を「違う画素」とし、
+     その割合が画面ごとの許容値（TS版と同じ）を超えたら失敗とする
+  2. 基準画像：基準画像がない場合は、今の画像を test-results/visual/ に保存してテストを失敗させる
+     （TS版と同じ流れ）。基準画像は CI（Linux）で作ったものだけを使い、自動で作り直す仕組み
+     （--update-snapshots など）は用意しない
+  3. 手元での扱い：普段の pytest では実行せず（pytest.ini の addopts で -m "not visual"）、
+     pytest tests/visual -m visual と明示したときだけ実行する
+  4. 待ち方：固定の待ち（sleep・wait_for_timeout）は使わない。画面の表示確認（expect_on_page など）
+     ＋フォントの読み込み完了＋画像の読み込み完了を待ってから撮影する
+  - あわせて、Login画面を開いて表示を確認するだけの操作がなかったため、LoginFlow に
+    open_login_page() を追加した（flows/ への変更はこれだけ）
+- 理由:
+  1. 外部の Visual 用プラグインは更新が止まりやすい。Pillow は広く使われていて、
+     TS版と同じ「違う画素の割合」の考え方を再現できる
+  2. 基準画像がないのに成功扱いにすると、比べ忘れに気づけないため
+  3. 基準画像は CI（Linux）で作るため、手元（Windows など）では描画の違いで失敗する。
+     普段の pytest を手元で全部通るように保つため
+  4. 固定の待ちは、環境によって足りなかったり無駄だったりするため。何が終わるのを待つかを明確にした
+- 影響範囲: utils/visual_assertions/（image_comparison.py・screenshot_assertions.py）、
+  tests/visual/（test_login_visual.py・test_inventory_visual.py・test_cart_visual.py・
+  test_checkout_step_one_visual.py・test_checkout_step_two_visual.py・
+  test_checkout_complete_visual.py）、tests/visual/__snapshots__/、flows/login_flow.py、
+  pytest.ini、requirements.txt（Pillow）、.github/workflows/playwright.yml（python-visual-tests）
+- TS逆輸入候補: 比較の仕組みは「なし」（TS版は Playwright 標準の toHaveScreenshot を使う）。
+  手元での扱い・待ち方・前提状態の作り方は「検討」（TS版への横展開のときに判断する）
+- 決定日: 2026-11-16
