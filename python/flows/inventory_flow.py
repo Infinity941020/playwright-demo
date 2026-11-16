@@ -1,9 +1,9 @@
 """InventoryFlow
 
 責務:
-    - 業務単位の操作のみ提供
-    - specからUI詳細を隠蔽
-    - InventoryPage / HeaderComponent / CartPage依存をFlowで吸収
+    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
+    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
+    - InventoryPage・HeaderComponent・CartPage の呼び出しは Flow の中で行う
 """
 
 from typing import Literal
@@ -19,17 +19,17 @@ class InventoryFlow:
     def __init__(self, page: Page) -> None:
         self._inventory_page = InventoryPage(page)
         self._header = HeaderComponent(page)
-        # 遷移先（カート画面）の表示確認用
+        # 操作の後に移るカート画面の表示を確かめるために使う
         self._cart_page = CartPage(page)
 
-    # 業務操作
+    # 利用者の操作の単位で、画面を操作する。
 
     def access_inventory_directly(self) -> None:
-        """商品一覧画面のURLを開く（表示確認なし）。"""
+        """商品一覧画面のURLを開く（表示は確かめない）。"""
         self._inventory_page.goto()
 
     def access_product_detail_directly(self, product_id: int) -> None:
-        """商品詳細画面のURLを開く（表示確認なし）。"""
+        """商品詳細画面のURLを開く（表示は確かめない）。"""
         self._inventory_page.goto_product_detail(product_id)
 
     def reload_inventory(self) -> None:
@@ -57,10 +57,10 @@ class InventoryFlow:
         """カートアイコンからカート画面を開く。"""
         self._header.click_cart_icon()
 
-    # 検証（業務レベル）
+    # 画面の状態を検証する。
 
     def expect_products_displayed(self, products: list[dict]) -> None:
-        """商品一覧の表示検証（件数・各商品の表示項目・商品名と価格の組み合わせ）。"""
+        """商品一覧の表示を検証する（件数、各商品の表示項目、商品名と価格の組み合わせ）。"""
         self._inventory_page.expect_product_count(len(products))
         self._inventory_page.expect_all_product_elements_visible()
         for product in products:
@@ -76,11 +76,11 @@ class InventoryFlow:
         self._inventory_page.expect_selected_sort(option_label)
 
     def expect_remove_button_shown(self, product_name: str) -> None:
-        """指定した商品のボタンが Remove と表示されていること（カート追加済み）。"""
+        """指定した商品のボタンが Remove と表示されていることを確かめる（カートに追加済みの状態）。"""
         self._inventory_page.expect_remove_button(product_name)
 
     def expect_add_to_cart_button_shown(self, product_name: str) -> None:
-        """指定した商品のボタンが Add to cart と表示されていること（カート未追加）。"""
+        """指定した商品のボタンが Add to cart と表示されていることを確かめる（カートに追加していない状態）。"""
         self._inventory_page.expect_add_to_cart_button(product_name)
 
     def expect_badge_count(self, count: int) -> None:

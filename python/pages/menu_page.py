@@ -1,9 +1,9 @@
-"""サイドメニューのUI操作（Page Object）
+"""サイドメニューの Page Object
 
 責務:
-    - 要素取得
-    - 単体操作
-    - 開閉状態・項目の検証
+    - 画面の要素（ロケータ）を定義する
+    - ボタンを押す・キーを押すなど、要素1つに対する操作を提供する
+    - メニューの開閉状態と項目を検証する
 
 メニューの開閉は aria-hidden 属性で判定する（decisions.md 論点17）。
 URLで開いた直後は、閉じているメニューの項目も「表示されている」と判定されるため、
@@ -28,7 +28,7 @@ class MenuPage:
         self.all_items_link: Locator = page.locator('[data-test="inventory-sidebar-link"]')
         self.logout_link: Locator = page.locator('[data-test="logout-sidebar-link"]')
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def click_menu_button(self) -> None:
         self.menu_button.click()
@@ -45,7 +45,7 @@ class MenuPage:
     def click_logout(self) -> None:
         self.logout_link.click()
 
-    # 検証
+    # メニューの開閉状態や項目を検証する。
 
     def expect_menu_opened(self) -> None:
         expect(self.menu_area).to_have_attribute("aria-hidden", "false")
@@ -54,5 +54,5 @@ class MenuPage:
         expect(self.menu_area).to_have_attribute("aria-hidden", "true")
 
     def expect_menu_items(self, item_names: list[str]) -> None:
-        """メニューの項目の並び順検証。"""
+        """メニューの項目が指定した順に並んでいることを確かめる。"""
         expect(self.menu_items).to_have_text(item_names)

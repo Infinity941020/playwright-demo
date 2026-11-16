@@ -1,7 +1,7 @@
-"""pytestルートconftest
+"""python/ 直下の conftest（pytest がテストの前に読み込む設定）
 
 責務:
-    - fixtureモジュールの登録
+    - fixture を定義したモジュールを登録する
     - APIの確認関数（utils/api_assertions/）の assert を、失敗時に値が表示される形にする
 """
 

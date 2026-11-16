@@ -7,11 +7,11 @@ from mocks.handler_types import Handler, MockRequest, MockResponse
 
 def create_logout_handlers() -> list[Handler]:
     def logout(request: MockRequest) -> MockResponse:
-        # Authorization チェック
+        # Authorization ヘッダーがなければ、401 を返す
         if not request.header("Authorization"):
             return MockResponse(401, {"error": "unauthorized"})
 
-        # 本文チェック（TS版と同じく、読めない本文は「本文なし」とみなす）
+        # 本文が空でなければ、400 を返す（TS版と同じく、読めない本文は「本文なし」とみなす）
         try:
             body = request.json()
         except json.JSONDecodeError:

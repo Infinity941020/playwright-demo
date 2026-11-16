@@ -1,7 +1,7 @@
 """モックAPIのリクエスト・レスポンス・ハンドラーの型
 
 責務:
-    - handlers/ 配下の各ハンドラーと server.py が共通で使う型の定義
+    - handlers/ 配下の各ハンドラーと server.py が共通で使う型を定義する
 
 TS版では MSW が提供する http.get／http.post／HttpResponse に相当する。
 """
@@ -18,7 +18,7 @@ class MockRequest:
     # ヘッダー名は小文字にそろえて持つ
     headers: dict[str, str]
     body: bytes
-    # パスの {id} などに当てはまった値
+    # パスの {id} などに当てはまった値を入れる
     params: dict[str, str] = field(default_factory=dict)
 
     def header(self, name: str) -> str | None:

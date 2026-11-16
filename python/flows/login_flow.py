@@ -1,9 +1,9 @@
 """LoginFlow
 
 責務:
-    - 業務単位の操作のみ提供
-    - specからUI詳細を隠蔽
-    - LoginPage / InventoryPage依存をFlowで吸収
+    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
+    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
+    - LoginPage・InventoryPage の呼び出しは Flow の中で行う
 """
 
 from playwright.sync_api import Page
@@ -15,13 +15,13 @@ from pages.login_page import LoginPage
 class LoginFlow:
     def __init__(self, page: Page) -> None:
         self._login_page = LoginPage(page)
-        # 遷移先（商品一覧）の表示確認用
+        # 操作の後に移る商品一覧画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
 
-    # 業務操作
+    # 利用者の操作の単位で、画面を操作する。
 
     def login(self, username: str, password: str) -> None:
-        """ログイン実行（業務操作）。"""
+        """ログイン画面を開いて表示を確かめてから、ログインする。"""
         self._login_page.goto()
         self._login_page.expect_on_login_page()
         self._login_page.login(username, password)
@@ -31,28 +31,28 @@ class LoginFlow:
         self._login_page.goto()
         self._login_page.expect_on_login_page()
 
-    # 検証（業務レベル）
+    # 画面の状態を検証する。
 
     def expect_login_error_message(self, message: str) -> None:
-        """ログイン画面のエラー文言検証。"""
+        """ログイン画面のエラーの文言を検証する。"""
         self._login_page.expect_error_message(message)
 
     def expect_username_retained(self, username: str) -> None:
-        """ログイン失敗後のユーザー名入力値保持検証。"""
+        """ログインに失敗した後も、ユーザー名の入力値が残っていることを確かめる。"""
         self._login_page.expect_username_value(username)
 
     def expect_no_login_error(self) -> None:
-        """ログイン画面にエラーが表示されていないこと。"""
+        """ログイン画面にエラーが表示されていないことを確かめる。"""
         self._login_page.expect_no_error()
 
     def expect_login_inputs_empty(self) -> None:
-        """ユーザー名・パスワードの入力欄が空であること。"""
+        """ユーザー名・パスワードの入力欄が空であることを確かめる。"""
         self._login_page.expect_inputs_empty()
 
     def expect_login_success(self) -> None:
-        """ログイン成功検証（商品一覧画面へ遷移していること）。"""
+        """ログインに成功し、商品一覧画面へ移っていることを確かめる。"""
         self._inventory_page.expect_on_page()
 
     def expect_on_login_page(self) -> None:
-        """ログイン画面表示確認。"""
+        """ログイン画面が表示されていることを確かめる。"""
         self._login_page.expect_on_login_page()

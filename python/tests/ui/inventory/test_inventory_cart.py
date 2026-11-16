@@ -12,17 +12,17 @@ from utils.ui_assertions.inventory_assertions import (
 
 
 class TestInventoryCart:
-    """カートへの追加・削除確認"""
+    """カートへの追加と削除を確かめる。"""
 
     def test_add_to_cart_changes_button_and_badge(self, logged_page: Page) -> None:
         """TC-PROD-006: Add to cart を押すと、ボタンが Remove に変わり、バッジが1になること。"""
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 業務操作（カート追加）
+        # 商品をカートに追加する
         inventory_flow.add_to_cart(backpack)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_remove_button_shown(inventory_flow, backpack)
         expect_badge_count(inventory_flow, 1)
 
@@ -32,12 +32,12 @@ class TestInventoryCart:
         backpack = PRODUCTS["backpack"]["name"]
         bike_light = PRODUCTS["bike_light"]["name"]
 
-        # 業務操作（2件追加後、1件削除）
+        # 2件を追加した後、1件を削除する
         inventory_flow.add_to_cart(backpack)
         inventory_flow.add_to_cart(bike_light)
         inventory_flow.remove_from_cart(backpack)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack)
         expect_remove_button_shown(inventory_flow, bike_light)
         expect_badge_count(inventory_flow, 1)
@@ -47,9 +47,9 @@ class TestInventoryCart:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 業務操作（追加後、同じ商品を削除）
+        # 商品を追加した後、同じ商品を削除する
         inventory_flow.add_to_cart(backpack)
         inventory_flow.remove_from_cart(backpack)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_badge_count(inventory_flow, 0)

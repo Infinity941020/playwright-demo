@@ -19,15 +19,15 @@ def create_checkout_handlers() -> list[Handler]:
 
         checkout_count += 1
 
-        # 呼び出し回数の上限（TS版と同じ。判断できない挙動）
+        # 呼び出し回数の上限を定める（TS版と同じ。意図された仕様か不具合かを判断できない挙動）
         if checkout_count >= 1000:
             return MockResponse(401, {"error": "unauthorized", "message": "mock auth error"})
 
-        # 本文なし（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
+        # 本文がない場合（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
         if body is None:
             return MockResponse(400, {"error": "invalid payload"})
 
-        # 必須項目チェック（TS版の !body.xxx と同じく、0 も未指定とみなす）
+        # 必須項目がそろっているかを確かめる（TS版の !body.xxx と同じく、0 も指定なしとみなす）
         if (
             not isinstance(body, dict)
             or not body.get("cartId")
@@ -40,7 +40,8 @@ def create_checkout_handlers() -> list[Handler]:
             201,
             {
                 "success": True,
-                # 呼び出した時刻（ミリ秒）（TS版の Date.now() と同じ。判断できない挙動）
+                # 呼び出した時刻をミリ秒で入れる
+                # （TS版の Date.now() と同じ。意図された仕様か不具合かを判断できない挙動）
                 "checkoutId": int(time.time() * 1000),
                 "cartId": body["cartId"],
                 "userId": body["userId"],

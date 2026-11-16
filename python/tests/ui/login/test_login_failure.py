@@ -11,7 +11,7 @@ from utils.ui_assertions.login_assertions import (
     expect_username_retained,
 )
 
-# エラー文言（login_testcases.md の期待結果どおり）
+# エラーの文言は、login_testcases.md の期待結果と同じにする
 _USERNAME_REQUIRED_MESSAGE = "Epic sadface: Username is required"
 _PASSWORD_REQUIRED_MESSAGE = "Epic sadface: Password is required"
 _CREDENTIALS_MISMATCH_MESSAGE = (
@@ -21,38 +21,38 @@ _LOCKED_OUT_MESSAGE = "Epic sadface: Sorry, this user has been locked out."
 
 
 class TestLoginFailure:
-    """ログイン異常系確認"""
+    """ログインの異常系を確かめる。"""
 
     def test_missing_username(self, page: Page) -> None:
-        """TC-LOGIN-002: ユーザー名未入力でログイン失敗すること。"""
+        """TC-LOGIN-002: ユーザー名を入力せずにログインすると、失敗すること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（ユーザー名未入力でログイン）
+        # ユーザー名を入力せずにログインする
         login_flow.login("", USERS["standard"]["password"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _USERNAME_REQUIRED_MESSAGE)
 
     def test_missing_password(self, page: Page) -> None:
-        """TC-LOGIN-003: パスワード未入力でログイン失敗すること。"""
+        """TC-LOGIN-003: パスワードを入力せずにログインすると、失敗すること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（パスワード未入力でログイン）
+        # パスワードを入力せずにログインする
         login_flow.login(USERS["standard"]["username"], "")
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _PASSWORD_REQUIRED_MESSAGE)
 
     def test_missing_username_and_password(self, page: Page) -> None:
-        """TC-LOGIN-004: ユーザー名・パスワード両方未入力でログイン失敗すること（ユーザー名側優先）。"""
+        """TC-LOGIN-004: ユーザー名・パスワードの両方が空だと、ユーザー名のエラーでログインに失敗すること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（両方未入力でログイン）
+        # ユーザー名もパスワードも入力せずにログインする
         login_flow.login("", "")
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _USERNAME_REQUIRED_MESSAGE)
 
@@ -62,24 +62,24 @@ class TestLoginFailure:
         ids=["TC-LOGIN-005", "TC-LOGIN-006"],
     )
     def test_single_field_wrong(self, page: Page, user_key: str) -> None:
-        """TC-LOGIN-005/006: ユーザー名・パスワードのどちらか片方のみ誤りでログイン失敗すること。"""
+        """TC-LOGIN-005/006: ユーザー名・パスワードのどちらか片方だけが誤っていると、ログインに失敗すること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（片方のみ誤りでログイン）
+        # ユーザー名かパスワードの片方だけを誤って、ログインする
         login_flow.login(USERS[user_key]["username"], USERS[user_key]["password"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _CREDENTIALS_MISMATCH_MESSAGE)
 
     def test_locked_out_user(self, page: Page) -> None:
-        """TC-LOGIN-007: ロック済みユーザーでログイン失敗すること。"""
+        """TC-LOGIN-007: ロックされたユーザーでは、ログインに失敗すること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（ロック済みユーザーでログイン）
+        # ロックされたユーザーでログインする
         login_flow.login(USERS["locked"]["username"], USERS["locked"]["password"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _LOCKED_OUT_MESSAGE)
 
@@ -88,9 +88,9 @@ class TestLoginFailure:
         login_flow = LoginFlow(page)
         username = USERS["standard"]["username"]
 
-        # 業務操作（パスワード未入力でログイン）
+        # パスワードを入力せずにログインする
         login_flow.login(username, "")
 
-        # 検証（業務レベル）：ログイン失敗を確認したうえで入力値を確認する
+        # ログインの失敗を確かめてから、入力値を検証する
         expect_login_error_message(login_flow, _PASSWORD_REQUIRED_MESSAGE)
         expect_username_retained(login_flow, username)

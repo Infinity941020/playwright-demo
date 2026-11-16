@@ -11,7 +11,7 @@ _STATUS_BAD_REQUEST = 400
 def expect_checkout_success(
     response: APIResponse, cart_id: int, user_id: int, total_price: int
 ) -> None:
-    """Checkout成功（201、success が true、checkoutId が数値、送った値と一致）。"""
+    """Checkout が成功したことを確かめる（201、success が true、checkoutId が数値、送った値と一致）。"""
     expect_status(response, _STATUS_CREATED)
     body = response.json()
     assert body["success"] is True
@@ -22,6 +22,6 @@ def expect_checkout_success(
 
 
 def expect_checkout_bad_request(response: APIResponse, error: str) -> None:
-    """Checkout失敗（400、error が期待値と一致）。"""
+    """Checkout が失敗したことを確かめる（400、error が期待値と一致）。"""
     expect_status(response, _STATUS_BAD_REQUEST)
     assert response.json()["error"] == error

@@ -1,9 +1,9 @@
-"""商品一覧画面のUI操作（Page Object）
+"""商品一覧画面の Page Object
 
 責務:
-    - 要素取得
-    - 単体操作
-    - 画面レベルの検証
+    - 画面の要素（ロケータ）を定義する
+    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
+    - 画面の表示や状態を検証する
 """
 
 import re
@@ -23,7 +23,7 @@ class InventoryPage:
         self.sort_select: Locator = page.locator('[data-test="product-sort-container"]')
         self.active_sort_option: Locator = page.locator('[data-test="active-option"]')
 
-    # 商品ごとに変わる部品（商品名で特定する）
+    # 商品ごとに変わる要素は、商品名で特定する。
 
     def _item(self, product_name: str) -> Locator:
         """商品名に完全一致する商品カードを返す。"""
@@ -38,14 +38,14 @@ class InventoryPage:
     def _remove_button(self, product_name: str) -> Locator:
         return self._item(product_name).get_by_role("button", name="Remove", exact=True)
 
-    # 単体操作
+    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
     def goto(self) -> None:
-        """商品一覧画面へ遷移する（表示確認は呼び出し側で expect_on_page() を呼ぶ）。"""
+        """商品一覧画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["inventory"])
 
     def goto_product_detail(self, product_id: int) -> None:
-        """商品詳細画面へURLで遷移する（表示確認は呼び出し側で行う）。"""
+        """商品詳細画面へURLで遷移する（表示の確認は、呼び出す側で行う）。"""
         self.page.goto(f"{URLS['inventory_item']}?id={product_id}")
 
     def reload(self) -> None:
@@ -66,10 +66,10 @@ class InventoryPage:
     def click_product_image(self, product_name: str) -> None:
         self._item(product_name).locator('a[data-test$="-img-link"]').click()
 
-    # 画面レベルの検証
+    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
-        """商品一覧画面表示確認。"""
+        """商品一覧画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["inventory"])
         expect(self.inventory_list).to_be_visible()
 
@@ -77,7 +77,7 @@ class InventoryPage:
         expect(self.inventory_items).to_have_count(count)
 
     def expect_all_product_elements_visible(self) -> None:
-        """全商品に「画像／商品名／説明／価格／Add to cartボタン」が表示されていること。"""
+        """全商品に「画像／商品名／説明／価格／Add to cartボタン」が表示されていることを確かめる。"""
         for item in self.inventory_items.all():
             expect(item.locator("img.inventory_item_img")).to_be_visible()
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()
@@ -91,11 +91,11 @@ class InventoryPage:
         )
 
     def expect_product_names(self, product_names: list[str]) -> None:
-        """商品名の並び順検証。"""
+        """商品名が指定した順に並んでいることを確かめる。"""
         expect(self.item_names).to_have_text(product_names)
 
     def expect_product_prices(self, prices: list[str]) -> None:
-        """価格の並び順検証。"""
+        """価格が指定した順に並んでいることを確かめる。"""
         expect(self.item_prices).to_have_text(prices)
 
     def expect_selected_sort(self, option_label: str) -> None:
@@ -108,5 +108,5 @@ class InventoryPage:
         expect(self._remove_button(product_name)).to_be_visible()
 
     def expect_on_product_detail_page(self, product_id: int) -> None:
-        """商品詳細画面への遷移確認（画面の中身は対象外）。"""
+        """商品詳細画面へ移ったことを確かめる（画面の中身は確かめない）。"""
         expect(self.page).to_have_url(f"{URLS['inventory_item']}?id={product_id}")

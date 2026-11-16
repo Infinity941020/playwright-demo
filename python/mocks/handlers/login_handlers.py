@@ -10,7 +10,7 @@ def create_login_handlers() -> list[Handler]:
     def login(request: MockRequest) -> MockResponse:
         body = request.json()
 
-        # 正常ログイン
+        # 正しいメールアドレスとパスワードなら、トークンを返す
         if (
             isinstance(body, dict)
             and body.get("email") == _VALID_EMAIL
@@ -18,7 +18,7 @@ def create_login_handlers() -> list[Handler]:
         ):
             return MockResponse(200, {"token": "mock-token"})
 
-        # 異常ログイン
+        # それ以外は、400 とエラーを返す
         return MockResponse(400, {"error": "user not found"})
 
     return [Handler("POST", "/api/login", login)]

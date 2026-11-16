@@ -13,7 +13,7 @@ from utils.ui_assertions.cart_assertions import (
 
 
 class TestCartRemove:
-    """カート内の商品の削除確認"""
+    """カート内の商品の削除を確かめる。"""
 
     def test_remove_only_selected_item(self, logged_page: Page) -> None:
         """TC-CART-004: Remove を押すと、その商品の行だけが消え、バッジが1減ること。"""
@@ -22,13 +22,13 @@ class TestCartRemove:
         bike_light = PRODUCTS["bike_light"]
         onesie = PRODUCTS["onesie"]
 
-        # 前提状態（Backpack → Bike Light → Onesie の順）
+        # 前提状態を作る（Backpack → Bike Light → Onesie の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light, onesie])
 
-        # 業務操作（2行目を削除）
+        # 2行目の商品を削除する
         cart_flow.remove_from_cart(bike_light["name"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_cart_item_names_in_order(cart_flow, [backpack["name"], onesie["name"]])
         expect_badge_count(cart_flow, 2)
 
@@ -37,13 +37,13 @@ class TestCartRemove:
         cart_flow = CartFlow(logged_page)
         backpack = PRODUCTS["backpack"]
 
-        # 前提状態（Backpack のみ）
+        # 前提状態を作る（カートには Backpack のみを入れる）
         cart_flow.open_cart_with([backpack])
 
-        # 業務操作（最後の1件を削除）
+        # 最後の1件を削除する
         cart_flow.remove_from_cart(backpack["name"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_cart_item_count(cart_flow, 0)
         expect_badge_count(cart_flow, 0)
         expect_cart_page_layout(cart_flow)

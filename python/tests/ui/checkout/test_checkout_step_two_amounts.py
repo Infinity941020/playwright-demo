@@ -10,7 +10,7 @@ from utils.ui_assertions.checkout_assertions import expect_step_two_amounts
 
 
 class TestCheckoutStepTwoAmounts:
-    """小計・税・合計の確認"""
+    """小計・税・合計を確かめる。"""
 
     @pytest.mark.parametrize(
         ("products", "item_total", "tax", "total"),
@@ -32,8 +32,8 @@ class TestCheckoutStepTwoAmounts:
         """TC-CO2-004/005/006: 小計・税・合計が、実機で確認した値どおりに表示されること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（1件／2件／全6件）
+        # 前提状態を作る（カートに1件・2件・全6件のいずれかを入れる）
         checkout_flow.open_step_two_with(products, CHECKOUT_DATA)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_step_two_amounts(checkout_flow, item_total, tax, total)

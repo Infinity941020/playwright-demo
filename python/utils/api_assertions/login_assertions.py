@@ -9,12 +9,12 @@ _STATUS_BAD_REQUEST = 400
 
 
 def expect_login_success(response: APIResponse, token: str) -> None:
-    """ログイン成功（200、token が期待値と一致）。"""
+    """ログインが成功したことを確かめる（200、token が期待値と一致）。"""
     expect_status(response, _STATUS_OK)
     assert response.json()["token"] == token
 
 
 def expect_login_bad_request(response: APIResponse, error: str) -> None:
-    """ログイン失敗（400、error が期待値と一致）。"""
+    """ログインが失敗したことを確かめる（400、error が期待値と一致）。"""
     expect_status(response, _STATUS_BAD_REQUEST)
     assert response.json()["error"] == error

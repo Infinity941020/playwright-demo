@@ -1,9 +1,9 @@
 """LogoutFlow
 
 責務:
-    - 業務単位の操作のみ提供
-    - specからUI詳細を隠蔽
-    - MenuPage / LoginPage / InventoryPage依存をFlowで吸収
+    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
+    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
+    - MenuPage・LoginPage・InventoryPage の呼び出しは Flow の中で行う
 """
 
 from playwright.sync_api import Page
@@ -17,10 +17,10 @@ class LogoutFlow:
     def __init__(self, page: Page) -> None:
         self._menu_page = MenuPage(page)
         self._login_page = LoginPage(page)
-        # 遷移先（商品一覧）の表示確認用
+        # 操作の後に移る商品一覧画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
 
-    # 業務操作
+    # 利用者の操作の単位で、画面を操作する。
 
     def open_menu(self) -> None:
         """メニューを開き、開いたことを確認する（aria-hidden で判定。decisions.md 論点17）。"""
@@ -50,7 +50,7 @@ class LogoutFlow:
         """ログアウト後に、ブラウザの「戻る」を押す。"""
         self._login_page.go_back()
 
-    # 検証（業務レベル）
+    # 画面の状態を検証する。
 
     def expect_menu_closed(self) -> None:
         self._menu_page.expect_menu_closed()

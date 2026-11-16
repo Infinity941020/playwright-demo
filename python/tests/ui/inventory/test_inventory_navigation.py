@@ -14,7 +14,7 @@ from utils.ui_assertions.inventory_assertions import (
 
 
 class TestInventoryNavigation:
-    """画面遷移確認"""
+    """画面遷移を確かめる。"""
 
     @pytest.mark.parametrize("via", ["name", "image"], ids=["TC-PROD-009", "TC-PROD-010"])
     def test_open_product_detail(self, logged_page: Page, via: Literal["name", "image"]) -> None:
@@ -22,18 +22,18 @@ class TestInventoryNavigation:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]
 
-        # 業務操作（商品詳細を開く）
+        # 商品詳細画面を開く
         inventory_flow.open_product_detail(backpack["name"], via)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_product_detail_page(inventory_flow, backpack["id"])
 
     def test_cart_icon_opens_cart(self, logged_page: Page) -> None:
         """TC-PROD-011: カートアイコンを押すと、Cart画面へ遷移すること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # 業務操作（カートを開く）
+        # カート画面を開く
         inventory_flow.open_cart()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_cart_page(inventory_flow)

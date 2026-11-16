@@ -16,21 +16,21 @@ from utils.api_helper import (
     execute_get_cart_api,
 )
 
-# エラー文言（api_testcases.md の期待結果どおり）
+# エラーの文言は、api_testcases.md の期待結果と同じにする
 _INVALID_PAYLOAD_MESSAGE = "invalid payload"
 
 
 class TestCartApi:
-    """Cart API の確認"""
+    """Cart API を確かめる。"""
 
     def test_add_cart(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CART-001: カートに追加すると、送った内容で行が作られること。"""
         payload = API_CARTS["valid_cart"]
 
-        # 操作
+        # API を呼び出す
         response = execute_add_cart_api(api_request_context, payload)
 
-        # 検証
+        # 結果を検証する
         expect_add_cart_success(response, payload["productId"], payload["quantity"])
 
     @pytest.mark.parametrize(
@@ -42,44 +42,44 @@ class TestCartApi:
         self, api_request_context: APIRequestContext, payload: dict | None
     ) -> None:
         """TC-API-CART-002/003: productId がない、または本文がないと、400 とエラーが返ること。"""
-        # 操作（None のときは本文なしで送る）
+        # API を呼び出す（payload が None のときは、本文なしで送る）
         response = execute_add_cart_api(api_request_context, payload)
 
-        # 検証
+        # 結果を検証する
         expect_cart_bad_request(response, _INVALID_PAYLOAD_MESSAGE)
 
     def test_add_cart_without_quantity(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CART-004: quantity を省略すると、quantity が 1 になること。"""
         payload = API_CARTS["input_patterns"]["missing_quantity"]
 
-        # 操作
+        # API を呼び出す
         response = execute_add_cart_api(api_request_context, payload)
 
-        # 検証
+        # 結果を検証する
         expect_add_cart_success(response, payload["productId"], 1)
 
     def test_get_cart_list(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CART-005: 一覧に、追加した行だけが返ること。"""
         items = API_CARTS["list_items"]
 
-        # 操作（2行追加してから一覧を取得）
+        # 2行追加してから、一覧を取得する
         for item in items:
             execute_add_cart_api(api_request_context, item)
         response = execute_get_cart_api(api_request_context)
 
-        # 検証（ほかのテストで追加した行が含まれないことも、件数で確かめる）
+        # 結果を検証する（ほかのテストで追加した行が含まれないことも、件数で確かめる）
         expect_get_cart_list_success(response, items)
 
     def test_delete_cart(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CART-006: 削除すると、一覧からその行がなくなること。"""
         first_item, second_item = API_CARTS["delete_items"]
 
-        # 操作（2行追加し、1行目を削除してから一覧を取得）
+        # 2行追加し、1行目を削除してから、一覧を取得する
         first_id = execute_add_cart_api(api_request_context, first_item).json()["id"]
         execute_add_cart_api(api_request_context, second_item)
         delete_response = execute_delete_cart_api(api_request_context, first_id)
         list_response = execute_get_cart_api(api_request_context)
 
-        # 検証
+        # 結果を検証する
         expect_delete_cart_success(delete_response)
         expect_get_cart_list_success(list_response, [{"productId": second_item["productId"]}])

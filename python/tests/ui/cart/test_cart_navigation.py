@@ -15,7 +15,7 @@ from utils.ui_assertions.cart_assertions import (
 
 
 class TestCartNavigation:
-    """画面遷移確認"""
+    """画面遷移を確かめる。"""
 
     @pytest.mark.parametrize(
         ("press_button", "expect_destination"),
@@ -34,13 +34,13 @@ class TestCartNavigation:
         """TC-CART-006/007: Continue Shopping・Checkout を押すと、それぞれの画面へ遷移すること。"""
         cart_flow = CartFlow(logged_page)
 
-        # 前提状態（Backpack のみ）
+        # 前提状態を作る（カートには Backpack のみを入れる）
         cart_flow.open_cart_with([PRODUCTS["backpack"]])
 
-        # 業務操作（ボタン押下）
+        # ボタンを押す
         press_button(cart_flow)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_destination(cart_flow)
 
     def test_open_product_detail(self, logged_page: Page) -> None:
@@ -48,11 +48,11 @@ class TestCartNavigation:
         cart_flow = CartFlow(logged_page)
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Bike Light のみ）
+        # 前提状態を作る（カートには Bike Light のみを入れる）
         cart_flow.open_cart_with([bike_light])
 
-        # 業務操作（商品名を押す）
+        # 商品名を押す
         cart_flow.open_product_detail(bike_light["name"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_product_detail_page(cart_flow, bike_light["id"])

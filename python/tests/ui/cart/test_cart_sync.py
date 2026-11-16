@@ -12,7 +12,7 @@ from utils.ui_assertions.inventory_assertions import (
 
 
 class TestCartSync:
-    """Products画面との連動確認"""
+    """Products画面との連動を確かめる。"""
 
     def test_remove_reflected_on_products_page(self, logged_page: Page) -> None:
         """TC-CART-009: Cart画面での削除が、Products画面の表示に反映されること。"""
@@ -21,13 +21,13 @@ class TestCartSync:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態（Backpack → Bike Light の順）
+        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light])
 
-        # 業務操作（Backpack を削除し、Products画面へ戻る）
+        # Backpack を削除し、Products画面へ戻る
         cart_flow.remove_from_cart(backpack["name"])
         cart_flow.continue_shopping()
 
-        # 検証（業務レベル：Products画面のボタン表示）
+        # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_remove_button_shown(inventory_flow, bike_light["name"])

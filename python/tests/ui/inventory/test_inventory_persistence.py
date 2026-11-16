@@ -13,18 +13,18 @@ from utils.ui_assertions.inventory_assertions import (
 
 
 class TestInventoryPersistence:
-    """再読み込み後の状態保持確認"""
+    """再読み込みした後も、状態が保持されることを確かめる。"""
 
     def test_cart_kept_after_reload(self, logged_page: Page) -> None:
         """TC-PROD-012: 再読み込み後も、カートの内容が保持されること。"""
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 業務操作（カート追加後に再読み込み）
+        # 商品をカートに追加してから、再読み込みする
         inventory_flow.add_to_cart(backpack)
         inventory_flow.reload_inventory()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_remove_button_shown(inventory_flow, backpack)
         expect_badge_count(inventory_flow, 1)
 
@@ -32,11 +32,11 @@ class TestInventoryPersistence:
         """TC-PROD-013: 再読み込み後、ソートが Name (A to Z) に戻ること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # 業務操作（ソート変更後に再読み込み）
+        # ソートを変えてから、再読み込みする
         inventory_flow.sort_by(SORT_OPTIONS["price_desc"])
         inventory_flow.reload_inventory()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_selected_sort(inventory_flow, SORT_OPTIONS["name_asc"])
         expect_product_names_in_order(
             inventory_flow, [product["name"] for product in PRODUCTS.values()]

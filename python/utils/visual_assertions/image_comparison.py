@@ -16,13 +16,13 @@ from PIL import Image, ImageChops
 # Playwright の既定の比較のしきい値（threshold 0.2）に合わせた値（255 × 0.2）。
 PIXEL_THRESHOLD = 51
 
-# diff 画像で違う画素を塗る色（赤）
+# diff 画像で、違う画素を塗る色（赤）を定める
 _DIFF_COLOR = (255, 0, 0)
 
 
 @dataclass(frozen=True)
 class ComparisonResult:
-    """比較の結果。
+    """比較の結果を表す。
 
     sizes_match が False の場合、diff_ratio は 1.0、diff_image は None。
     """
@@ -44,7 +44,7 @@ def compare_images(expected: Image.Image, actual: Image.Image) -> ComparisonResu
     red, green, blue = ImageChops.difference(expected_rgb, actual_rgb).split()
     max_channel_diff = ImageChops.lighter(ImageChops.lighter(red, green), blue)
 
-    # 違う画素を 255、それ以外を 0 にした画像
+    # 違う画素を 255、それ以外を 0 にした画像を作る
     diff_mask = max_channel_diff.point(lambda value: 255 if value > PIXEL_THRESHOLD else 0)
     diff_pixel_count = diff_mask.histogram()[255]
 

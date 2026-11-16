@@ -1,4 +1,4 @@
-"""ログイン機能の正常系テスト（業務フロー単位でのE2Eテスト）"""
+"""ログイン機能の正常系テスト（ログインの手順を、画面で最初から最後まで通すテスト）"""
 
 from playwright.sync_api import Page
 
@@ -8,14 +8,14 @@ from utils.ui_assertions.login_assertions import expect_login_success
 
 
 class TestLoginSuccess:
-    """ログイン正常系確認"""
+    """ログインの正常系を確かめる。"""
 
     def test_login_success_shows_inventory(self, page: Page) -> None:
         """TC-LOGIN-001: 正しいユーザー名・パスワードでログインできること。"""
         login_flow = LoginFlow(page)
 
-        # 業務操作（ログイン実行）
+        # ログインする
         login_flow.login(USERS["standard"]["username"], USERS["standard"]["password"])
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_login_success(login_flow)

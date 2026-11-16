@@ -12,7 +12,7 @@ pytestmark = pytest.mark.visual
 
 
 class TestCheckoutCompleteVisual:
-    """Checkout Complete画面の見た目の確認"""
+    """Checkout Complete画面の見た目を確かめる。"""
 
     def test_checkout_complete_page_matches_snapshot(self, logged_page: Page) -> None:
         """TC-VIS-006: Checkout Complete画面の見た目が、基準画像と一致すること。
@@ -22,10 +22,10 @@ class TestCheckoutCompleteVisual:
         """
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack をカートに入れ、Step One・Step Two を経て購入を完了する）
+        # 前提状態を作る（Backpack をカートに入れ、Step One画面・Step Two画面を経て購入を完了する）
         checkout_flow.open_complete_with([PRODUCTS["backpack"]], CHECKOUT_DATA)
 
-        # 検証（見た目）
+        # 見た目を基準画像と比べて検証する
         expect_screenshot_matches(
             logged_page, "checkout-complete-page.png", max_diff_ratio=0.01
         )

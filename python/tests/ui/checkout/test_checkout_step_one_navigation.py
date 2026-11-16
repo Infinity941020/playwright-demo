@@ -15,22 +15,22 @@ from utils.ui_assertions.checkout_assertions import (
 
 
 class TestCheckoutStepOneNavigation:
-    """画面遷移確認"""
+    """画面遷移を確かめる。"""
 
     def test_continue_to_step_two(self, logged_page: Page) -> None:
         """TC-CO1-008: 3項目を入力して Continue を押すと、Step Two画面へ遷移すること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack のみ）
+        # 前提状態を作る（カートには Backpack のみを入れる）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 業務操作（3項目を入力して Continue）
+        # 3項目を入力して Continue を押す
         checkout_flow.fill_checkout_info(
             CHECKOUT_DATA["first_name"], CHECKOUT_DATA["last_name"], CHECKOUT_DATA["postal_code"]
         )
         checkout_flow.proceed_to_overview_step()
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_checkout_step_two_page(checkout_flow)
 
     @pytest.mark.parametrize(
@@ -44,11 +44,11 @@ class TestCheckoutStepOneNavigation:
         """TC-CO1-009/010: Cancel・カートアイコンを押すと、Cart画面へ遷移すること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack のみ）
+        # 前提状態を作る（カートには Backpack のみを入れる）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 業務操作（Cancel またはカートアイコンを押す）
+        # Cancel またはカートアイコンを押す
         go_to_cart(checkout_flow)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_on_cart_page(checkout_flow)

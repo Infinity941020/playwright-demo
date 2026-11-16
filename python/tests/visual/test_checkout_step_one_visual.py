@@ -11,16 +11,16 @@ pytestmark = pytest.mark.visual
 
 
 class TestCheckoutStepOneVisual:
-    """Checkout Step One画面の見た目の確認"""
+    """Checkout Step One画面の見た目を確かめる。"""
 
     def test_checkout_step_one_page_matches_snapshot(self, logged_page: Page) -> None:
         """TC-VIS-004: Checkout Step One画面の見た目が、基準画像と一致すること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態（Backpack をカートに入れて Step One を開く。入力欄は空のまま）
+        # 前提状態を作る（Backpack をカートに入れ、Step One画面を開く。入力欄は空のままにする）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 検証（見た目）
+        # 見た目を基準画像と比べて検証する
         expect_screenshot_matches(
             logged_page, "checkout-step-one-page.png", max_diff_ratio=0.01
         )

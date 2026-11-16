@@ -14,7 +14,7 @@ from utils.ui_assertions.login_assertions import expect_login_error_message, exp
 _INVENTORY_NOT_LOGGED_IN_MESSAGE = (
     "Epic sadface: You can only access '/inventory.html' when you are logged in."
 )
-# クエリ「?id=4」は文言に含まれない
+# エラーの文言には、クエリ「?id=4」は含まれない
 _PRODUCT_DETAIL_NOT_LOGGED_IN_MESSAGE = (
     "Epic sadface: You can only access '/inventory-item.html' when you are logged in."
 )
@@ -25,7 +25,7 @@ def _access_backpack_detail(inventory_flow: InventoryFlow) -> None:
 
 
 class TestLogoutAccess:
-    """ログアウト後のアクセス制限確認"""
+    """ログアウト後のアクセス制限を確かめる。"""
 
     @pytest.mark.parametrize(
         ("access_directly", "error_message"),
@@ -46,11 +46,11 @@ class TestLogoutAccess:
         inventory_flow = InventoryFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # 業務操作（ログアウトして、URLで直接開く）
+        # ログアウトしてから、画面の URL を直接開く
         logout_flow.logout()
         access_directly(inventory_flow)
 
-        # 検証（業務レベル）
+        # 結果を検証する
         expect_login_error_message(login_flow, error_message)
         expect_on_login_page(login_flow)
 
@@ -59,10 +59,10 @@ class TestLogoutAccess:
         logout_flow = LogoutFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # 業務操作（ログアウトして、ブラウザの「戻る」を押す）
+        # ログアウトしてから、ブラウザの「戻る」を押す
         logout_flow.logout()
         logout_flow.go_back_in_browser()
 
-        # 検証（業務レベル：戻された後のエラーを確かめてから URL を確認する）
+        # 戻された後のエラーを確かめてから、URL を検証する
         expect_login_error_message(login_flow, _INVENTORY_NOT_LOGGED_IN_MESSAGE)
         expect_on_login_page(login_flow)
