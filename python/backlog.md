@@ -67,6 +67,9 @@
   （decisions.md 論点20）
 - ドキュメント（*.md）だけの push で CI を動かさない設定（paths-ignore）。
   TS版の CI の動きも変わるため、影響を確かめてから入れる
+- Slack 通知の Branch が、プルリクエストでの実行時に「6/merge」のような一時的な名前になる
+  （github.ref_name を使っているため。TS版の CI のころからの動き）。
+  プルリクエストのときは元のブランチ名（github.head_ref）を表示する
 - テストの接続先と URL の管理（今は utils/urls.py に絶対URLを固定。pytest-base-url は未使用）
 - エラー文言をまとめるかどうか：今はテストファイルに直接書く運用で、別ファイル間で同じ文言が
   2組重複している（'/inventory.html' の未ログインエラー、Postal Code is required）。

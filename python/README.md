@@ -160,7 +160,6 @@ TS版自体の修正は本プロジェクトのスコープ外としています
 
 TS版にあって、Python版ではまだ実装していないものです。
 
-- CI（GitHub Actions）への組み込み
 - 見た目の比較テスト（Visual Regression）
 
 ---
@@ -226,6 +225,18 @@ pytest --tracing retain-on-failure
 
 ---
 
+## CI
+
+main へのプルリクエストと push のたびに、GitHub Actions（[.github/workflows/playwright.yml](../.github/workflows/playwright.yml)）で TS版のテストと一緒に実行されます。
+
+- Python版のジョブは UI Tests (Python)・API Tests (Python) の2つです（Python 3.14、Chromium）
+- 失敗時は、画面のテストのトレースとスクリーンショットを Artifact（7日間）で確認できます
+- 結果は Slack に通知されます
+
+詳細は [論点20](decisions.md#論点20-ci-の構成) を参照してください。
+
+---
+
 ## 関連ファイル
 
 | ファイル | 内容 |
@@ -234,5 +245,5 @@ pytest --tracing retain-on-failure
 | [decisions.md](decisions.md) | TS版との設計差異に関する意思決定の記録 |
 | [backlog.md](backlog.md) | 今後の作業候補 |
 | [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |
-| [specs/](specs/) | 画面ごとの仕様書・テストケース |
+| [specs/](specs/) | 画面ごと・APIの仕様書・テストケース |
 | [TS版 README](../README.md) | 移植元の TypeScript 版ポートフォリオ |

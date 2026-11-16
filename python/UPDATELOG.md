@@ -1,5 +1,90 @@
 # UPDATE LOG（Python版）
 ---
+## 2026-11-16（Stage 2-1：CI組み込み）
+
+### ■ Before
+
+- Stage 2-1 の APIテストが完了していた
+- CI（GitHub Actions）で動いていたのは TS版のテスト（UI・API・Visual）だけで、Python版の95件は手元でしか実行していなかった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ Stage 2-1：CI組み込み
+
+---
+
+### ■ 構成の決定（decisions.md 論点20）
+
+- 設定ファイル：別ファイルは作らず、既存の .github/workflows/playwright.yml に Python版のジョブを追加した
+- ジョブの表示名：TS版・Python版の両方に付けた（UI Tests (TS)／API Tests (TS)／Visual Tests (TS)／UI Tests (Python)／API Tests (Python)）。ジョブID は変えていない
+- 古い実行の自動キャンセル（concurrency）：プルリクエストでは古い実行を止め、main への push では止めない
+- ドキュメント（*.md）だけの push で CI を動かさない設定（paths-ignore）：今回は入れず、backlog.md に候補として記録した
+
+---
+
+### ■ 実装
+
+- 既存の playwright.yml に Python版のジョブを2つ追加した（UI Tests (Python)・API Tests (Python)）
+  - Python 3.14、Chromium
+  - 失敗時の画面のテストのトレース・スクリーンショットを Artifact に7日間保存する
+- TS版のジョブは表示名だけを変更した（手順・コマンド・キャッシュ・Artifact は変えていない）
+- Slack 通知に5つのジョブの結果を表示するようにした
+
+---
+
+### ■ プルリクエスト
+
+- コミット：0d4163f／236d6ef／35c41cd（Slack の失敗判定の行の継続 \ を既存の書き方に戻す修正）
+- プルリクエスト #6 を CI 成功後にマージした（22fa07a）
+
+---
+
+### ■ 記録の整理（main への直接コミット）
+
+- ebbb2f0：backlog.md に「Stage 3（追加チャレンジ・任意）」の節を新設し、外部APIの2項目を移動
+- bf93db0：外部APIへの流用の見込み（送る部分は流用できるが、期待値は見直しが必要）を追記し、仕様書の呼び方を Stage 3 に統一
+- 今回のコミット：CLAUDE.md に force-push をしないルールを追加
+
+---
+
+### ■ Result（成果）
+
+- プルリクエスト #6 の CI：6つのチェックがすべて成功
+  - UI Tests (Python)：77 passed（50.15秒）
+  - API Tests (Python)：18 passed（9.47秒）
+  - Slack 通知に5つのジョブの結果（すべて success）が表示された
+- マージ後の main の CI も5つのジョブがすべて成功し、Slack 通知も成功
+- 手元での実行：画面77件 Pass（263.49秒）、API18件 Pass（17.26秒）
+- 手元より CI の方が速いのは、CI の実行環境から SauceDemo への通信が速いためと考えられる
+
+---
+
+### ■ Overall Status
+
+- Login：完了（8件＋補助テスト1件）
+- Products：完了（14件）
+- Cart：完了（11件）
+- Checkout Step One：完了（13件）
+- Checkout Step Two：完了（14件）
+- Checkout Complete：完了（6件）
+- Logout：完了（10件）
+- Stage 2-0（全体の整理）：完了
+- APIテスト：完了（18件）
+- CI組み込み：完了
+- Visual Regression：未実装（次に着手）
+
+---
+
+### ■ Conclusion
+
+本対応では、Python版のテストが CI（GitHub Actions）で自動的に実行されるようになり、Stage 2-1 の2つ目の項目（CI組み込み）が完了した。
+
+次は Visual Regression に進む。
+
+---
+
 ## 2026-11-15（Stage 2-1：APIテスト）
 
 ### ■ Before
