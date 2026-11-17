@@ -122,8 +122,7 @@ python/
 │       └── __snapshots__/   # 基準画像（CI で撮影したもの）
 ├── README.md                # 本ファイル
 ├── UPDATELOG.md             # 作業履歴・最新の状況
-├── decisions.md             # TS版との設計差異に関する意思決定の記録
-└── backlog.md               # 今後の作業候補
+└── decisions.md             # TS版との設計差異に関する意思決定の記録
 ```
 
 仕様書・テストケース（画面ごと・API）は、リポジトリ直下の [specs/](../specs/) にあります（両版共通）。
@@ -257,9 +256,9 @@ main へのプルリクエストと push のたびに、GitHub Actions（[.githu
 
 | ファイル | 内容 |
 |---|---|
-| [CLAUDE.md](../CLAUDE.md) | Claude Code への指示（移植方針・APIテストの通信方針・実装依頼時の運用ルール・ブランチとマージの運用・完了報告の形式） |
+| CLAUDE.md | Claude Code への指示（移植方針・APIテストの通信方針・実装依頼時の運用ルール・ブランチとマージの運用・完了報告の形式）。非公開の作業用ファイルで管理している |
 | [decisions.md](decisions.md) | TS版との設計差異に関する意思決定の記録 |
-| [backlog.md](backlog.md) | 今後の作業候補 |
+| backlog.md | 今後の作業候補。非公開の作業メモで管理している |
 | [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |
 | [specs/](../specs/) | 画面ごと・APIの仕様書・テストケース（リポジトリ直下。両版共通） |
 | [TS版 README](../README.md) | 移植元の TypeScript 版ポートフォリオ |
