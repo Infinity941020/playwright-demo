@@ -416,3 +416,17 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: 比較の仕組みは「なし」（TS版は Playwright 標準の toHaveScreenshot を使う）。
   手元での扱い・待ち方・前提状態の作り方は「検討」（TS版への横展開のときに判断する）
 - 決定日: 2026-11-16
+
+## 論点22: CI の OS を固定する
+
+- 分類: ②
+- 判断: 変更（ubuntu-latest ではなく ubuntu-24.04 に固定する）
+- 理由: ubuntu-latest が Ubuntu 26.04 に切り替わり、TS版の Playwright 1.59.1 が対応していなかったため
+  （TS版の3ジョブが「Install Playwright browsers」で
+  「Playwright does not support chromium on ubuntu26.04-x64」となり失敗した）。
+  また、Visual の基準画像（TS版・Python版とも Ubuntu 24.04 で撮影）と環境を揃え、
+  OS の切り替えで突然壊れることを防ぐため。
+  OS を上げるときは、Playwright のバージョンと Visual の基準画像の作り直しとあわせて、意図的に行う。
+- 影響範囲: .github/workflows/playwright.yml の全ジョブ（TS版3つ、Python版3つ、Slack Notification）
+- TS逆輸入候補: なし（共通のファイルのため）
+- 決定日: 2026-11-17
