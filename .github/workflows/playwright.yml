@@ -14,7 +14,7 @@ jobs:
 
   ui-tests:
     name: UI Tests (TS)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -53,7 +53,7 @@ jobs:
 
   api-tests:
     name: API Tests (TS)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -92,7 +92,7 @@ jobs:
 
   visual-tests:
     name: Visual Tests (TS)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -132,7 +132,7 @@ jobs:
 
   python-ui-tests:
     name: UI Tests (Python)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -174,7 +174,7 @@ jobs:
 
   python-api-tests:
     name: API Tests (Python)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -216,7 +216,7 @@ jobs:
 
   python-visual-tests:
     name: Visual Tests (Python)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -258,7 +258,7 @@ jobs:
 
   notify:
     name: Slack Notification
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs:
       - ui-tests
