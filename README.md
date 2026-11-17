@@ -86,12 +86,17 @@ API構成・MSW設計・フォルダ構成を含む全仕様一覧は
 初めての方へ:以下の手順でインストール後、「実行方法」のコマンドをそのまま
 実行すれば動作確認できます。
 
+TS版のファイルは typescript/ にあります。リポジトリ直下から次のように実行します。
+
 ```bash
+cd typescript
 npm install
 npx playwright install
 ```
 
 ## 実行方法
+
+typescript/ ディレクトリで実行します（セットアップの `cd typescript` の後）。
 
 ### 全テスト実行
 
