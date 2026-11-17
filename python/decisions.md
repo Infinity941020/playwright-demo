@@ -430,3 +430,34 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: .github/workflows/playwright.yml の全ジョブ（TS版3つ、Python版3つ、Slack Notification）
 - TS逆輸入候補: なし（共通のファイルのため）
 - 決定日: 2026-11-17
+
+## 論点23: 完成形の構成と公開範囲
+
+- 分類: ②
+- 判断: 変更
+  1. TS版をリポジトリ直下から typescript/ へ移す（横展開1で実施）
+  2. 完成形の構成
+     - 直下：README.md・UPDATELOG.md・decisions.md（公開。両版共通。横展開5で1つにまとめる）
+     - specs/：仕様書・テストケース（両版共通。横展開1で python/specs/ から移す）
+     - shared/：テストデータ・URL・エラー文言・APIモックの返事（JSON。横展開2で作る）
+     - typescript/：TS版のコード
+     - python/：Python版のコード
+  3. 公開しないファイル：CLAUDE.md、backlog.md、auth.json（decisions.md は公開のまま）。
+     構築中に一時的に公開していたものとして扱い、今後は公開しない。過去の履歴は書き換えない
+  4. 公開しないファイルの保管：別の非公開リポジトリ（例：playwright-demo-internal）で管理する
+     - 公開リポジトリのフォルダの中（例：internal/）に置き、公開リポジトリ側では .gitignore で除外する
+     - Claude Code に CLAUDE.md を今までどおり読ませる方法は、横展開1で確認して決める
+     - 非公開リポジトリの作成はユーザーが GitHub で行う
+- 理由:
+  1. 「極力 Python版と同じ形・構成にしたい」意向に合わせ、python/ と対になる構成にするため。
+     調査の結果、TS版の import はすべて相対パスで、移しても中身の書き換えは不要。
+     直す必要があるのは外側から TS版を指している箇所（CI、直下の .gitignore、Dockerfile、README・Wiki のリンク）だけ
+  2. 言語に関係なく共通にできるものは共通のファイルにする方針
+     （backlog.md「TS版への横展開のときに扱うもの」）を形にするため
+  3. 第三者が見ることを想定すると、作業用のファイル（AI への作業指示、作業メモ、ログイン状態の保存ファイル）は
+     見せる必要がないため。decisions.md は設計判断の経緯で、見せたい内容のため公開する
+  4. PC が壊れても残り、変更履歴も含めて、後から公開リポジトリに取り込み直せるようにするため
+- 影響範囲: リポジトリ全体の構成、.github/workflows/playwright.yml、直下の .gitignore、
+  Dockerfile・.dockerignore、README・Wiki のリンク
+- TS逆輸入候補: なし（リポジトリ全体の構成のため）
+- 決定日: 2026-11-17
