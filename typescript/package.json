@@ -6,10 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "test:login": "playwright test tests/login --reporter=list",
-    "test:cart": "playwright test tests/cart --reporter=list",
-    "test:checkout": "playwright test tests/checkout --reporter=list",
-    "test:logout": "playwright test tests/logout --reporter=list",
+    "test:login": "playwright test tests/ui/login --reporter=list",
+    "test:cart": "playwright test tests/ui/cart --reporter=list",
+    "test:checkout": "playwright test tests/ui/checkout --reporter=list",
+    "test:logout": "playwright test tests/ui/logout --reporter=list",
     "test:all": "playwright test --reporter=list"
   },
   "keywords": [

@@ -25,20 +25,24 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: typescript/package-lock.json
 
       - name: Restore Playwright Browser Cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: typescript
         run: npm ci
 
       - name: Install Playwright browsers
+        working-directory: typescript
         run: npx playwright install --with-deps
 
       - name: Run UI Tests
+        working-directory: typescript
         run: npx playwright test tests/ui
 
       - name: Upload UI Artifacts
@@ -47,8 +51,8 @@ jobs:
         with:
           name: ui-artifacts
           path: |
-            playwright-report
-            test-results
+            typescript/playwright-report
+            typescript/test-results
           retention-days: 7
 
   api-tests:
@@ -64,20 +68,24 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: typescript/package-lock.json
 
       - name: Restore Playwright Browser Cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: typescript
         run: npm ci
 
       - name: Install Playwright browsers
+        working-directory: typescript
         run: npx playwright install --with-deps
 
       - name: Run API Tests
+        working-directory: typescript
         run: npx playwright test tests/api
 
       - name: Upload API Artifacts
@@ -86,8 +94,8 @@ jobs:
         with:
           name: api-artifacts
           path: |
-            playwright-report
-            test-results
+            typescript/playwright-report
+            typescript/test-results
           retention-days: 7
 
   visual-tests:
@@ -103,20 +111,24 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: typescript/package-lock.json
 
       - name: Restore Playwright Browser Cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: typescript
         run: npm ci
 
       - name: Install Playwright browsers
+        working-directory: typescript
         run: npx playwright install --with-deps
 
       - name: Run Visual Tests
+        working-directory: typescript
         run: npx playwright test tests/visual
 
       - name: Upload Visual Artifacts
@@ -125,9 +137,9 @@ jobs:
         with:
           name: visual-artifacts
           path: |
-            playwright-report
-            test-results
-            tests/visual/__snapshots__
+            typescript/playwright-report
+            typescript/test-results
+            typescript/tests/visual/__snapshots__
           retention-days: 7
 
   python-ui-tests:
