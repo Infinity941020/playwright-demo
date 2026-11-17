@@ -107,7 +107,8 @@
   - TS版はリポジトリ直下から typescript/ へ移す（横展開1で実施）。
     TS版の import はすべて相対パスのため、中身の書き換えは不要。直すのは外側から TS版を指している箇所
     （CI、直下の .gitignore、Dockerfile、README・Wiki のリンク）だけ
-  - 仕様書・テストケース（python/specs/）は、横展開1でリポジトリ直下の specs/ へ移す（両版共通）
+  - 仕様書・テストケース（python/specs/）は、横展開1でリポジトリ直下の specs/ へ移す（両版共通）。
+    横展開1-2 で移した（2026-11-17）
   - 共通データ（テストデータ・URL・エラー文言・APIモックの返事）は shared/ に JSON で置く（横展開2で作る）
   - 完成形の構成
     - 直下：README.md・UPDATELOG.md・decisions.md（公開。両版共通。横展開5で1つにまとめる）

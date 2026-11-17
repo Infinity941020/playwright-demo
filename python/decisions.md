@@ -226,7 +226,7 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   「仕様書→観点→テストケース」を作る進め方のため、Products画面を
   独立させ、検証範囲を広げた（18観点・14件）。全商品を追加して
   バッジ＝件数を確認するテストは、TS版と同じくCart側で扱う。
-- 影響範囲: python/specs/products_*.md、pages/inventory_page.py、
+- 影響範囲: specs/products_*.md、pages/inventory_page.py、
   pages/header_component.py、flows/inventory_flow.py、tests/ui/inventory/
 - TS逆輸入候補: 検討（TS版のWikiの対象ドメインにProductsを追加するか
   どうかを含む）

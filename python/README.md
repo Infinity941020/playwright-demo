@@ -13,15 +13,15 @@ TS版との差異について行った意思決定も記録しており、その
 
 ### 画面のテスト：77件（テストケース76件＋補助テスト1件）
 
-- Login：8件＋補助テスト1件（[仕様書](specs/login_spec.md) ／ [テストケース](specs/login_testcases.md)）
-- Products：14件（[仕様書](specs/products_spec.md) ／ [テストケース](specs/products_testcases.md)）
-- Cart：11件（[仕様書](specs/cart_spec.md) ／ [テストケース](specs/cart_testcases.md)）
-- Checkout Step One：13件（[仕様書](specs/checkout_step_one_spec.md) ／ [テストケース](specs/checkout_step_one_testcases.md)）
-- Checkout Step Two：14件（[仕様書](specs/checkout_step_two_spec.md) ／ [テストケース](specs/checkout_step_two_testcases.md)）
-- Checkout Complete：6件（[仕様書](specs/checkout_complete_spec.md) ／ [テストケース](specs/checkout_complete_testcases.md)）
-- Logout：10件（[仕様書](specs/logout_spec.md) ／ [テストケース](specs/logout_testcases.md)）
+- Login：8件＋補助テスト1件（[仕様書](../specs/login_spec.md) ／ [テストケース](../specs/login_testcases.md)）
+- Products：14件（[仕様書](../specs/products_spec.md) ／ [テストケース](../specs/products_testcases.md)）
+- Cart：11件（[仕様書](../specs/cart_spec.md) ／ [テストケース](../specs/cart_testcases.md)）
+- Checkout Step One：13件（[仕様書](../specs/checkout_step_one_spec.md) ／ [テストケース](../specs/checkout_step_one_testcases.md)）
+- Checkout Step Two：14件（[仕様書](../specs/checkout_step_two_spec.md) ／ [テストケース](../specs/checkout_step_two_testcases.md)）
+- Checkout Complete：6件（[仕様書](../specs/checkout_complete_spec.md) ／ [テストケース](../specs/checkout_complete_testcases.md)）
+- Logout：10件（[仕様書](../specs/logout_spec.md) ／ [テストケース](../specs/logout_testcases.md)）
 
-### APIテスト：18件（[仕様書](specs/api_spec.md) ／ [テストケース](specs/api_testcases.md)）
+### APIテスト：18件（[仕様書](../specs/api_spec.md) ／ [テストケース](../specs/api_testcases.md)）
 
 - Login API：2件
 - User API：2件
@@ -29,7 +29,7 @@ TS版との差異について行った意思決定も記録しており、その
 - Checkout API：5件
 - Logout API：3件
 
-### 見た目の比較テスト：6件（[仕様書](specs/visual_spec.md) ／ [テストケース](specs/visual_testcases.md)）
+### 見た目の比較テスト：6件（[仕様書](../specs/visual_spec.md) ／ [テストケース](../specs/visual_testcases.md)）
 
 - Login・Products・Cart・Checkout Step One・Checkout Step Two・Checkout Complete：各1件
 
@@ -65,7 +65,7 @@ TS版との差異について行った意思決定も記録しており、その
 **モックAPI（APIテスト）**
 
 APIテストは、テストごとにローカル（127.0.0.1）で立ち上げるモックAPIを対象とします。
-外部の実APIには接続しません（[API仕様書](specs/api_spec.md)）。
+外部の実APIには接続しません（[API仕様書](../specs/api_spec.md)）。
 
 ---
 
@@ -120,12 +120,13 @@ python/
 │   ├── api/                 # APIテスト（API ごとに1ファイル）
 │   └── visual/              # 見た目の比較テスト（画面ごとに1ファイル）
 │       └── __snapshots__/   # 基準画像（CI で撮影したもの）
-├── specs/                   # 画面ごと・APIの仕様書・テストケース
 ├── README.md                # 本ファイル
 ├── UPDATELOG.md             # 作業履歴・最新の状況
 ├── decisions.md             # TS版との設計差異に関する意思決定の記録
 └── backlog.md               # 今後の作業候補
 ```
+
+仕様書・テストケース（画面ごと・API）は、リポジトリ直下の [specs/](../specs/) にあります（両版共通）。
 
 ---
 
@@ -246,7 +247,7 @@ main へのプルリクエストと push のたびに、GitHub Actions（[.githu
 - Python版のジョブは UI Tests (Python)・API Tests (Python)・Visual Tests (Python) の3つです（Python 3.14、Chromium）
 - 失敗時は、画面のテストのトレースとスクリーンショット、見た目の比較テストの基準画像・今の画像・差分の画像を Artifact（7日間）で確認できます
 - 結果は Slack に通知されます
-- 基準画像の作り方・作り直し方は [visual_spec.md](specs/visual_spec.md) の「基準画像の作り方・作り直し方」を参照してください
+- 基準画像の作り方・作り直し方は [visual_spec.md](../specs/visual_spec.md) の「基準画像の作り方・作り直し方」を参照してください
 
 詳細は [論点20](decisions.md#論点20-ci-の構成)・[論点21](decisions.md#論点21-visual-regression-の方式) を参照してください。
 
@@ -260,5 +261,5 @@ main へのプルリクエストと push のたびに、GitHub Actions（[.githu
 | [decisions.md](decisions.md) | TS版との設計差異に関する意思決定の記録 |
 | [backlog.md](backlog.md) | 今後の作業候補 |
 | [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |
-| [specs/](specs/) | 画面ごと・APIの仕様書・テストケース |
+| [specs/](../specs/) | 画面ごと・APIの仕様書・テストケース（リポジトリ直下。両版共通） |
 | [TS版 README](../README.md) | 移植元の TypeScript 版ポートフォリオ |
