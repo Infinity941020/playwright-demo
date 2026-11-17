@@ -137,10 +137,11 @@
   横展開で TS版を Python版に揃えると設計はほぼ共通になるため、Wiki は版ごとに分けず両版共通の内容とし、
   README・UPDATELOG を1つにまとめるときに、必要な箇所に Python版と TS版の違い
   （言語の書き方、API のモック、画像比較など）を追記する（2026-11-16 決定）
-- TS版を typescript/ フォルダへ移し、python/ と対称な構成にする案：
-  極力 Python版と同じ形・構成にしたい意向。実施するかどうかは、影響範囲（import、
+- TS版を typescript/ フォルダへ移し、python/ と対称な構成にする：
+  極力 Python版と同じ形・構成にしたい意向から検討していた案。影響範囲（import、
   tsconfig.json・playwright.config.ts・package.json のパス、CI の設定）を調べたうえで、
-  TS版への横展開のときに最終判断する
+  decisions.md 論点23 で移すことに決定し、横展開1-1 で実施した（2026-11-17）
+- Wiki の TS版のファイルへのリンク（typescript/ への移動でリンク切れになったもの）は、横展開5で直す
 
 ## Stage 3（追加チャレンジ・任意）
 
@@ -197,9 +198,11 @@ Stage 2-1 と TS版への横展開が終わった後に、任意で取り組む�
 - Visual のテストで固定の待ち（waitForTimeout 300）を使っている
 - Visual のテストで、各テストが画面からログインしている（保存したログイン状態を使っていない）
 - TS版の Playwright を最新に上げる（今は 1.59.1。Ubuntu 26.04 に対応していない）。
-  横展開4で Node.js の更新とあわせて行い、CI の OS を上げるかどうかもそのときに判断する
+  横展開4で Node.js の更新とあわせて行い、CI の OS を上げるかどうかもそのときに判断する。
+  手元で Node.js 26 を使ったところ、Playwright 1.59.1 のブラウザのインストールで、ダウンロード後の zip の展開が止まった
+  （Node.js 22 では問題なし。2026-11-17）。Node.js・Playwright を上げるときは、組み合わせを確かめること
 - package.json の npm scripts のパスが古い（例：test:login が tests/login を指しているが、実際は tests/ui/login）。
-  横展開1で typescript/ へ移すときに直す
+  横展開1で typescript/ へ移すときに直す → 横展開1-1 で修正済み
 - Dockerfile の Playwright のイメージが v1.49.0（実際に使っているのは 1.59.1）。
   横展開1で typescript/ へ移すときに、扱い（直すか、使っていなければ削除するか）を決める
 - バージョンの更新を自動で知らせる仕組み（Dependabot）の導入を検討する。
