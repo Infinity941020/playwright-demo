@@ -2,13 +2,12 @@
 
 from playwright.sync_api import Page
 
+from data.messages import MESSAGES
 from flows.checkout_flow import CheckoutFlow
 from flows.login_flow import LoginFlow
 from utils.ui_assertions.login_assertions import expect_login_error_message, expect_on_login_page
 
-_NOT_LOGGED_IN_MESSAGE = (
-    "Epic sadface: You can only access '/checkout-step-two.html' when you are logged in."
-)
+_NOT_LOGGED_IN_MESSAGE = MESSAGES["login"]["not_logged_in"].format(path="/checkout-step-two.html")
 
 
 class TestCheckoutStepTwoAuth:

@@ -3,6 +3,7 @@
 import pytest
 from playwright.sync_api import Page
 
+from data.messages import MESSAGES
 from data.users import USERS
 from flows.login_flow import LoginFlow
 from utils.ui_assertions.login_assertions import (
@@ -11,13 +12,11 @@ from utils.ui_assertions.login_assertions import (
     expect_username_retained,
 )
 
-# エラーの文言は、login_testcases.md の期待結果と同じにする
-_USERNAME_REQUIRED_MESSAGE = "Epic sadface: Username is required"
-_PASSWORD_REQUIRED_MESSAGE = "Epic sadface: Password is required"
-_CREDENTIALS_MISMATCH_MESSAGE = (
-    "Epic sadface: Username and password do not match any user in this service"
-)
-_LOCKED_OUT_MESSAGE = "Epic sadface: Sorry, this user has been locked out."
+# エラーの文言（shared/data/messages.json）は、login_testcases.md の期待結果と同じにする
+_USERNAME_REQUIRED_MESSAGE = MESSAGES["login"]["username_required"]
+_PASSWORD_REQUIRED_MESSAGE = MESSAGES["login"]["password_required"]
+_CREDENTIALS_MISMATCH_MESSAGE = MESSAGES["login"]["credentials_mismatch"]
+_LOCKED_OUT_MESSAGE = MESSAGES["login"]["locked_out"]
 
 
 class TestLoginFailure:

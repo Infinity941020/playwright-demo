@@ -3,6 +3,7 @@
 from playwright.sync_api import Page
 
 from data.checkout_data import CHECKOUT_DATA
+from data.messages import MESSAGES
 from data.products import PRODUCTS
 from flows.checkout_flow import CheckoutFlow
 from utils.ui_assertions.checkout_assertions import (
@@ -11,7 +12,7 @@ from utils.ui_assertions.checkout_assertions import (
     expect_no_checkout_error,
 )
 
-_POSTAL_CODE_REQUIRED_MESSAGE = "Error: Postal Code is required"
+_POSTAL_CODE_REQUIRED_MESSAGE = MESSAGES["checkout"]["postal_code_required"]
 
 
 class TestCheckoutStepOnePersistence:

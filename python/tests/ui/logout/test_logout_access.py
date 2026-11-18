@@ -5,18 +5,17 @@ from typing import Callable
 import pytest
 from playwright.sync_api import Page
 
+from data.messages import MESSAGES
 from data.products import PRODUCTS
 from flows.inventory_flow import InventoryFlow
 from flows.login_flow import LoginFlow
 from flows.logout_flow import LogoutFlow
 from utils.ui_assertions.login_assertions import expect_login_error_message, expect_on_login_page
 
-_INVENTORY_NOT_LOGGED_IN_MESSAGE = (
-    "Epic sadface: You can only access '/inventory.html' when you are logged in."
-)
+_INVENTORY_NOT_LOGGED_IN_MESSAGE = MESSAGES["login"]["not_logged_in"].format(path="/inventory.html")
 # エラーの文言には、クエリ「?id=4」は含まれない
-_PRODUCT_DETAIL_NOT_LOGGED_IN_MESSAGE = (
-    "Epic sadface: You can only access '/inventory-item.html' when you are logged in."
+_PRODUCT_DETAIL_NOT_LOGGED_IN_MESSAGE = MESSAGES["login"]["not_logged_in"].format(
+    path="/inventory-item.html"
 )
 
 
