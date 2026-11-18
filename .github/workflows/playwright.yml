@@ -254,8 +254,14 @@ jobs:
 
     if: always()
 
+    # 所要時間を求めるために、この実行とジョブの一覧を GitHub の API から読む
+    permissions:
+      actions: read
+
     steps:
       - name: Send Slack Notification
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ needs.ui-tests.result }}" == "failure" || \
                 "${{ needs.api-tests.result }}" == "failure" || \
@@ -268,9 +274,53 @@ jobs:
             STATUS="✅ Playwright CI Success"
           fi
 
+          # 秒数を「4m 12s」の形にする
+          format_duration() {
+            local total=$1
+            if (( total >= 60 )); then
+              echo "$((total / 60))m $((total % 60))s"
+            else
+              echo "${total}s"
+            fi
+          }
+
+          # 所要時間が取れなかった場合でも通知は送り、時間の部分だけ unknown にする
+          RUN_API="repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # CI 全体：この実行が始まった時刻から、notify のジョブが動いた今の時刻まで
+          DURATION="unknown"
+          RUN_STARTED_AT=$(gh api "${RUN_API}" --jq '.run_started_at' 2>/dev/null || true)
+          START_EPOCH=$(date -d "${RUN_STARTED_AT}" +%s 2>/dev/null || true)
+          if [[ -n "${RUN_STARTED_AT}" && "${START_EPOCH}" =~ ^[0-9]+$ ]]; then
+            DURATION=$(format_duration $(( $(date +%s) - START_EPOCH )))
+          fi
+
+          # ジョブごと：この実行（今回の試行）のジョブの開始・終了の時刻から求める
+          JOBS_JSON=$(gh api "${RUN_API}/attempts/${{ github.run_attempt }}/jobs?per_page=100" 2>/dev/null || true)
+
+          job_duration() {
+            local seconds
+            seconds=$(jq -r --arg name "$1" \
+              '.jobs[] | select(.name == $name and .started_at != null and .completed_at != null)
+                | (.completed_at | fromdateiso8601) - (.started_at | fromdateiso8601)' \
+              <<< "${JOBS_JSON}" 2>/dev/null | head -n 1 || true)
+            if [[ "${seconds}" =~ ^[0-9]+$ ]]; then
+              format_duration "${seconds}"
+            else
+              echo "unknown"
+            fi
+          }
+
+          UI_TS_TIME=$(job_duration "UI Tests (TS)")
+          API_TS_TIME=$(job_duration "API Tests (TS)")
+          VISUAL_TS_TIME=$(job_duration "Visual Tests (TS)")
+          UI_PY_TIME=$(job_duration "UI Tests (Python)")
+          API_PY_TIME=$(job_duration "API Tests (Python)")
+          VISUAL_PY_TIME=$(job_duration "Visual Tests (Python)")
+
           cat > payload.json <<EOF
           {
-            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }}\nAPI Tests (TS): ${{ needs.api-tests.result }}\nVisual Tests (TS): ${{ needs.visual-tests.result }}\nUI Tests (Python): ${{ needs.python-ui-tests.result }}\nAPI Tests (Python): ${{ needs.python-api-tests.result }}\nVisual Tests (Python): ${{ needs.python-visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.head_ref || github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nDuration: ${DURATION}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }} (${UI_TS_TIME})\nAPI Tests (TS): ${{ needs.api-tests.result }} (${API_TS_TIME})\nVisual Tests (TS): ${{ needs.visual-tests.result }} (${VISUAL_TS_TIME})\nUI Tests (Python): ${{ needs.python-ui-tests.result }} (${UI_PY_TIME})\nAPI Tests (Python): ${{ needs.python-api-tests.result }} (${API_PY_TIME})\nVisual Tests (Python): ${{ needs.python-visual-tests.result }} (${VISUAL_PY_TIME})\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
 
