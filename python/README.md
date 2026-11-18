@@ -78,10 +78,12 @@ python/
 ├── conftest.py              # fixtureモジュールの登録、APIの確認関数の assert の書き換えの登録
 ├── pytest.ini               # pytest設定（testpaths = tests）
 ├── requirements.txt         # 依存パッケージ（バージョン固定）
-├── data/
+├── data/                    # users.py〜messages.py は shared/data/ の JSON を読み込んで渡す
+│   ├── shared_data.py       # shared/data/ の JSON の読み込み（1か所にまとめる）
 │   ├── users.py             # ログインユーザー情報
 │   ├── products.py          # 商品情報（商品名・価格・商品ID）とソート選択肢
 │   ├── checkout_data.py     # 購入者情報（Checkout画面の入力値）
+│   ├── messages.py          # 画面に表示されるエラー文言
 │   └── api/                 # APIテストで使う値（api_users.py・api_carts.py・api_checkout.py）
 ├── fixtures/
 │   ├── login_fixture.py     # storage_state の生成・再利用、logged_page
@@ -104,7 +106,7 @@ python/
 │   ├── checkout_flow.py
 │   └── logout_flow.py
 ├── utils/
-│   ├── urls.py              # URL定義（一元管理）
+│   ├── urls.py              # URL定義（一元管理。shared/data/urls.json を読み込む）
 │   ├── ui_assertions/       # Specから呼ぶ検証関数（Flow経由）
 │   ├── api_helper.py        # API の呼び出し
 │   ├── api_assertions/      # API ごとの確認関数
@@ -126,6 +128,7 @@ python/
 ```
 
 仕様書・テストケース（画面ごと・API）は、リポジトリ直下の [specs/](../specs/) にあります（両版共通）。
+テストデータ（ログインユーザー・商品・購入者情報・URL・エラー文言）は、リポジトリ直下の [shared/data/](../shared/data/) にあります（両版共通。APIテストの値は除く）。
 
 ---
 
@@ -137,6 +140,7 @@ python/
 - **ロケータの定義**：`__init__` でまとめて定義し、商品ごとに変わる部品は商品名を受け取るメソッドで扱います（[論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一)）
 - **カートの前提状態**：Cart・Checkout・Logout のテストは、カートに商品が入った状態を、ブラウザの保存領域（localStorage）への直接書き込みで作ります（Cart画面の「追加した順」を確かめる TC-CART-003 を除く）。書き込み処理は1か所（CartPage.set_cart_contents）にまとめています（[論点15](decisions.md#論点15-cart画面テストの前提状態の作り方)）
 - **URLの一元管理**：URL は原則として utils/urls.py から参照します（[論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない)）
+- **テストデータの共通化**：ログインユーザー・商品・購入者情報・URL・エラー文言は、リポジトリ直下の shared/data/ の JSON に置き、TS版と共通で使います。data/ と utils/urls.py は JSON を読み込んで今までと同じ名前・同じ形で渡すだけなので、テスト側は変わりません。JSON の場所はファイルの場所から求めるため、実行する場所に左右されません（[論点24](decisions.md#論点24-テストデータの共通化)）
 - **Checkout の Page Object**：ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分けています（CheckoutStepOnePage／CheckoutStepTwoPage／CheckoutCompletePage）（[論点16](decisions.md#論点16-checkout画面の-page-object-の構成)）
 - **メニューの開閉の判定**：表示の有無ではなく aria-hidden 属性で判定します。URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるためです（[論点17](decisions.md#論点17-メニューの開閉の判定方法)）
 - **商品一覧画面の表示確認**：InventoryPage.expect_on_page() の1か所にまとめ、URL の完全一致と data-test で確認します。ログイン成功の確認や logged_page fixture もここを使います（[論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所)）
@@ -261,4 +265,5 @@ main へのプルリクエストと push のたびに、GitHub Actions（[.githu
 | backlog.md | 今後の作業候補。非公開の作業メモで管理している |
 | [UPDATELOG.md](UPDATELOG.md) | 作業履歴・最新の状況 |
 | [specs/](../specs/) | 画面ごと・APIの仕様書・テストケース（リポジトリ直下。両版共通） |
+| [shared/data/](../shared/data/) | テストデータ（ログインユーザー・商品・購入者情報・URL・エラー文言）の JSON（リポジトリ直下。両版共通） |
 | [TS版 README](../README.md) | 移植元の TypeScript 版ポートフォリオ |
