@@ -121,6 +121,29 @@ jobs:
             typescript/tests/visual/__snapshots__
           retention-days: 7
 
+  ts-typecheck:
+    name: Type Check (TS)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Install dependencies
+        working-directory: typescript
+        run: npm ci
+
+      - name: Run Type Check
+        working-directory: typescript
+        run: npm run typecheck
+
   python-ui-tests:
     name: UI Tests (Python)
     runs-on: ubuntu-24.04
@@ -237,6 +260,7 @@ jobs:
       - ui-tests
       - api-tests
       - visual-tests
+      - ts-typecheck
       - python-ui-tests
       - python-api-tests
       - python-visual-tests
@@ -255,6 +279,7 @@ jobs:
           if [[ "${{ needs.ui-tests.result }}" == "failure" || \
                 "${{ needs.api-tests.result }}" == "failure" || \
                 "${{ needs.visual-tests.result }}" == "failure" || \
+                "${{ needs.ts-typecheck.result }}" == "failure" || \
                 "${{ needs.python-ui-tests.result }}" == "failure" || \
                 "${{ needs.python-api-tests.result }}" == "failure" || \
                 "${{ needs.python-visual-tests.result }}" == "failure" ]]; then
@@ -303,13 +328,14 @@ jobs:
           UI_TS_TIME=$(job_duration "UI Tests (TS)")
           API_TS_TIME=$(job_duration "API Tests (TS)")
           VISUAL_TS_TIME=$(job_duration "Visual Tests (TS)")
+          TYPECHECK_TS_TIME=$(job_duration "Type Check (TS)")
           UI_PY_TIME=$(job_duration "UI Tests (Python)")
           API_PY_TIME=$(job_duration "API Tests (Python)")
           VISUAL_PY_TIME=$(job_duration "Visual Tests (Python)")
 
           cat > payload.json <<EOF
           {
-            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.head_ref || github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nDuration: ${DURATION}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }} (${UI_TS_TIME})\nAPI Tests (TS): ${{ needs.api-tests.result }} (${API_TS_TIME})\nVisual Tests (TS): ${{ needs.visual-tests.result }} (${VISUAL_TS_TIME})\nUI Tests (Python): ${{ needs.python-ui-tests.result }} (${UI_PY_TIME})\nAPI Tests (Python): ${{ needs.python-api-tests.result }} (${API_PY_TIME})\nVisual Tests (Python): ${{ needs.python-visual-tests.result }} (${VISUAL_PY_TIME})\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.head_ref || github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nDuration: ${DURATION}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }} (${UI_TS_TIME})\nAPI Tests (TS): ${{ needs.api-tests.result }} (${API_TS_TIME})\nVisual Tests (TS): ${{ needs.visual-tests.result }} (${VISUAL_TS_TIME})\nType Check (TS): ${{ needs.ts-typecheck.result }} (${TYPECHECK_TS_TIME})\nUI Tests (Python): ${{ needs.python-ui-tests.result }} (${UI_PY_TIME})\nAPI Tests (Python): ${{ needs.python-api-tests.result }} (${API_PY_TIME})\nVisual Tests (Python): ${{ needs.python-visual-tests.result }} (${VISUAL_PY_TIME})\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
 
