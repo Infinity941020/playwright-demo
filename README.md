@@ -75,7 +75,7 @@ API構成・MSW設計・フォルダ構成を含む全仕様一覧は
 
 ## 動作環境
 
-- Node.js 18 以上（CI環境：Node.js 20 / Ubuntu）
+- Node.js 18 以上（CI環境：Node.js 22 / Ubuntu）
 - npm（Node.js付属のもので可）
 - OS：macOS / Linux / Windows（ローカル環境）
 
