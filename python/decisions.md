@@ -535,3 +535,17 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   python-api-tests・python-visual-tests）
 - TS逆輸入候補: なし（共通のファイルのため）
 - 決定日: 2026-11-18
+
+## 論点26: TS版の型の確認
+
+- 分類: ②
+- 判断: 変更（TypeScript を devDependencies に入れ、CI の独立したジョブで tsc --noEmit を実行する）
+  1. typescript/package.json の devDependencies に TypeScript 7.0.2 を固定のバージョンで入れる
+     （--save-exact。入れた時点の最新の安定版で、型のエラーが0件であることを確かめた）
+  2. scripts に "typecheck": "tsc --noEmit -p tsconfig.json" を追加する
+  3. CI に独立したジョブ「Type Check (TS)」（ts-typecheck）を追加する。ブラウザは使わないため container は使わない。
+     Slack 通知の needs・失敗の判定・Results（所要時間を含む）にも追加する
+- 理由: tsconfig.json と package.json の設定の食い違い（論点8）に、型の確認がなかったため長く気づけなかった
+- 影響範囲: typescript/package.json・package-lock.json、.github/workflows/playwright.yml（ts-typecheck、notify）
+- TS逆輸入候補: なし。Python版の型の確認（mypy など）は、Lint・整形とあわせて別に検討する
+- 決定日: 2026-11-18
