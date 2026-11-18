@@ -82,7 +82,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: typescript
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run API Tests
         working-directory: typescript
@@ -125,7 +125,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: typescript
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run Visual Tests
         working-directory: typescript
