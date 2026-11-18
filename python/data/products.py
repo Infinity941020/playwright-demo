@@ -1,44 +1,15 @@
-"""商品情報（Products画面）"""
+"""商品情報（Products画面）
 
-# 仕様書「表示商品」の表の順（初期表示 = Name (A to Z) の並び）で定義する。
+値は両版共通の shared/data/products.json に置いている（decisions.md 論点24）。
+"""
+
+from data.shared_data import load_shared_data
+
+_PRODUCTS_DATA = load_shared_data("products.json")
+
+# 仕様書「表示商品」の表の順（初期表示 = Name (A to Z) の並び）で定義している。
 # 商品IDは商品詳細画面のURL（inventory-item.html?id=）で実機確認済み（2026-10-07）。
-PRODUCTS = {
-    "backpack": {
-        "name": "Sauce Labs Backpack",
-        "price": "$29.99",
-        "id": 4,
-    },
-    "bike_light": {
-        "name": "Sauce Labs Bike Light",
-        "price": "$9.99",
-        "id": 0,
-    },
-    "bolt_t_shirt": {
-        "name": "Sauce Labs Bolt T-Shirt",
-        "price": "$15.99",
-        "id": 1,
-    },
-    "fleece_jacket": {
-        "name": "Sauce Labs Fleece Jacket",
-        "price": "$49.99",
-        "id": 5,
-    },
-    "onesie": {
-        "name": "Sauce Labs Onesie",
-        "price": "$7.99",
-        "id": 2,
-    },
-    "red_t_shirt": {
-        "name": "Test.allTheThings() T-Shirt (Red)",
-        "price": "$15.99",
-        "id": 3,
-    },
-}
+PRODUCTS = _PRODUCTS_DATA["products"]
 
-# ソートの選択肢を、画面に表示される文言で定義する
-SORT_OPTIONS = {
-    "name_asc": "Name (A to Z)",
-    "name_desc": "Name (Z to A)",
-    "price_asc": "Price (low to high)",
-    "price_desc": "Price (high to low)",
-}
+# ソートの選択肢を、画面に表示される文言で定義している
+SORT_OPTIONS = _PRODUCTS_DATA["sort_options"]

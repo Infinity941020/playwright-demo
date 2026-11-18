@@ -2,27 +2,28 @@
 // ログインユーザー情報
 // ========================================
 
+// 値は両版共通の shared/data/users.json に置いている（decisions.md 論点24）
+import sharedUsers from '../../shared/data/users.json' with { type: 'json' };
+
+// ユーザー名とパスワードの組
+type User = {
+  readonly username: string;
+  readonly password: string;
+};
+
 // テスト用ログインユーザー定義
-export const users = {
+export const users: {
+  readonly standard: User;
+  readonly locked: User;
+  readonly invalid: User;
+} = {
 
   // 正常ログイン可能ユーザー
-  standard: {
-
-    username: 'standard_user',
-    password: 'secret_sauce',
-  },
+  standard: sharedUsers.standard,
 
   // ログイン不可（ロック済み）ユーザー
-  locked: {
+  locked: sharedUsers.locked,
 
-    username: 'locked_out_user',
-    password: 'secret_sauce',
-  },
-
-  // 異常系テスト用（存在しないユーザー）
-  invalid: {
-
-    username: 'wrong_user',
-    password: 'wrong_pass',
-  },
-} as const;
+  // 異常系テスト用（存在しないユーザー。ユーザー名・パスワードとも誤り）
+  invalid: sharedUsers.wrong_both,
+};

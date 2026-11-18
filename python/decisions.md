@@ -172,12 +172,14 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 ## 論点8: tsconfig.json の設定不整合
 
 - 分類: ③
-- 判断: 未定（Python版の設定ファイルには引き継がない方針を確認のみ）
+- 判断: 解決済み（横展開2-1 で tsconfig.json を ESM に合わせて修正。論点24）
 - 理由: 単なる設定ミスであり、Python版のpyproject.toml等には
-  そもそも該当しない。実害がないため保留してよい。
+  そもそも該当しない。当初は実害がないため保留とした。
+  横展開2-1 で、JSON の読み込みのために module・moduleResolution を
+  package.json の "type": "module" に合わせて直した。
 - 影響範囲: なし（Python版設定ファイルへの影響なし）
 - TS逆輸入候補: なし
-- 決定日: -
+- 決定日: 2026-11-18
 
 ## 論点9: zodスキーマ検証の適用範囲が不統一
 
@@ -463,6 +465,46 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   Dockerfile・.dockerignore、README・Wiki のリンク
 - TS逆輸入候補: なし（リポジトリ全体の構成のため）
 - 決定日: 2026-11-17
+
+## 論点24: テストデータの共通化
+
+- 分類: ②
+- 判断: 変更（テストデータを両版共通の JSON にまとめ、TS版・Python版の両方から読み込む。横展開2-1）
+  1. 置き場所：リポジトリ直下の shared/data/ に users.json・products.json・checkout.json・urls.json・messages.json を置く
+  2. JSON の項目名は Python版と同じ書き方（first_name など）にする。
+     TS版は読み込むファイルで TS の書き方（firstName など）に変換する
+  3. 今のデータのファイル（Python版：data/users.py・products.py・checkout_data.py、utils/urls.py。
+     TS版：data/users.ts・checkoutData.ts、utils/urls.ts）は残し、中身を「JSON を読み込んで、今と同じ名前・同じ形で渡すだけ」にする。
+     テスト側の import や書き方は変えない
+  4. 値の違いは次のように揃える
+     - 購入者情報の郵便番号は Python版の値（1000001）にする（TS版の 1234567 は使わない）
+     - ログインユーザーは、Python版の4種類に、TS版だけが使っている「ユーザー名・パスワードとも誤り」を
+       wrong_both として加える。TS版の users.invalid はこれを指す
+     - URL は Python版の7画面分にする。TS版にも商品詳細（inventoryItem）が増えるが、今は使わない
+  5. エラー文言：Python版のテストに直接書いていたエラー文言を messages.json にまとめ、Python版のテストはそこから読む
+     - 未ログインのときの文言は、画面のパスを {path} に差し込む1つの文言にする
+     - TS版は今回は使わない（横展開3で使う）
+  6. API のデータ（data/api/、data/apiUsers.ts など）は今回は変えない（横展開4-1 で扱う）
+- 理由:
+  1・3. 論点23 で決めた完成形の構成（shared/ に共通データ）に合わせるため。
+     テスト側を変えずに済むように、今のデータのファイルを入り口として残す
+  2. JSON は両版で1つなので、どちらかの書き方に決める必要がある。
+     Python版の書き方は、Python版の今のデータとそのまま一致し、変換が要らない
+  4. 両版で同じ値を使うため。郵便番号は Python版の値がテストケース
+     （checkout_step_one_testcases.md の「入力に使う値」）と一致している
+  5. 同じ文言が別のファイルに重複していたため（未ログインのエラー、Postal Code is required）。
+     置き換えた後の文言が、置き換える前と一字一句同じであることを確かめた
+  6. API のモックの方式が両版で違い、データの形も揃っていないため、方式を揃えるかの判断（横展開4-1）とあわせて扱う
+- 補足（TS版の読み込み方）:
+  TS版は package.json が "type": "module"（ESM）のため、JSON の import に with { type: 'json' } が必要になる。
+  あわせて tsconfig.json を ESM に合わせて直した（module: CommonJS → ESNext、moduleResolution: Node → Bundler、
+  rootDir を削除、include に ../shared/data/*.json を追加）。
+  JSON から読み込んだ値は as const のような「値そのものの型」にならないため、読み込むファイルで型を書き添える。
+  tsconfig.json の設定の食い違いは論点8（tsconfig.json の設定不整合）にも関係する
+- 影響範囲: shared/data/、Python版 data/・utils/urls.py・エラー文言を使うテスト（9ファイル）、
+  TS版 data/users.ts・data/checkoutData.ts・utils/urls.ts・tsconfig.json
+- TS逆輸入候補: なし（両版共通のため）
+- 決定日: 2026-11-18
 
 ## 論点25: CI の実行環境
 

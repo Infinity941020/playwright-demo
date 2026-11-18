@@ -4,6 +4,7 @@ import pytest
 from playwright.sync_api import Page
 
 from data.checkout_data import CHECKOUT_DATA
+from data.messages import MESSAGES
 from data.products import PRODUCTS
 from flows.checkout_flow import CheckoutFlow
 from utils.ui_assertions.checkout_assertions import (
@@ -12,10 +13,10 @@ from utils.ui_assertions.checkout_assertions import (
     expect_on_checkout_step_two_page,
 )
 
-# エラーの文言は、checkout_step_one_testcases.md の期待結果と同じにする
-_FIRST_NAME_REQUIRED_MESSAGE = "Error: First Name is required"
-_LAST_NAME_REQUIRED_MESSAGE = "Error: Last Name is required"
-_POSTAL_CODE_REQUIRED_MESSAGE = "Error: Postal Code is required"
+# エラーの文言（shared/data/messages.json）は、checkout_step_one_testcases.md の期待結果と同じにする
+_FIRST_NAME_REQUIRED_MESSAGE = MESSAGES["checkout"]["first_name_required"]
+_LAST_NAME_REQUIRED_MESSAGE = MESSAGES["checkout"]["last_name_required"]
+_POSTAL_CODE_REQUIRED_MESSAGE = MESSAGES["checkout"]["postal_code_required"]
 
 
 class TestCheckoutStepOneValidation:
