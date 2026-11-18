@@ -1,11 +1,26 @@
 // Playwrightのfixture機能・Page型・expectを使用
 import { test as base, Page, expect } from '@playwright/test';
+import path from 'node:path';
+import { urls } from '../utils/urls';
 
 /*
 ================================
-ログインfixture（型安全・CI安定版）
+ログインfixture
 ================================
+準備用のプロジェクト（setup。tests/setup/auth.setup.ts）が保存したログイン状態（storageState）を
+再利用して、ログイン済みの Page を渡す（Python版の logged_page と同じ形。decisions.md 論点1）。
+
+browser.newContext() で自分で context を作ると、config の video などの設定が効かないため、
+storageState の設定を差し替えて、Playwright が作る page を使う
+（context の作成とテスト後のクローズは Playwright が行う）。
+差し替えは、この fixture の test を使うテストだけに効く。
 */
+
+// ログイン状態の保存先（typescript/.gitignore で除外している）
+export const STANDARD_USER_STORAGE_STATE = path.join(
+  import.meta.dirname,
+  '../playwright/.auth/standard_user.json'
+);
 
 // fixture型定義
 type Fixtures = {
@@ -17,6 +32,9 @@ type Fixtures = {
 // fixture拡張
 export const test = base.extend<Fixtures>({
 
+  // 保存したログイン状態で、新しいブラウザの状態（context）を作る
+  storageState: STANDARD_USER_STORAGE_STATE,
+
   // ログイン済みPage生成
   loggedPage: async (
     { page }: { page: Page },
@@ -24,30 +42,13 @@ export const test = base.extend<Fixtures>({
   ) => {
 
     // ================================
-    // ■ ログイン画面へ遷移
+    // ■ 商品一覧画面へ遷移
     // ================================
-    await page.goto('https://www.saucedemo.com/');
+    // storageState は Cookie などだけを復元し、開いていた画面までは復元しないため、明示的に開く
+    await page.goto(urls.inventory);
 
     // ================================
-    // ■ ログイン情報入力
-    // ================================
-    await page.fill(
-      '[data-test="username"]',
-      'standard_user'
-    );
-
-    await page.fill(
-      '[data-test="password"]',
-      'secret_sauce'
-    );
-
-    // ================================
-    // ■ ログイン実行
-    // ================================
-    await page.click('[data-test="login-button"]');
-
-    // ================================
-    // ■ ログイン成功確認
+    // ■ ログイン済みの確認
     // ================================
     await expect(page).toHaveURL(/inventory/);
 
