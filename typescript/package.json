@@ -10,7 +10,8 @@
     "test:cart": "playwright test tests/ui/cart --reporter=list",
     "test:checkout": "playwright test tests/ui/checkout --reporter=list",
     "test:logout": "playwright test tests/ui/logout --reporter=list",
-    "test:all": "playwright test --reporter=list"
+    "test:all": "playwright test --reporter=list",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "keywords": [
     "playwright",
@@ -24,7 +25,8 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
-    "msw": "^2.14.6"
+    "msw": "^2.14.6",
+    "typescript": "7.0.2"
   },
   "dependencies": {
     "zod": "^4.4.3"
