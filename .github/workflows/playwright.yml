@@ -15,6 +15,9 @@ jobs:
   ui-tests:
     name: UI Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -27,19 +30,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps
 
       - name: Run UI Tests
         working-directory: typescript
@@ -58,6 +51,9 @@ jobs:
   api-tests:
     name: API Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -70,19 +66,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps chromium
 
       - name: Run API Tests
         working-directory: typescript
@@ -101,6 +87,9 @@ jobs:
   visual-tests:
     name: Visual Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -113,19 +102,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps chromium
 
       - name: Run Visual Tests
         working-directory: typescript
@@ -145,35 +124,29 @@ jobs:
   python-ui-tests:
     name: UI Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
-
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
+        run: python -m pip install -r requirements.txt
 
       - name: Run UI Tests
         working-directory: python
-        run: pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
+        run: python -m pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
 
       - name: Upload UI Artifacts
         if: always()
@@ -187,35 +160,29 @@ jobs:
   python-api-tests:
     name: API Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
-
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
+        run: python -m pip install -r requirements.txt
 
       - name: Run API Tests
         working-directory: python
-        run: pytest tests/api
+        run: python -m pytest tests/api
 
       - name: Upload API Artifacts
         if: always()
@@ -229,35 +196,29 @@ jobs:
   python-visual-tests:
     name: Visual Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
-
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
+        run: python -m pip install -r requirements.txt
 
       - name: Run Visual Tests
         working-directory: python
-        run: pytest tests/visual -m visual
+        run: python -m pytest tests/visual -m visual
 
       - name: Upload Visual Artifacts
         if: always()
@@ -282,8 +243,14 @@ jobs:
 
     if: always()
 
+    # 所要時間を求めるために、この実行とジョブの一覧を GitHub の API から読む
+    permissions:
+      actions: read
+
     steps:
       - name: Send Slack Notification
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ needs.ui-tests.result }}" == "failure" || \
                 "${{ needs.api-tests.result }}" == "failure" || \
@@ -296,9 +263,53 @@ jobs:
             STATUS="✅ Playwright CI Success"
           fi
 
+          # 秒数を「4m 12s」の形にする
+          format_duration() {
+            local total=$1
+            if (( total >= 60 )); then
+              echo "$((total / 60))m $((total % 60))s"
+            else
+              echo "${total}s"
+            fi
+          }
+
+          # 所要時間が取れなかった場合でも通知は送り、時間の部分だけ unknown にする
+          RUN_API="repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # CI 全体：この実行が始まった時刻から、notify のジョブが動いた今の時刻まで
+          DURATION="unknown"
+          RUN_STARTED_AT=$(gh api "${RUN_API}" --jq '.run_started_at' 2>/dev/null || true)
+          START_EPOCH=$(date -d "${RUN_STARTED_AT}" +%s 2>/dev/null || true)
+          if [[ -n "${RUN_STARTED_AT}" && "${START_EPOCH}" =~ ^[0-9]+$ ]]; then
+            DURATION=$(format_duration $(( $(date +%s) - START_EPOCH )))
+          fi
+
+          # ジョブごと：この実行（今回の試行）のジョブの開始・終了の時刻から求める
+          JOBS_JSON=$(gh api "${RUN_API}/attempts/${{ github.run_attempt }}/jobs?per_page=100" 2>/dev/null || true)
+
+          job_duration() {
+            local seconds
+            seconds=$(jq -r --arg name "$1" \
+              '.jobs[] | select(.name == $name and .started_at != null and .completed_at != null)
+                | (.completed_at | fromdateiso8601) - (.started_at | fromdateiso8601)' \
+              <<< "${JOBS_JSON}" 2>/dev/null | head -n 1 || true)
+            if [[ "${seconds}" =~ ^[0-9]+$ ]]; then
+              format_duration "${seconds}"
+            else
+              echo "unknown"
+            fi
+          }
+
+          UI_TS_TIME=$(job_duration "UI Tests (TS)")
+          API_TS_TIME=$(job_duration "API Tests (TS)")
+          VISUAL_TS_TIME=$(job_duration "Visual Tests (TS)")
+          UI_PY_TIME=$(job_duration "UI Tests (Python)")
+          API_PY_TIME=$(job_duration "API Tests (Python)")
+          VISUAL_PY_TIME=$(job_duration "Visual Tests (Python)")
+
           cat > payload.json <<EOF
           {
-            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }}\nAPI Tests (TS): ${{ needs.api-tests.result }}\nVisual Tests (TS): ${{ needs.visual-tests.result }}\nUI Tests (Python): ${{ needs.python-ui-tests.result }}\nAPI Tests (Python): ${{ needs.python-api-tests.result }}\nVisual Tests (Python): ${{ needs.python-visual-tests.result }}\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "${STATUS}\n\nRepository: ${{ github.repository }}\n\nBranch: ${{ github.head_ref || github.ref_name }}\n\nTriggered By: ${{ github.actor }}\n\nDuration: ${DURATION}\n\nResults:\nUI Tests (TS): ${{ needs.ui-tests.result }} (${UI_TS_TIME})\nAPI Tests (TS): ${{ needs.api-tests.result }} (${API_TS_TIME})\nVisual Tests (TS): ${{ needs.visual-tests.result }} (${VISUAL_TS_TIME})\nUI Tests (Python): ${{ needs.python-ui-tests.result }} (${UI_PY_TIME})\nAPI Tests (Python): ${{ needs.python-api-tests.result }} (${API_PY_TIME})\nVisual Tests (Python): ${{ needs.python-visual-tests.result }} (${VISUAL_PY_TIME})\n\nWorkflow:\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
 
