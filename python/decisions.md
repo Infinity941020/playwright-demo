@@ -174,7 +174,7 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 分類: ③
 - 判断: 解決済み（横展開2-1 で tsconfig.json を ESM に合わせて修正。論点24）
 - 理由: 単なる設定ミスであり、Python版のpyproject.toml等には
-  そもそも該当しない。実害がないため保留してよい。
+  そもそも該当しない。当初は実害がないため保留とした。
   横展開2-1 で、JSON の読み込みのために module・moduleResolution を
   package.json の "type": "module" に合わせて直した。
 - 影響範囲: なし（Python版設定ファイルへの影響なし）
