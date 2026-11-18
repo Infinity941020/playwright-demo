@@ -15,6 +15,9 @@ jobs:
   ui-tests:
     name: UI Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -27,19 +30,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps
 
       - name: Run UI Tests
         working-directory: typescript
@@ -58,6 +51,9 @@ jobs:
   api-tests:
     name: API Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -70,19 +66,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps chromium
 
       - name: Run API Tests
         working-directory: typescript
@@ -145,6 +131,9 @@ jobs:
   python-ui-tests:
     name: UI Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -157,19 +146,9 @@ jobs:
           cache: pip
           cache-dependency-path: python/requirements.txt
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
-
       - name: Install dependencies
         working-directory: python
         run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
 
       - name: Run UI Tests
         working-directory: python
@@ -187,6 +166,9 @@ jobs:
   python-api-tests:
     name: API Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -199,19 +181,9 @@ jobs:
           cache: pip
           cache-dependency-path: python/requirements.txt
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
-
       - name: Install dependencies
         working-directory: python
         run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
 
       - name: Run API Tests
         working-directory: python
