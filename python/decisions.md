@@ -463,3 +463,24 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   Dockerfile・.dockerignore、README・Wiki のリンク
 - TS逆輸入候補: なし（リポジトリ全体の構成のため）
 - 決定日: 2026-11-17
+
+## 論点25: CI の実行環境
+
+- 分類: ②
+- 判断: 変更（UI・API の4ジョブは Playwright 公式の Docker イメージで動かす。Visual の2ジョブは今のまま）
+  1. UI Tests (TS)・API Tests (TS)：mcr.microsoft.com/playwright:v1.59.1-noble
+     （typescript/package-lock.json の Playwright のバージョンに合わせる）
+  2. UI Tests (Python)・API Tests (Python)：mcr.microsoft.com/playwright/python:v1.63.0-noble
+     （python/requirements.txt の playwright のバージョンに合わせる）
+  3. 4ジョブの「Install Playwright browsers」とブラウザのキャッシュのステップは削除する
+     （イメージにブラウザと部品が入っているため）。書き方は Playwright 公式ドキュメントの
+     「Continuous Integration」の GitHub Actions のコンテナの例に従う（options: --user 1001）
+  4. Node.js 22・Python 3.14 は、今と同じ準備のステップ（setup-node・setup-python）で入れる
+  5. Visual Tests (TS)・Visual Tests (Python) は変えない（基準画像の見た目がずれるのを避けるため。
+     横展開4-2 で判断する）
+- 理由: 毎回の Ubuntu の部品のダウンロードが遅く、CI が10分以上かかることが続いたため
+- 注意: Playwright のバージョンを上げるときは、イメージのバージョンも同時に上げる
+  （ずれるとブラウザが見つからない。横展開4-3、Dependabot の検討とあわせて）
+- 影響範囲: .github/workflows/playwright.yml（ui-tests・api-tests・python-ui-tests・python-api-tests）
+- TS逆輸入候補: なし（共通のファイルのため）
+- 決定日: 2026-11-18
