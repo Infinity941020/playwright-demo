@@ -463,3 +463,33 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   Dockerfile・.dockerignore、README・Wiki のリンク
 - TS逆輸入候補: なし（リポジトリ全体の構成のため）
 - 決定日: 2026-11-17
+
+## 論点25: CI の実行環境
+
+- 分類: ②
+- 判断: 変更（UI・API・Visual の6ジョブすべてを Playwright 公式の Docker イメージで動かす）
+  1. UI Tests (TS)・API Tests (TS)・Visual Tests (TS)：mcr.microsoft.com/playwright:v1.59.1-noble
+     （typescript/package-lock.json の Playwright のバージョンに合わせる）
+  2. UI Tests (Python)・API Tests (Python)・Visual Tests (Python)：
+     mcr.microsoft.com/playwright/python:v1.63.0-noble
+     （python/requirements.txt の playwright のバージョンに合わせる）
+  3. 6ジョブの「Install Playwright browsers」とブラウザのキャッシュのステップは削除する
+     （イメージにブラウザと部品が入っているため）。書き方は Playwright 公式ドキュメントの
+     「Continuous Integration」の GitHub Actions のコンテナの例に従う（TS版は options: --user 1001）
+  4. Python のジョブは、setup-python に必要な lsb_release を入れるため、--user 1001 を外して動かす
+     （Python 用のイメージに lsb_release が入っておらず、「Setup Python」が失敗したため。
+     setup-python の前に apt-get で lsb-release だけを入れる）
+     Python のジョブは、setup-python が用意した pip・pytest のコマンドがコンテナの中で起動できないため、
+     python -m で実行する（pip のキャッシュは使わない）
+  5. Node.js 22・Python 3.14 は、今と同じ準備のステップ（setup-node・setup-python）で入れる
+  6. Visual の2ジョブも、当初は基準画像の見た目がずれるのを避けるため今のままとしたが、
+     Ubuntu の部品のダウンロードで引き続き遅れていたため、イメージで動かすことにした。基準画像は変えない
+- 理由: 毎回の Ubuntu の部品のダウンロードが遅く、CI が10分以上かかることが続いたため
+- 確認: 基準画像との見た目のずれがないことを、プルリクエストの CI で確かめた（両版とも基準画像の作り直しは不要だった）
+- 結果: CI 全体の所要時間は、10分以上かかることが続いていたのが、約1分40秒になった（2026-11-18）
+- 注意: Playwright のバージョンを上げるときは、イメージのバージョンも同時に上げる
+  （ずれるとブラウザが見つからない。横展開4-3、Dependabot の検討とあわせて）
+- 影響範囲: .github/workflows/playwright.yml（ui-tests・api-tests・visual-tests・python-ui-tests・
+  python-api-tests・python-visual-tests）
+- TS逆輸入候補: なし（共通のファイルのため）
+- 決定日: 2026-11-18
