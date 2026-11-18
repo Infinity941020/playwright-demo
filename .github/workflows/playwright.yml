@@ -87,6 +87,9 @@ jobs:
   visual-tests:
     name: Visual Tests (TS)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user 1001
 
     steps:
       - name: Checkout repository
@@ -99,19 +102,9 @@ jobs:
           cache: npm
           cache-dependency-path: typescript/package-lock.json
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('typescript/package-lock.json') }}
-
       - name: Install dependencies
         working-directory: typescript
         run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: typescript
-        run: npx playwright install --with-deps chromium
 
       - name: Run Visual Tests
         working-directory: typescript
@@ -133,11 +126,14 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright/python:v1.63.0-noble
-      options: --user 1001
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -168,11 +164,14 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright/python:v1.63.0-noble
-      options: --user 1001
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -201,10 +200,16 @@ jobs:
   python-visual-tests:
     name: Visual Tests (Python)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # setup-python が使う lsb_release がイメージに入っていないため入れる
+      - name: Install lsb_release
+        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -213,19 +218,9 @@ jobs:
           cache: pip
           cache-dependency-path: python/requirements.txt
 
-      - name: Restore Playwright Browser Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-python-${{ runner.os }}-${{ hashFiles('python/requirements.txt') }}
-
       - name: Install dependencies
         working-directory: python
         run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        working-directory: python
-        run: python -m playwright install --with-deps chromium
 
       - name: Run Visual Tests
         working-directory: python
