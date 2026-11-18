@@ -479,6 +479,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   4. Python のジョブは、setup-python に必要な lsb_release を入れるため、--user 1001 を外して動かす
      （Python 用のイメージに lsb_release が入っておらず、「Setup Python」が失敗したため。
      setup-python の前に apt-get で lsb-release だけを入れる）
+     Python のジョブは、setup-python が用意した pip・pytest のコマンドがコンテナの中で起動できないため、
+     python -m で実行する（pip のキャッシュは使わない）
   5. Node.js 22・Python 3.14 は、今と同じ準備のステップ（setup-node・setup-python）で入れる
   6. Visual の2ジョブも、当初は基準画像の見た目がずれるのを避けるため今のままとしたが、
      Ubuntu の部品のダウンロードで引き続き遅れていたため、イメージで動かすことにした。基準画像は変えない

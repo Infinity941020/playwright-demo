@@ -139,16 +139,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
       - name: Run UI Tests
         working-directory: python
-        run: pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
+        run: python -m pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
 
       - name: Upload UI Artifacts
         if: always()
@@ -177,16 +175,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
       - name: Run API Tests
         working-directory: python
-        run: pytest tests/api
+        run: python -m pytest tests/api
 
       - name: Upload API Artifacts
         if: always()
@@ -215,16 +211,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: pip
-          cache-dependency-path: python/requirements.txt
 
       - name: Install dependencies
         working-directory: python
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
       - name: Run Visual Tests
         working-directory: python
-        run: pytest tests/visual -m visual
+        run: python -m pytest tests/visual -m visual
 
       - name: Upload Visual Artifacts
         if: always()
