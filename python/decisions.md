@@ -59,13 +59,20 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   単なる設計ドリフトと判断されるため踏襲しない。
 - 影響範囲: conftest.py（storage_state生成・再利用fixture）、
   LoginFlow/LoginPage相当のPythonクラス
-- TS逆輸入候補: あり（auth.setup.tsをplaywright.config.tsの
-  projectsに正式配線すれば同じ恩恵を得られるが、本プロジェクトの
-  スコープ外）
+- TS逆輸入候補: 反映済み（横展開2-2。当初は「あり（auth.setup.tsをplaywright.config.tsの
+  projectsに正式配線すれば同じ恩恵を得られるが、本プロジェクトのスコープ外）」としていた）
 - 決定日: 2026-07-30
 - 追記（2026-10-07）: logged_page を pytest-playwright の new_context
   fixture 経由で生成する形に変更した。--screenshot / --tracing / --video
   等の設定が logged_page を使うテストにも適用されるようにするため。
+- 追記（2026-11-18）: 横展開2-2 で TS版にも反映した。
+  auth.setup.ts を playwright.config.ts の準備用のプロジェクト（setup）にし、UI の3プロジェクトを
+  setup に依存させた。ログイン状態は playwright/.auth/standard_user.json に保存する。
+  loggedPage は、loginFixture.ts の中で storageState の設定を保存したファイルに差し替え、
+  Playwright が作る page で商品一覧画面を開いて表示を確かめてから渡す。
+  browser.newContext() で自分で context を作ると config の video の設定が効かず、録画が取れなくなるため
+  （Python版の 2026-10-07 の追記と同じ理由）。差し替えは loginFixture の test を使うテストだけに効き、
+  プロジェクト全体の use には storageState を入れない（ログインしていない状態が必要なテストがあるため）。
 
 ## 論点2: ロケータのキャッシュ有無が不統一
 
