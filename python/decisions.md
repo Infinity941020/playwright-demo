@@ -73,6 +73,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   browser.newContext() で自分で context を作ると config の video の設定が効かず、録画が取れなくなるため
   （Python版の 2026-10-07 の追記と同じ理由）。差し替えは loginFixture の test を使うテストだけに効き、
   プロジェクト全体の use には storageState を入れない（ログインしていない状態が必要なテストがあるため）。
+- 追記（2026-11-19）: 横展開3-0 で、setup をやめて worker ごとに作る形に変えた（論点27）。
+  ログイン状態は playwright/.auth/standard_user-〈ブラウザ名〉-〈parallelIndex〉.json に保存し、作ってから8分を過ぎたら作り直す。
+  loggedPage の形（storageState の設定を差し替え、Playwright が作る page を使う）は変えていない。
 
 ## 論点2: ロケータのキャッシュ有無が不統一
 
@@ -591,3 +594,29 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: typescript/package.json・package-lock.json、.github/workflows/playwright.yml（ts-typecheck、notify）
 - TS逆輸入候補: なし。Python版の型の確認（mypy など）は、Lint・整形とあわせて別に検討する
 - 決定日: 2026-11-18
+
+## 論点27: ログイン状態の期限切れ対策
+
+- 分類: ②
+- 判断: 変更（TS版は worker ごとにログイン状態を作り、作ってから8分を過ぎたら作り直す。
+  setup の準備用のプロジェクトはなくす。手元の trace・video は失敗したときだけ残す）
+  1. fixtures/loginFixture.ts：同時に動く担当（worker）ごとに、playwright/.auth/standard_user-〈ブラウザ名〉-〈parallelIndex〉.json を使う。
+     ファイル名にブラウザ名を含めるのは、ブラウザによって保存される Cookie の属性が違い（WebKit は sameSite: None・
+     secure: false で保存し、Chromium はそれを受け付けない）、別のブラウザが作ったファイルは使えないため。
+     parallelIndex だけで分けたところ、WebKit が作ったファイルを Chromium が使って、ログイン画面に戻されることを確かめた
+     テストごとにファイルを作ってからの時間を確かめ、ファイルがない、または8分を過ぎていたら、
+     テスト用の画面とは別の一時的な context でログインし直してファイルを作り直す（作り直しの処理は1か所にまとめる）。
+     8分は、確かめのときだけ環境変数 STORAGE_STATE_MAX_AGE_MINUTES で短くできる
+  2. 形は Playwright 公式ドキュメント（Authentication の「worker ごとにアカウントを使う」例）に沿い、時間の確認と作り直しを足した。
+     公式の例は、ファイルがあれば古くても使い回すため、そのままでは期限切れを防げない
+  3. playwright.config.ts：準備用のプロジェクト（setup）と UI の3プロジェクトの dependencies を削除し、
+     tests/setup/auth.setup.ts を削除する。trace・video は手元でも retain-on-failure にする（workers・retries などは変えない）
+- 理由: saucedemo のログイン状態（Cookie の session-username）が約10分で切れ、TS版のテストが増えると
+  実行が10分を超えるため（setup で最初に1回だけログインする形では、後半のテストがログイン画面に戻されて失敗する）。
+  テストのたびのログイン（遅い）や、Cookie の期限の書き換え（アプリの決まりをごまかす形）は選ばなかった。
+  手元の trace・video を常に残すと実行が遅くなるため、CI と同じく失敗したときだけ残す
+- Python版: テストの実行全体で1回だけログインする今の形のまま（手元でも約3分で終わるため）。
+  実行が10分に近づいたら、TS版と同じ形に揃える
+- 影響範囲: typescript/fixtures/loginFixture.ts、typescript/playwright.config.ts、typescript/tests/setup/auth.setup.ts（削除）
+- TS逆輸入候補: なし（TS版の対策）。Python版への反映は上のとおり
+- 決定日: 2026-11-19
