@@ -154,23 +154,23 @@ python/
 ## TS版との主な違い
 
 decisions.md で「TS逆輸入候補」を「あり」「検討」としている論点です。
-TS版自体の修正は本プロジェクトのスコープ外としています。
+TS版への横展開（TS版を Python版に揃える作業）で、順に TS版にも反映しています。
 
 | 論点 | Python版での扱い | TS逆輸入候補 |
 |---|---|---|
-| [論点1](decisions.md#論点1-storagestate機構が未配線) storageState機構が未配線 | storage_state を正式に配線し、ログイン状態を再利用 | あり |
-| [論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一) ロケータのキャッシュ有無が不統一 | 全Page Objectで `__init__` にまとめて定義する方式に統一 | あり |
-| [論点5-a](decisions.md#論点5-a-resetxxxmockが未呼び出しテスト独立性の問題) モックのリセットが未呼び出し | テストごとにモックサーバーを立ち上げ、状態がテストをまたがないようにした（論点19） | あり |
-| [論点5-b](decisions.md#論点5-b-utilsloginhelperts-等のデッドコード) loginHelper.ts 等のデッドコード | loginHelper.ts 相当は移植しない | あり |
-| [論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない) URL参照が徹底されていない | 最初から utils/urls.py の参照を徹底 | あり |
-| [論点12](decisions.md#論点12-products画面を独立した画面として扱う) Products画面を独立した画面として扱う | 仕様書・テストケースを独立させ、ソート・画面遷移・未ログイン時も検証 | 検討 |
-| [論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け) goto() と expect_on_xxx() の使い分け | goto() は移動のみ、表示確認は expect_on_xxx() に統一 | あり |
-| [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 検討 |
-| [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | あり |
-| [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | あり |
-| [論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所) 商品一覧画面の表示確認の置き場所 | InventoryPage.expect_on_page() の1か所にまとめ、URL は完全一致、要素は data-test で確認する | あり |
-| [論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所) APIテストのモックの方式とファイルの置き場所 | 127.0.0.1 の空いているポートでモックサーバーを立ち上げる（TS版は MSW による通信の横取り）。API専用のファイルは専用のフォルダにまとめる | 検討 |
-| [論点21](decisions.md#論点21-visual-regression-の方式) Visual Regression の方式 | 普段の pytest では実行せず明示したときだけ実行する、固定の待ちを使わない、前提状態は保存したログイン状態とカートの書き込みで作る（比較の仕組みは TS版が標準機能を使うため対象外） | 検討 |
+| [論点1](decisions.md#論点1-storagestate機構が未配線) storageState機構が未配線 | storage_state を正式に配線し、ログイン状態を再利用 | 反映済み（横展開2-2） |
+| [論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一) ロケータのキャッシュ有無が不統一 | 全Page Objectで `__init__` にまとめて定義する方式に統一 | 反映済み（横展開2-3・2-4） |
+| [論点5-a](decisions.md#論点5-a-resetxxxmockが未呼び出しテスト独立性の問題) モックのリセットが未呼び出し | テストごとにモックサーバーを立ち上げ、状態がテストをまたがないようにした（論点19） | あり（横展開4-1 で判断） |
+| [論点5-b](decisions.md#論点5-b-utilsloginhelperts-等のデッドコード) loginHelper.ts 等のデッドコード | loginHelper.ts 相当は移植しない | 反映済み（横展開2-5。API 関係は 4-1） |
+| [論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない) URL参照が徹底されていない | 最初から utils/urls.py の参照を徹底 | 反映済み（横展開2-3・2-4） |
+| [論点12](decisions.md#論点12-products画面を独立した画面として扱う) Products画面を独立した画面として扱う | 仕様書・テストケースを独立させ、ソート・画面遷移・未ログイン時も検証 | 検討（横展開3） |
+| [論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け) goto() と expect_on_xxx() の使い分け | goto() は移動のみ、表示確認は expect_on_xxx() に統一 | 反映済み（横展開2-3・2-4） |
+| [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 検討（横展開3） |
+| [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | 反映済み（横展開2-4） |
+| [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | 反映済み（横展開2-4） |
+| [論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所) 商品一覧画面の表示確認の置き場所 | InventoryPage.expect_on_page() の1か所にまとめ、URL は完全一致、要素は data-test で確認する | 反映済み（横展開2-3・2-4） |
+| [論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所) APIテストのモックの方式とファイルの置き場所 | 127.0.0.1 の空いているポートでモックサーバーを立ち上げる（TS版は MSW による通信の横取り）。API専用のファイルは専用のフォルダにまとめる | 検討（横展開4-1） |
+| [論点21](decisions.md#論点21-visual-regression-の方式) Visual Regression の方式 | 普段の pytest では実行せず明示したときだけ実行する、固定の待ちを使わない、前提状態は保存したログイン状態とカートの書き込みで作る（比較の仕組みは TS版が標準機能を使うため対象外） | 検討（横展開4-2。比較の仕組みは対象外） |
 
 ---
 
