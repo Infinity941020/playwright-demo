@@ -154,22 +154,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # setup-python が使う lsb_release がイメージに入っていないため入れる
-      - name: Install lsb_release
-        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+      # Python 3.14 は uv で準備する（setup-python は apt での lsb_release のインストールが必要で、数分かかることがあったため）
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
 
       - name: Install dependencies
         working-directory: python
-        run: python -m pip install -r requirements.txt
+        run: |
+          uv venv --python 3.14 .venv
+          uv pip install --python .venv/bin/python -r requirements.txt
 
       - name: Run UI Tests
         working-directory: python
-        run: python -m pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
+        run: .venv/bin/python -m pytest tests/ui --tracing retain-on-failure --screenshot only-on-failure
 
       - name: Upload UI Artifacts
         if: always()
@@ -190,22 +187,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # setup-python が使う lsb_release がイメージに入っていないため入れる
-      - name: Install lsb_release
-        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+      # Python 3.14 は uv で準備する（setup-python は apt での lsb_release のインストールが必要で、数分かかることがあったため）
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
 
       - name: Install dependencies
         working-directory: python
-        run: python -m pip install -r requirements.txt
+        run: |
+          uv venv --python 3.14 .venv
+          uv pip install --python .venv/bin/python -r requirements.txt
 
       - name: Run API Tests
         working-directory: python
-        run: python -m pytest tests/api
+        run: .venv/bin/python -m pytest tests/api
 
       - name: Upload API Artifacts
         if: always()
@@ -226,22 +220,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # setup-python が使う lsb_release がイメージに入っていないため入れる
-      - name: Install lsb_release
-        run: apt-get update && apt-get install -y --no-install-recommends lsb-release
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
+      # Python 3.14 は uv で準備する（setup-python は apt での lsb_release のインストールが必要で、数分かかることがあったため）
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
 
       - name: Install dependencies
         working-directory: python
-        run: python -m pip install -r requirements.txt
+        run: |
+          uv venv --python 3.14 .venv
+          uv pip install --python .venv/bin/python -r requirements.txt
 
       - name: Run Visual Tests
         working-directory: python
-        run: python -m pytest tests/visual -m visual
+        run: .venv/bin/python -m pytest tests/visual -m visual
 
       - name: Upload Visual Artifacts
         if: always()

@@ -551,12 +551,17 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   3. 6ジョブの「Install Playwright browsers」とブラウザのキャッシュのステップは削除する
      （イメージにブラウザと部品が入っているため）。書き方は Playwright 公式ドキュメントの
      「Continuous Integration」の GitHub Actions のコンテナの例に従う（TS版は options: --user 1001）
-  4. Python のジョブは、setup-python に必要な lsb_release を入れるため、--user 1001 を外して動かす
-     （Python 用のイメージに lsb_release が入っておらず、「Setup Python」が失敗したため。
-     setup-python の前に apt-get で lsb-release だけを入れる）
-     Python のジョブは、setup-python が用意した pip・pytest のコマンドがコンテナの中で起動できないため、
-     python -m で実行する（pip のキャッシュは使わない）
-  5. Node.js 22・Python 3.14 は、今と同じ準備のステップ（setup-node・setup-python）で入れる
+  4. Python のジョブは、--user 1001 を外して（root のまま）動かす。
+     Python 3.14 は uv（astral-sh/setup-uv@v10.3.3）で準備し、python/ に仮想環境（.venv）を作って
+     requirements.txt のパッケージを入れ、その環境の Python（.venv/bin/python -m pytest）でテストを実行する（2026-11-19）
+     - 経緯1（2026-11-18）：当初は setup-python を使っていたが、Python 用のイメージに lsb_release が入っておらず
+       「Setup Python」が失敗したため、--user 1001 を外し、setup-python の前に apt-get で lsb-release を入れた
+     - 経緯2（2026-11-18）：setup-python が用意した pip・pytest のコマンドがコンテナの中で起動できなかったため、
+       python -m で実行した（pip のキャッシュは使わない）
+     - 経緯3（2026-11-19）：Python のジョブは、setup-python が必要とする lsb_release の apt でのインストールに
+       数分かかることがあったため、uv で Python 3.14 を準備する形に変えた。apt と setup-python は使わない
+     - setup-uv は v8 以降メジャーバージョンだけのタグ（@v10 など）がないため、細かい版のタグ（@v10.3.3）で指定する
+  5. Node.js 22 は、今と同じ準備のステップ（setup-node）で入れる
   6. Visual の2ジョブも、当初は基準画像の見た目がずれるのを避けるため今のままとしたが、
      Ubuntu の部品のダウンロードで引き続き遅れていたため、イメージで動かすことにした。基準画像は変えない
 - 理由: 毎回の Ubuntu の部品のダウンロードが遅く、CI が10分以上かかることが続いたため
