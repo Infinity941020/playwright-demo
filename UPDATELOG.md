@@ -1,5 +1,95 @@
 # UPDATE LOG
 ---
+## 2026-11-19（TS版への横展開：横展開2-3・2-4・2-5）
+
+### ■ Before
+
+- 横展開2-1・2-2・2-6 が終わっていた
+- TS版の Page Object は、ロケータの定義の場所・コンストラクタの書き方・「画面を開く」と「表示を確かめる」の
+  分け方がそろっておらず、Checkout の3画面の操作が1つのクラスに混在していた
+- CI の Python のジョブは、Python の準備のための Ubuntu の部品のインストールで、数分かかることがあった
+
+---
+
+### ■ Action（実施内容）
+
+## ■ 横展開2-3：Page Object の書き方を揃える
+
+---
+
+### ■ Page Object の書き方（python/decisions.md 論点2・3・10・13・18、プルリクエスト #15）
+
+- ロケータをコンストラクタにまとめ、data-test 属性で指定するようにした。コンストラクタの書き方を統一した
+- goto（画面を開く）と expectOnPage（表示を確かめる）を分離した
+- 商品一覧画面の表示確認を InventoryPage.expectOnPage に集約した。URL の直書きをやめた
+
+---
+
+## ■ 横展開2-4：Checkout とメニューの部品の整理
+
+---
+
+### ■ Checkout とメニュー（python/decisions.md 論点16・17、プルリクエスト #16）
+
+- CheckoutPage を Step One・Step Two・Complete の3クラスに分割した。「Checkout を始める」は CartPage に移した
+- Page Object のボタン操作は押すだけにし、画面が移ったかの確認は、Flow で各画面の expectOnPage を呼ぶ形に統一した
+- メニューの開閉の判定を aria-hidden 属性に変更し、ログアウトでメニューを開く処理の重複をなくした
+
+---
+
+## ■ CI の Python のジョブで uv を使う
+
+---
+
+### ■ Python の準備（python/decisions.md 論点25、プルリクエスト #17）
+
+- Python 3.14 の準備を setup-python から uv に変更し、Ubuntu の部品のインストールをなくした
+
+---
+
+## ■ 横展開2-5：使われていないコードの削除
+
+---
+
+### ■ 使われていないコードの削除（python/decisions.md 論点5-b、プルリクエスト #18）
+
+- utils/loginHelper.ts、CartPage.backToInventory（continueShopping と重複）、CartFlow.getCartPage を削除した
+- API 関係は横展開4-1、テストのファイルが使っている部品は横展開3 で判断する
+- python/README.md の「TS版との主な違い」を、横展開の進み具合に合わせて更新した
+
+---
+
+### ■ Result（成果）
+
+- テストのファイル（*.spec.ts）は変えずに、TS版の部品の作りを Python版に揃えた。
+  テストの件数（TS版 116件、Python版 95件＋Visual 6件）は変わらず
+- 各プルリクエストの CI（8つのチェック）と Slack 通知がすべて成功
+- CI の Python のジョブの所要時間：uv に変えた後、Visual (Python) は 5分19秒 → 48秒、
+  UI (Python) は 3分7秒 → 1分57秒、CI 全体は 5分28秒 → 2分3秒（#16 と #17 の CI の比較）
+- コミット：
+  - #15（02556a2／f12f99a、マージ 2ee5b12）
+  - #16（8413c37／dd0d441、マージ 7179bdb）
+  - #17（b8d4b61／08fd50c、マージ 1baf740）
+  - #18（eaa5ed1／4169c8f／f2f5a65、マージ eee8474）
+
+---
+
+### ■ Overall Status
+
+- 横展開2（共通部品・データの共通化）：完了
+- 横展開3（画面ごとにテストの中身を揃える）：次に着手
+- 横展開4・5：未着手
+
+---
+
+### ■ Conclusion
+
+本対応では、TS版の部品の作りを Python版に揃え、横展開2 を完了した。
+
+次は横展開3 に進む。
+
+---
+
 ## 2026-11-18（TS版への横展開：横展開2-1・2-2・2-6）
 
 ### ■ Before
