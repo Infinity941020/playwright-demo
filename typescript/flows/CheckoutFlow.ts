@@ -4,7 +4,11 @@ import { Page } from '@playwright/test';
 // Page Object
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
-import { CheckoutPage } from '../pages/CheckoutPage';
+import {
+  CheckoutStepOnePage,
+  CheckoutStepTwoPage,
+  CheckoutCompletePage,
+} from '../pages/CheckoutPage';
 
 /*
 ================================
@@ -24,8 +28,10 @@ export class CheckoutFlow {
   // カート画面操作
   private cart: CartPage;
 
-  // チェックアウト画面操作
-  private checkout: CheckoutPage;
+  // Checkout画面操作（画面ごと）
+  private stepOne: CheckoutStepOnePage;
+  private stepTwo: CheckoutStepTwoPage;
+  private complete: CheckoutCompletePage;
 
   /*
   ================================
@@ -36,7 +42,9 @@ export class CheckoutFlow {
 
     this.inventory = new InventoryPage(page);
     this.cart = new CartPage(page);
-    this.checkout = new CheckoutPage(page);
+    this.stepOne = new CheckoutStepOnePage(page);
+    this.stepTwo = new CheckoutStepTwoPage(page);
+    this.complete = new CheckoutCompletePage(page);
   }
 
   // =================================================
@@ -78,7 +86,8 @@ export class CheckoutFlow {
 
   async startCheckout() {
 
-    await this.checkout.startCheckout();
+    await this.cart.clickCheckout();
+    await this.stepOne.expectOnPage();
   }
 
   // =================================================
@@ -87,7 +96,7 @@ export class CheckoutFlow {
 
   async fillCheckoutInfo(first: string, last: string, zip: string) {
 
-    await this.checkout.fillInfo(first, last, zip);
+    await this.stepOne.fillInfo(first, last, zip);
   }
 
   // =================================================
@@ -96,12 +105,14 @@ export class CheckoutFlow {
 
   async proceedToOverviewStep() {
 
-    await this.checkout.continue();
+    await this.stepOne.clickContinue();
+    await this.stepTwo.expectOnPage();
   }
 
   async completePurchase() {
 
-    await this.checkout.finish();
+    await this.stepTwo.clickFinish();
+    await this.complete.expectOnPage();
   }
 
   // =================================================
@@ -110,7 +121,11 @@ export class CheckoutFlow {
 
   async continueExpectError() {
 
-    await this.checkout.continueExpectError();
+    await this.stepOne.clickContinue();
+
+    // Step Oneに留まり、エラーが表示されることを確認
+    await this.stepOne.expectOnPage();
+    await this.stepOne.expectErrorVisible();
   }
 
   // =================================================
@@ -119,17 +134,20 @@ export class CheckoutFlow {
 
   async cancelFromStepOne() {
 
-    await this.checkout.cancelFromStepOne();
+    await this.stepOne.clickCancel();
+    await this.cart.expectOnPage();
   }
 
   async cancelFromStepTwo() {
 
-    await this.checkout.cancelFromStepTwo();
+    await this.stepTwo.clickCancel();
+    await this.inventory.expectOnPage();
   }
 
   async cancelFromCart() {
 
     await this.cart.backToInventory();
+    await this.inventory.expectOnPage();
   }
 
  // =================================================
@@ -139,6 +157,7 @@ export class CheckoutFlow {
  // 購入完了状態を検証
   async verifyOrderComplete() {
 
-   await this.checkout.expectComplete();
+   await this.complete.expectOnPage();
+   await this.complete.expectCompleteHeaderVisible();
   }
 }

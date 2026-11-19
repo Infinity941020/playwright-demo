@@ -45,7 +45,7 @@ export class LogoutFlow {
     // メニューを開く
     await this.menu.openMenu();
 
-    // Logout押下
+    // Logout押下（メニューを開くのは上の1回だけ）
     await this.menu.logout();
 
     // ログイン画面へ戻ったこと確認
