@@ -134,15 +134,4 @@ export class CartPage {
       await this.removeButtons.first().click();
     }
   }
-
-  /*
-  ================================
-  カート→一覧戻り（旧互換）
-  ================================
-  */
-  async backToInventory() {
-
-    // ボタン押下（商品一覧画面の確認は、呼び出す側で InventoryPage.expectOnPage() を呼んで行う）
-    await this.continueShoppingButton.click();
-  }
 }
