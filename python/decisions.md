@@ -85,9 +85,11 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   なく、Pythonの Page Object では一般的な書き方である（判断基準3）。
   商品ごとに変わる部品は、商品名を受け取るメソッドで扱う。
 - 影響範囲: Python版の全Page Object
-- TS逆輸入候補: あり（TS版は都度生成派が多数のため、統一する場合は
-  InventoryPage / CartPage / CheckoutPage / HeaderComponent の書き換えが
-  必要）
+- TS逆輸入候補: 一部反映（横展開2-3。残りは 2-4）。
+  LoginPage / InventoryPage / CartPage / HeaderComponent は、ロケータをコンストラクタでまとめて定義し、
+  指定を Python版と同じ data-test 属性にした。CheckoutPage / MenuPage は横展開2-4 で扱う
+  （当初は「あり（TS版は都度生成派が多数のため、統一する場合は InventoryPage / CartPage /
+  CheckoutPage / HeaderComponent の書き換えが必要）」としていた）
 - 決定日: 2026-07-30（初回）／2026-10-07（更新）
 
 ## 論点3: コンストラクタスタイルの不統一（TS特有）
@@ -98,7 +100,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 理由: TypeScript固有の構文差（parameter propertyの有無）であり、
   Python移植によって自動的に解消するため、意思決定自体が不要。
 - 影響範囲: 全Page Objectクラスの__init__実装（統一形式に自然収束）
-- TS逆輸入候補: なし
+- TS逆輸入候補: 一部反映（横展開2-3。残りは 2-4）。
+  TS版の書き方の決まりはなかったため、LoginPage の形（readonly の項目を宣言し、コンストラクタで代入する。
+  parameter property は使わない）に、LoginPage / InventoryPage / CartPage / HeaderComponent を揃えた。
+  CheckoutPage / MenuPage は横展開2-4 で扱う（当初は「なし」としていた）
 - 決定日: 2026-07-30
 
 ## 論点4: Page Object内に画面レベルの検証が同居
@@ -208,8 +213,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   実装漏れと判断できるため、Python版では最初から徹底する。
   実装コストも小さく、安全弁（実装コスト膨張時の相談）には該当しない。
 - 影響範囲: Python版LoginPage相当クラスのURL参照方法
-- TS逆輸入候補: あり（TS版でも徹底する価値があるが、本プロジェクトの
-  スコープ外）
+- TS逆輸入候補: 一部反映（横展開2-3。残りは 2-4）。
+  LoginPage / InventoryPage / CartPage の URL を utils/urls.ts の参照にした。
+  MenuPage に残っている直書きは横展開2-4 で扱う
+  （当初は「あり（TS版でも徹底する価値があるが、本プロジェクトのスコープ外）」としていた）
 - 決定日: 2026-07-30
 
 ## 論点11: テストケース一覧との照合漏れ（Login画面）
@@ -255,7 +262,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   LoginPage.goto() も同じ考え方に合わせて変更した。
 - 影響範囲: pages/login_page.py、pages/inventory_page.py、
   flows/login_flow.py、fixtures/login_fixture.py（今後の全Page Object）
-- TS逆輸入候補: あり
+- TS逆輸入候補: 一部反映（横展開2-3。残りは 2-4）。
+  LoginPage / InventoryPage / CartPage の goto() を「開くだけ」にし、表示の確認を expectOnPage() に分けた
+  （InventoryPage の今までの goto() は、表示を確かめるだけだったため expectOnPage() にした）。
+  CheckoutPage は横展開2-4 で扱う（当初は「あり」としていた）
 - 決定日: 2026-10-07
 
 ## 論点14: 依存パッケージの管理方法
@@ -340,7 +350,12 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: pages/inventory_page.py、pages/login_page.py、flows/login_flow.py、
   flows/inventory_flow.py、fixtures/login_fixture.py、
   utils/ui_assertions/inventory_assertions.py、tests/ui/login/
-- TS逆輸入候補: あり
+- TS逆輸入候補: 一部反映（横展開2-3。残りは 2-4）。
+  商品一覧画面の表示確認を InventoryPage.expectOnPage()（URL の完全一致と [data-test="inventory-list"] の表示）に
+  まとめ、LoginPage.expectOnInventoryPage() を削除した（LoginFlow・auth.setup.ts・loginFixture.ts の loggedPage は
+  InventoryPage.expectOnPage() を使う）。
+  画面の移動の後に URL の部分一致（/inventory/）を確かめている箇所（CartPage.continueShopping・backToInventory、
+  CheckoutPage）は残っており、横展開2-4 で扱う（当初は「あり」としていた）
 - 決定日: 2026-11-15
 
 ## 論点19: APIテストのモックの方式とファイルの置き場所
