@@ -49,6 +49,7 @@ export class CartFlow {
 
   async continueShopping() {
     await this.cartPage.continueShopping();
+    await this.inventory.expectOnPage();
   }
 
   /*

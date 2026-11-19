@@ -6,35 +6,44 @@ import { Page, Locator, expect } from '@playwright/test';
 MenuPage
 サイドメニュー操作用 Page Object
 ================================
+メニューの開閉は、メニュー領域の aria-hidden 属性で判定する（開いているとき "false"。decisions.md 論点17）。
+URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるため、
+表示の有無では開閉を判定できない。
 */
 export class MenuPage {
 
-  // Playwrightページ保持
+  // ================================
+  // ■ ページインスタンス
+  // ================================
   readonly page: Page;
 
-  // ハンバーガーメニューボタン
+  // ================================
+  // ■ ハンバーガーメニューボタン
+  // ================================
+  // 開閉ボタン自体には data-test がないため、id で特定する
   readonly menuButton: Locator;
 
-  // Logoutリンク
+  // ================================
+  // ■ メニュー領域
+  // ================================
+  // メニュー領域には id・data-test がないため、CSS クラスで特定する
+  readonly menuArea: Locator;
+
+  // ================================
+  // ■ Logoutリンク
+  // ================================
   readonly logoutLink: Locator;
 
-  /*
-  ================================
-  コンストラクタ
-  ================================
-  */
-
-  // Pageインスタンスを受け取りLocatorを初期化
+  // ================================
+  // コンストラクタ
+  // ================================
   constructor(page: Page) {
 
-    // Playwright Page保持
     this.page = page;
 
-    // ハンバーガーメニューボタン取得
     this.menuButton = page.locator('#react-burger-menu-btn');
-
-    // Logoutリンク取得
-    this.logoutLink = page.locator('#logout_sidebar_link');
+    this.menuArea = page.locator('.bm-menu-wrap');
+    this.logoutLink = page.locator('[data-test="logout-sidebar-link"]');
   }
 
   /*
@@ -44,46 +53,31 @@ export class MenuPage {
   */
   async openMenu() {
 
-    // メニューボタン表示確認
-    await expect(this.menuButton).toBeVisible();
-
     // メニュー押下
     await this.menuButton.click();
 
-    // Logoutリンク表示確認
-    await expect(this.logoutLink).toBeVisible();
+    // メニューが開いたことを確認
+    await this.expectMenuOpened();
   }
 
   /*
   ================================
-  Logout実行
+  Logoutリンク押下
+  （ログイン画面の確認は、呼び出す側で LoginPage.expectOnPage() を呼んで行う）
   ================================
   */
   async logout() {
 
-    // メニュー未展開時は開く
-    if (!(await this.logoutLink.isVisible())) {
-
-      await this.openMenu();
-    }
-
-    // Logoutリンク押下
     await this.logoutLink.click();
-
-    // ログイン画面へ戻ったこと確認
-    await expect(this.page).toHaveURL(
-      'https://www.saucedemo.com/'
-    );
   }
 
   /*
   ================================
-  メニュー表示確認
+  メニューが開いていることの確認
   ================================
   */
   async expectMenuOpened() {
 
-    // Logoutリンク表示確認
-    await expect(this.logoutLink).toBeVisible();
+    await expect(this.menuArea).toHaveAttribute('aria-hidden', 'false');
   }
 }

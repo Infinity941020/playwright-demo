@@ -1,142 +1,237 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
+import { urls } from '../utils/urls';
 
 /*
 ================================
-CheckoutPage（CI安定版・統一設計）
+Checkout画面の Page Object
 責務：
-- Checkout画面のUI操作
-- 画面遷移・入力・完了操作
-- 最小限の検証
+- 要素取得
+- 単体操作（ボタンを押す・入力する。押した後の画面の確認はしない）
+- 画面レベルの検証
+================================
+Python版の pages/checkout_page.py と1対1で対応するファイルで、クラスは画面ごとに分ける
+（decisions.md 論点16）。
+「Checkout を始める」（カート画面の Checkout ボタン）は CartPage にある。
+*/
+
+/*
+================================
+CheckoutStepOnePage（購入者情報の入力画面）
 ================================
 */
-export class CheckoutPage {
+export class CheckoutStepOnePage {
 
-  // Playwrightページインスタンス
-  constructor(private page: Page) {}
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
 
-  // =========================
-  // ■ Checkout開始（Cart → Step1）
-  // =========================
-  async startCheckout() {
+  // ================================
+  // ■ 入力フィールド（名・姓・郵便番号）
+  // ================================
+  readonly firstNameInput: Locator;
+  readonly lastNameInput: Locator;
+  readonly postalCodeInput: Locator;
 
-    // Checkoutボタン取得
-    const btn = this.page.locator('#checkout');
+  // ================================
+  // ■ Cancel・Continueボタン
+  // ================================
+  readonly cancelButton: Locator;
+  readonly continueButton: Locator;
 
-    // Checkout開始ボタン押下
-    await btn.click();
+  // ================================
+  // ■ エラーメッセージ表示エリア
+  // ================================
+  readonly errorMessageLocator: Locator;
 
-    // Step1画面遷移確認
-    await this.page.waitForURL(/checkout-step-one/, {
-      timeout: 10000
-    });
+  // ================================
+  // コンストラクタ
+  // ================================
+  constructor(page: Page) {
+
+    this.page = page;
+
+    this.firstNameInput = page.locator('[data-test="firstName"]');
+    this.lastNameInput = page.locator('[data-test="lastName"]');
+    this.postalCodeInput = page.locator('[data-test="postalCode"]');
+    this.cancelButton = page.locator('[data-test="cancel"]');
+    this.continueButton = page.locator('[data-test="continue"]');
+    this.errorMessageLocator = page.locator('[data-test="error"]');
   }
 
-  // =========================
-  // ■ 情報入力（Step1）
-  // =========================
+  // ================================
+  // Checkout Step One画面へ遷移
+  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
+  // ================================
+  async goto() {
+
+    await this.page.goto(urls.checkoutStepOne);
+  }
+
+  // ================================
+  // 購入者情報入力
+  // ================================
   async fillInfo(first: string, last: string, zip: string) {
 
-    // 各入力フィールド取得
-    const firstName = this.page.locator('[data-test="firstName"]');
-    const lastName = this.page.locator('[data-test="lastName"]');
-    const postal = this.page.locator('[data-test="postalCode"]');
-
-    // 入力処理
-    await firstName.fill(first);
-    await lastName.fill(last);
-    await postal.fill(zip);
+    await this.firstNameInput.fill(first);
+    await this.lastNameInput.fill(last);
+    await this.postalCodeInput.fill(zip);
   }
 
-  // =========================
-  // ■ 次へ（正常系：Step1 → Step2）
-  // =========================
-  async continue() {
+  // ================================
+  // Continueボタン押下
+  // ================================
+  async clickContinue() {
 
-    // Continueボタン押下
-    await this.page.locator('[data-test="continue"]').click();
-
-    // Step2遷移確認
-    await expect(this.page).toHaveURL(/checkout-step-two/);
+    await this.continueButton.click();
   }
 
-  // =========================
-  // ■ 次へ（異常系）
-  // =========================
-  async continueExpectError() {
+  // ================================
+  // Cancelボタン押下
+  // ================================
+  async clickCancel() {
 
-    // Continueボタン押下
-    await this.page.locator('[data-test="continue"]').click();
-
-    // Step1に留まることを確認
-    await expect(this.page).toHaveURL(/checkout-step-one/);
-
-    // エラーメッセージ表示確認
-    await expect(this.page.locator('[data-test="error"]')).toBeVisible();
+    await this.cancelButton.click();
   }
 
-  // =========================
-  // ■ 完了（Step2 → Complete）
-  // =========================
-  async finish() {
+  // ================================
+  // Checkout Step One画面表示確認
+  // ================================
+  async expectOnPage() {
 
-    // Finishボタン押下
-    await this.page.locator('[data-test="finish"]').click();
-
-    // 完了画面遷移確認
-    await expect(this.page).toHaveURL(/checkout-complete/);
+    await expect(this.page).toHaveURL(urls.checkoutStepOne);
+    await expect(this.continueButton).toBeVisible();
   }
 
-  // =========================
-  // ■ キャンセル（Step1 → Cart）
-  // =========================
-  async cancelFromStepOne() {
+  // ================================
+  // エラー表示検証
+  // ================================
+  async expectErrorVisible() {
 
-    // Cancelボタン押下
-    await this.page.locator('[data-test="cancel"], #cancel').first().click();
+    await expect(this.errorMessageLocator).toBeVisible();
+  }
+}
 
-    // カート画面遷移確認
-    await expect(this.page).toHaveURL(/cart/);
+/*
+================================
+CheckoutStepTwoPage（購入内容の確認画面）
+================================
+*/
+export class CheckoutStepTwoPage {
+
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
+
+  // ================================
+  // ■ Cancel・Finishボタン
+  // ================================
+  readonly cancelButton: Locator;
+  readonly finishButton: Locator;
+
+  // ================================
+  // コンストラクタ
+  // ================================
+  constructor(page: Page) {
+
+    this.page = page;
+
+    this.cancelButton = page.locator('[data-test="cancel"]');
+    this.finishButton = page.locator('[data-test="finish"]');
   }
 
-  // =========================
-  // ■ キャンセル（Step2 → Inventory）
-  // =========================
-  async cancelFromStepTwo() {
+  // ================================
+  // Checkout Step Two画面へ遷移
+  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
+  // ================================
+  async goto() {
 
-    // Cancelボタン押下
-    await this.page.locator('[data-test="cancel"], #cancel').first().click();
-
-    // 商品一覧画面遷移確認
-    await expect(this.page).toHaveURL(/inventory/);
+    await this.page.goto(urls.checkoutStepTwo);
   }
 
-  // =========================
-  // ■ 状態確認（Step1）
-  // =========================
-  async expectOnStepOne() {
+  // ================================
+  // Finishボタン押下
+  // ================================
+  async clickFinish() {
 
-    // Step1 URL確認
-    await expect(this.page).toHaveURL(/checkout-step-one/);
+    await this.finishButton.click();
   }
 
-  // =========================
-  // ■ 状態確認（Step2）
-  // =========================
-  async expectOnStepTwo() {
+  // ================================
+  // Cancelボタン押下
+  // ================================
+  async clickCancel() {
 
-    // Step2 URL確認
-    await expect(this.page).toHaveURL(/checkout-step-two/);
+    await this.cancelButton.click();
   }
 
-  // =========================
-  // ■ 完了状態確認
-  // =========================
-  async expectComplete() {
+  // ================================
+  // Checkout Step Two画面表示確認
+  // ================================
+  async expectOnPage() {
 
-    // 完了画面URL確認
-    await expect(this.page).toHaveURL(/checkout-complete/);
+    await expect(this.page).toHaveURL(urls.checkoutStepTwo);
+    await expect(this.finishButton).toBeVisible();
+  }
+}
 
-    // 完了メッセージ確認
-    await expect(this.page.locator('.complete-header')).toBeVisible();
+/*
+================================
+CheckoutCompletePage（購入完了画面）
+================================
+*/
+export class CheckoutCompletePage {
+
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
+
+  // ================================
+  // ■ 完了メッセージ（見出し）
+  // ================================
+  readonly completeHeader: Locator;
+
+  // ================================
+  // ■ Back Homeボタン
+  // ================================
+  readonly backHomeButton: Locator;
+
+  // ================================
+  // コンストラクタ
+  // ================================
+  constructor(page: Page) {
+
+    this.page = page;
+
+    this.completeHeader = page.locator('[data-test="complete-header"]');
+    this.backHomeButton = page.locator('[data-test="back-to-products"]');
+  }
+
+  // ================================
+  // Checkout Complete画面へ遷移
+  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
+  // ================================
+  async goto() {
+
+    await this.page.goto(urls.complete);
+  }
+
+  // ================================
+  // Checkout Complete画面表示確認
+  // ================================
+  async expectOnPage() {
+
+    await expect(this.page).toHaveURL(urls.complete);
+    await expect(this.backHomeButton).toBeVisible();
+  }
+
+  // ================================
+  // 完了メッセージ表示確認
+  // ================================
+  async expectCompleteHeaderVisible() {
+
+    await expect(this.completeHeader).toBeVisible();
   }
 }

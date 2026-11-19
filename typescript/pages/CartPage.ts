@@ -19,6 +19,11 @@ export class CartPage {
   readonly continueShoppingButton: Locator;
 
   // ================================
+  // ■ Checkoutボタン
+  // ================================
+  readonly checkoutButton: Locator;
+
+  // ================================
   // ■ カート内の商品の行
   // ================================
   // 削除した行はページ内に見えない要素（.removed_cart_item）として残るため、
@@ -38,6 +43,7 @@ export class CartPage {
     this.page = page;
 
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
+    this.checkoutButton = page.locator('[data-test="checkout"]');
     this.cartItems = page.locator('[data-test="inventory-item"]');
     this.removeButtons = page.locator('[data-test^="remove"]');
   }
@@ -100,14 +106,19 @@ export class CartPage {
   */
   async continueShopping() {
 
-    // ボタン表示確認
-    await expect(this.continueShoppingButton).toBeVisible();
-
-    // ボタン押下
+    // ボタン押下（商品一覧画面の確認は、呼び出す側で InventoryPage.expectOnPage() を呼んで行う）
     await this.continueShoppingButton.click();
+  }
 
-    // 一覧画面遷移確認
-    await expect(this.page).toHaveURL(/inventory/);
+  /*
+  ================================
+  Checkout開始（カート→Checkout Step One）
+  ================================
+  */
+  async clickCheckout() {
+
+    // ボタン押下（Step One画面の確認は、呼び出す側で CheckoutStepOnePage.expectOnPage() を呼んで行う）
+    await this.checkoutButton.click();
   }
 
   /*
@@ -131,9 +142,7 @@ export class CartPage {
   */
   async backToInventory() {
 
-    await this.continueShoppingButton.waitFor({ state: 'visible' });
+    // ボタン押下（商品一覧画面の確認は、呼び出す側で InventoryPage.expectOnPage() を呼んで行う）
     await this.continueShoppingButton.click();
-
-    await this.page.waitForURL(/inventory/);
   }
 }
