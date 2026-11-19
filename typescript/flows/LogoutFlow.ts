@@ -49,7 +49,7 @@ export class LogoutFlow {
     await this.menu.logout();
 
     // ログイン画面へ戻ったこと確認
-    await this.login.expectOnLoginPage();
+    await this.login.expectOnPage();
   }
 
   /*
@@ -60,6 +60,6 @@ export class LogoutFlow {
   async expectOnLoginPage() {
 
     // ログイン画面表示確認
-    await this.login.expectOnLoginPage();
+    await this.login.expectOnPage();
   }
 }

@@ -45,13 +45,13 @@ export class CheckoutFlow {
 
   async addSingleItem() {
 
-    await this.inventory.goto();
+    await this.inventory.expectOnPage();
     await this.inventory.addFirstItem();
   }
 
   async addMultipleItems() {
 
-    await this.inventory.goto();
+    await this.inventory.expectOnPage();
     await this.inventory.addAllItems();
   }
 
@@ -73,6 +73,7 @@ export class CheckoutFlow {
   async goToCart() {
 
     await this.cart.goto();
+    await this.cart.expectOnPage();
   }
 
   async startCheckout() {

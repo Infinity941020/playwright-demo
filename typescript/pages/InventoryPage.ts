@@ -1,5 +1,6 @@
-// PlaywrightのPage型・expectを使用
-import { Page, expect } from '@playwright/test';
+// PlaywrightのPage型・Locator型・expectを使用
+import { Page, Locator, expect } from '@playwright/test';
+import { urls } from '../utils/urls';
 
 /*
 ================================
@@ -9,20 +10,41 @@ InventoryPage
 */
 export class InventoryPage {
 
-  // Playwright Page保持
-  private page: Page;
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
+
+  // ================================
+  // ■ 商品一覧
+  // ================================
+  readonly inventoryList: Locator;
+
+  // ================================
+  // ■ 商品追加ボタン（全商品分）
+  // ================================
+  readonly addToCartButtons: Locator;
+
+  // ================================
+  // コンストラクタ
+  // ================================
+  constructor(page: Page) {
+
+    this.page = page;
+
+    this.inventoryList = page.locator('[data-test="inventory-list"]');
+    this.addToCartButtons = page.locator('[data-test^="add-to-cart"]');
+  }
 
   /*
   ================================
-  コンストラクタ
+  商品一覧画面へ遷移
+  （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
   ================================
   */
+  async goto() {
 
-  // Pageインスタンスを受け取り保持
-  constructor(page: Page) {
-
-    // Playwright Page保持
-    this.page = page;
+    await this.page.goto(urls.inventory);
   }
 
   /*
@@ -30,15 +52,13 @@ export class InventoryPage {
   商品一覧画面表示確認
   ================================
   */
-  async goto() {
+  async expectOnPage() {
 
     // inventory画面URL確認
-    await expect(this.page).toHaveURL(/inventory/);
+    await expect(this.page).toHaveURL(urls.inventory);
 
-    // 商品追加ボタン表示確認
-    await expect(
-      this.page.locator('[data-test^="add-to-cart"]').first()
-    ).toBeVisible();
+    // 商品一覧表示確認
+    await expect(this.inventoryList).toBeVisible();
   }
 
   /*
@@ -48,23 +68,18 @@ export class InventoryPage {
   */
   async addAllItems() {
 
-    // add-to-cartボタン一覧取得
-    const buttons = this.page.locator(
-      '[data-test^="add-to-cart"]'
-    );
-
     // ボタン表示待機
-    await expect(buttons.first()).toBeVisible();
+    await expect(this.addToCartButtons.first()).toBeVisible();
 
     // ボタン件数取得
-    const count = await buttons.count();
+    const count = await this.addToCartButtons.count();
 
     // 先頭ボタンを順番に押下
     // 押下後はremoveへ変化するためfirst固定
     for (let i = 0; i < count; i++) {
 
       // 先頭ボタン押下
-      await buttons.first().click();
+      await this.addToCartButtons.first().click();
     }
 
     // 追加件数返却
@@ -79,14 +94,9 @@ export class InventoryPage {
   async addFirstItem() {
 
     // 最初の商品追加ボタン表示確認
-    await expect(
-      this.page.locator('[data-test^="add-to-cart"]').first()
-    ).toBeVisible();
+    await expect(this.addToCartButtons.first()).toBeVisible();
 
     // 最初の商品追加ボタン押下
-    await this.page
-      .locator('[data-test^="add-to-cart"]')
-      .first()
-      .click();
+    await this.addToCartButtons.first().click();
   }
 }
