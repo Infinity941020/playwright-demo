@@ -159,8 +159,12 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   apiConfig.ts等はAPI層に関わるため、Login画面の実装には影響せず、
   該当フェーズで改めて判断する。
 - 影響範囲: Login画面実装（loginHelper.ts相当は作成しない）
-- TS逆輸入候補: あり（TS版でも不要コードとして削除する価値が
-  あるが、本プロジェクトのスコープ外）
+- TS逆輸入候補: 反映済み（横展開2-5。API 関係は 4-1 で判断）。
+  TS版の pages/・flows/・fixtures/・data/・utils/ から、使われていない utils/loginHelper.ts、
+  CartPage.backToInventory（continueShopping と同じボタンを押すだけの重複。CheckoutFlow.cancelFromCart は
+  continueShopping を使う形にした）、CartFlow.getCartPage を削除した。
+  使われていないが横展開3 で使う見込みのもの（Checkout の各画面の goto() など）は残した
+  （当初は「あり（TS版でも不要コードとして削除する価値があるが、本プロジェクトのスコープ外）」としていた）
 - 決定日: 2026-07-30（初回）／2026-11-15（更新：apiConfig.ts）
 
 ## 論点6: types/api.ts の型定義が実質使われていない

@@ -71,13 +71,4 @@ export class CartFlow {
 
     await this.header.expectBadgeCount(expected);
   }
-
-  /*
-  ================================
-  ■ 追加（検証用アクセサ）
-  ================================
-  */
-  getCartPage() {
-    return this.cartPage;
-  }
 }
