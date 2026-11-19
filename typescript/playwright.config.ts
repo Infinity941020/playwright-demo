@@ -47,15 +47,12 @@ export default defineConfig({
 
     actionTimeout: 0,
 
-    trace: isCI
-      ? 'retain-on-failure'
-      : 'on',
+    // 手元でも CI と同じく、失敗したときだけ残す（decisions.md 論点27）
+    trace: 'retain-on-failure',
 
     screenshot: 'off',
 
-    video: isCI
-      ? 'retain-on-failure'
-      : 'on',
+    video: 'retain-on-failure',
 
   },
 
@@ -76,23 +73,6 @@ export default defineConfig({
 
     /*
     ================================
-    Setup（ログイン状態の保存）
-    ================================
-    UI テストの前に1回だけ実行し、loggedPage で使うログイン状態を保存する（decisions.md 論点1）
-    */
-
-
-    {
-      name: 'setup',
-
-      testMatch:
-        /auth\.setup\.ts/,
-
-    },
-
-
-    /*
-    ================================
     UI Tests
     ================================
     */
@@ -103,8 +83,6 @@ export default defineConfig({
 
       testMatch:
         '**/tests/ui/**/*.spec.ts',
-
-      dependencies: ['setup'],
 
       use: {
         browserName: 'chromium',
@@ -119,8 +97,6 @@ export default defineConfig({
       testMatch:
         '**/tests/ui/**/*.spec.ts',
 
-      dependencies: ['setup'],
-
       use: {
         browserName: 'firefox',
       },
@@ -133,8 +109,6 @@ export default defineConfig({
 
       testMatch:
         '**/tests/ui/**/*.spec.ts',
-
-      dependencies: ['setup'],
 
       use: {
         browserName: 'webkit',
