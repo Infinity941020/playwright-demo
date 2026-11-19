@@ -1,7 +1,7 @@
 // Playwrightのfixture機能・Page型・expectを使用
 import { test as base, Page, expect } from '@playwright/test';
 import path from 'node:path';
-import { urls } from '../utils/urls';
+import { InventoryPage } from '../pages/InventoryPage';
 
 /*
 ================================
@@ -41,21 +41,18 @@ export const test = base.extend<Fixtures>({
     use: (value: Page) => Promise<void>
   ) => {
 
+    const inventoryPage = new InventoryPage(page);
+
     // ================================
     // ■ 商品一覧画面へ遷移
     // ================================
     // storageState は Cookie などだけを復元し、開いていた画面までは復元しないため、明示的に開く
-    await page.goto(urls.inventory);
+    await inventoryPage.goto();
 
     // ================================
-    // ■ ログイン済みの確認
+    // ■ ログイン済みの確認（商品一覧画面の表示確認）
     // ================================
-    await expect(page).toHaveURL(/inventory/);
-
-    // 商品一覧表示確認
-    await expect(
-      page.locator('.inventory_list')
-    ).toBeVisible();
+    await inventoryPage.expectOnPage();
 
     // ログイン済みPageを返却
     await use(page);

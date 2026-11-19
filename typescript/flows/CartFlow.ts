@@ -23,7 +23,7 @@ export class CartFlow {
 
   async addItems(type: 'single' | 'multi' = 'single'): Promise<number> {
 
-    await this.inventory.goto();
+    await this.inventory.expectOnPage();
 
     if (type === 'single') {
 
@@ -36,6 +36,7 @@ export class CartFlow {
 
   async openCart() {
     await this.cartPage.goto();
+    await this.cartPage.expectOnPage();
   }
 
   async removeFirstItem() {

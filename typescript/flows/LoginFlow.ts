@@ -1,6 +1,9 @@
 // LoginPage（UI操作クラス）を利用するためのインポート
 import { LoginPage } from '../pages/LoginPage';
 
+// InventoryPage（商品一覧画面の表示確認）を利用するためのインポート
+import { InventoryPage } from '../pages/InventoryPage';
+
 // PlaywrightのPage型を使用するためのインポート
 import { Page } from '@playwright/test';
 
@@ -19,6 +22,9 @@ export class LoginFlow {
   // LoginPageインスタンス（UI操作担当）
   private loginPage: LoginPage;
 
+  // InventoryPageインスタンス（ログイン後の商品一覧画面の確認担当）
+  private inventoryPage: InventoryPage;
+
   /*
   ================================
   コンストラクタ
@@ -28,6 +34,7 @@ export class LoginFlow {
   constructor(page: Page) {
 
     this.loginPage = new LoginPage(page);
+    this.inventoryPage = new InventoryPage(page);
   }
 
   /*
@@ -40,6 +47,7 @@ export class LoginFlow {
   async login(username: string, password: string) {
 
     await this.loginPage.goto();
+    await this.loginPage.expectOnPage();
     await this.loginPage.login(username, password);
   }
 
@@ -58,12 +66,12 @@ export class LoginFlow {
   // ログイン成功検証
   async expectLoginSuccess() {
 
-    await this.loginPage.expectOnInventoryPage();
+    await this.inventoryPage.expectOnPage();
   }
 
   // ログイン画面表示確認
   async expectOnLoginPage() {
 
-    await this.loginPage.expectOnLoginPage();
+    await this.loginPage.expectOnPage();
   }
 }

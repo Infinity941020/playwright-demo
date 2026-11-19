@@ -1,5 +1,5 @@
-// PlaywrightのPage型・expectを使用
-import { Page, expect } from '@playwright/test';
+// PlaywrightのPage型・Locator型・expectを使用
+import { Page, Locator, expect } from '@playwright/test';
 
 /*
 ================================
@@ -9,20 +9,24 @@ HeaderComponent
 */
 export class HeaderComponent {
 
-  // Playwright Page保持
-  private page: Page;
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
 
-  /*
-  ================================
-  コンストラクタ
-  ================================
-  */
+  // ================================
+  // ■ カートバッジ
+  // ================================
+  readonly cartBadge: Locator;
 
-  // Pageインスタンスを受け取り保持
+  // ================================
+  // コンストラクタ
+  // ================================
   constructor(page: Page) {
 
-    // Playwright Page保持
     this.page = page;
+
+    this.cartBadge = page.locator('[data-test="shopping-cart-badge"]');
   }
 
   /*
@@ -32,18 +36,15 @@ export class HeaderComponent {
   */
   async expectBadgeCount(count: number) {
 
-    // カートバッジ取得
-    const badge = this.page.locator('.shopping_cart_badge');
-
     // 0件時は非表示確認
     if (count === 0) {
 
-      await expect(badge).toHaveCount(0);
+      await expect(this.cartBadge).toHaveCount(0);
 
     } else {
 
       // 件数表示確認
-      await expect(badge).toHaveText(String(count));
+      await expect(this.cartBadge).toHaveText(String(count));
     }
   }
 }

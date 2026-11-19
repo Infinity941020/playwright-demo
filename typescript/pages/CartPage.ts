@@ -1,4 +1,5 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
+import { urls } from '../utils/urls';
 
 /*
 ================================
@@ -6,24 +7,51 @@ CartPage（CI安定版）
 ================================
 */
 export class CartPage {
-  constructor(private page: Page) {}
+
+  // ================================
+  // ■ ページインスタンス
+  // ================================
+  readonly page: Page;
+
+  // ================================
+  // ■ Continue Shoppingボタン
+  // ================================
+  readonly continueShoppingButton: Locator;
+
+  // ================================
+  // ■ カート内の商品の行
+  // ================================
+  // 削除した行はページ内に見えない要素（.removed_cart_item）として残るため、
+  // data-test="inventory-item" を持つ行のみを数える（Python版と同じ）
+  readonly cartItems: Locator;
+
+  // ================================
+  // ■ 商品削除ボタン（全商品分）
+  // ================================
+  readonly removeButtons: Locator;
+
+  // ================================
+  // コンストラクタ
+  // ================================
+  constructor(page: Page) {
+
+    this.page = page;
+
+    this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
+    this.cartItems = page.locator('[data-test="inventory-item"]');
+    this.removeButtons = page.locator('[data-test^="remove"]');
+  }
 
   /*
   ================================
   カート画面へ遷移
+  （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
   ================================
   */
   async goto() {
 
     // カート画面へ移動
-    await this.page.goto('https://www.saucedemo.com/cart.html');
-
-    // カート画面URLであることを確認
-    await expect(this.page).toHaveURL(/cart/);
-
-    // カート操作ボタンが表示されていることを確認
-    await expect(this.page.locator('[data-test="continue-shopping"]'))
-      .toBeVisible();
+    await this.page.goto(urls.cart);
   }
 
   /*
@@ -31,14 +59,13 @@ export class CartPage {
   カート画面表示保証
   ================================
   */
-  async expectOnCartPage() {
+  async expectOnPage() {
 
     // カート画面URLであることを確認
-    await expect(this.page).toHaveURL(/cart/);
+    await expect(this.page).toHaveURL(urls.cart);
 
     // Continue Shoppingボタン表示確認
-    await expect(this.page.locator('[data-test="continue-shopping"]'))
-      .toBeVisible();
+    await expect(this.continueShoppingButton).toBeVisible();
   }
 
   /*
@@ -49,7 +76,7 @@ export class CartPage {
   async expectItemCount(count: number) {
 
     // カート内商品数確認
-    await expect(this.page.locator('.cart_item')).toHaveCount(count);
+    await expect(this.cartItems).toHaveCount(count);
   }
 
   /*
@@ -59,13 +86,11 @@ export class CartPage {
   */
   async removeFirstItem() {
 
-    const removeButtons = this.page.locator('[data-test^="remove"]');
-
     // 削除ボタンが表示されていることを確認
-    await expect(removeButtons.first()).toBeVisible();
+    await expect(this.removeButtons.first()).toBeVisible();
 
     // 1件目削除
-    await removeButtons.first().click();
+    await this.removeButtons.first().click();
   }
 
   /*
@@ -75,13 +100,11 @@ export class CartPage {
   */
   async continueShopping() {
 
-    const btn = this.page.locator('[data-test="continue-shopping"]');
-
     // ボタン表示確認
-    await expect(btn).toBeVisible();
+    await expect(this.continueShoppingButton).toBeVisible();
 
     // ボタン押下
-    await btn.click();
+    await this.continueShoppingButton.click();
 
     // 一覧画面遷移確認
     await expect(this.page).toHaveURL(/inventory/);
@@ -94,12 +117,10 @@ export class CartPage {
   */
   async removeAllItems() {
 
-    const buttons = this.page.locator('[data-test^="remove"]');
-
-    const count = await buttons.count();
+    const count = await this.removeButtons.count();
 
     for (let i = 0; i < count; i++) {
-      await buttons.first().click();
+      await this.removeButtons.first().click();
     }
   }
 
@@ -110,12 +131,8 @@ export class CartPage {
   */
   async backToInventory() {
 
-    const btn = this.page.locator(
-      '[data-test="continue-shopping"], #continue-shopping'
-    );
-
-    await btn.waitFor({ state: 'visible' });
-    await btn.click();
+    await this.continueShoppingButton.waitFor({ state: 'visible' });
+    await this.continueShoppingButton.click();
 
     await this.page.waitForURL(/inventory/);
   }

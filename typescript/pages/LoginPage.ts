@@ -1,5 +1,6 @@
 // PlaywrightのPage型・Locator型・expectを使用するためのインポート
 import { Page, Locator, expect } from '@playwright/test';
+import { urls } from '../utils/urls';
 
 /*
 ================================
@@ -44,20 +45,19 @@ export class LoginPage {
 
     this.page = page;
 
-    this.usernameInput = page.locator('#user-name');
-    this.passwordInput = page.locator('#password');
-    this.loginButton = page.locator('#login-button');
+    this.usernameInput = page.locator('[data-test="username"]');
+    this.passwordInput = page.locator('[data-test="password"]');
+    this.loginButton = page.locator('[data-test="login-button"]');
     this.errorMessageLocator = page.locator('[data-test="error"]');
   }
 
   // ================================
   // ログイン画面へ遷移
+  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
   // ================================
   async goto() {
 
-    await this.page.goto('https://www.saucedemo.com/');
-
-    await expect(this.loginButton).toBeVisible();
+    await this.page.goto(urls.login);
   }
 
   // ================================
@@ -100,23 +100,11 @@ export class LoginPage {
   }
 
   // ================================
-  // ログイン成功後（商品一覧ページ）
-  // ================================
-  async expectOnInventoryPage() {
-
-    // URLがinventoryページに遷移していることを確認
-    await expect(this.page).toHaveURL(/inventory\.html/);
-
-    // 商品一覧が表示されていることを確認
-    await expect(this.page.locator('.inventory_list')).toBeVisible();
-  }
-
-  // ================================
   // ログイン画面表示確認
   // ================================
-  async expectOnLoginPage() {
+  async expectOnPage() {
 
-    await expect(this.page).toHaveURL('https://www.saucedemo.com/');
+    await expect(this.page).toHaveURL(urls.login);
     await expect(this.loginButton).toBeVisible();
     await expect(this.usernameInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();

@@ -1,5 +1,6 @@
 import { test as setup } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
+import { InventoryPage } from '../../pages/InventoryPage';
 import { users } from '../../data/users';
 import { STANDARD_USER_STORAGE_STATE } from '../../fixtures/loginFixture';
 
@@ -17,10 +18,11 @@ setup('login and save storage state', async ({ page }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.goto();
+  await loginPage.expectOnPage();
   await loginPage.login(users.standard.username, users.standard.password);
 
   // 保存の前に、商品一覧画面が表示されていることを確認
-  await loginPage.expectOnInventoryPage();
+  await new InventoryPage(page).expectOnPage();
 
   // ログイン状態保存
   await page.context().storageState({ path: STANDARD_USER_STORAGE_STATE });
