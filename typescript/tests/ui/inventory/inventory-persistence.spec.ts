@@ -7,7 +7,7 @@ import {
   expectRemoveButtonShown,
   expectSelectedSort,
 } from '../../../utils/uiAssertions/inventoryAssertions';
-import { productsInDisplayOrder, products, sortOptions } from '../../../data/products';
+import { products, productsInDisplayOrder, sortOptions } from '../../../data/products';
 
 test.describe('Products画面の状態保持', () => {
 
@@ -29,7 +29,7 @@ test.describe('Products画面の状態保持', () => {
 
     await inventoryFlow.sortBy(sortOptions.priceDesc);
 
-    // 並べ替えが効かなくても、再読み込みの後は Name (A to Z) になるため、並べ替えが効いたことを先に確かめる
+    // 並べ替えが効かなくても、再読み込みの後は Name (A to Z) になるため、先にソートの選択が切り替わったことを確かめる
     await expectSelectedSort(inventoryFlow, sortOptions.priceDesc);
 
     await inventoryFlow.reloadInventory();
