@@ -19,6 +19,8 @@ ECサイト（SauceDemo）の商品一覧画面。ログイン成功後に最初
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 （Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
 
+TS版の Wiki では、Products画面は今は独立した画面として扱っておらず、Cart仕様の中に含まれている。Wiki の見直しは後の作業で行う。
+
 実機確認：2026-10-07（Playwright調査用スクリプトにて確認）
 
 ---

@@ -256,13 +256,16 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   バッジ＝件数を確認するテストは、TS版と同じくCart側で扱う。
 - 影響範囲: specs/products_*.md、pages/inventory_page.py、
   pages/header_component.py、flows/inventory_flow.py、tests/ui/inventory/
-- TS逆輸入候補: 検討（TS版のWikiの対象ドメインにProductsを追加するか
-  どうかを含む）
+- TS逆輸入候補: 反映済み（Wiki の扱いは後の作業で判断）。当初は「検討（TS版のWikiの対象ドメインにProductsを追加するか
+  どうかを含む）」としていた
 - 決定日: 2026-10-07
-- 追記（2026-11-20）: 横展開3-2 で TS版にも反映した。TS版に Products画面のテスト（typescript/tests/ui/inventory/ の6ファイル）を
-  新しく作り、両版共通のテストケースと同じ14件を、Python版と同じ確かめ方で実装した（3ブラウザで実行）。
-  あわせて、TS版の InventoryPage・HeaderComponent・InventoryFlow と確認の部品に、Python版と対応する操作と確認を足した。
-  Wiki の扱いは、横展開5（Wiki を両版共通の内容に直す回）で判断する
+- 追記（2026-11-20）: TS版に Products画面のテストを追加したとき（横展開3-2）に、TS版にも反映した。
+  TS版に Products画面のテスト（typescript/tests/ui/inventory/ の6ファイル）を新しく作り、両版共通のテストケースと同じ14件を、
+  Python版と同じ確かめ方で実装した（3ブラウザで実行）。
+  両版の部品は、今回のテストで使うものだけを揃えた。Python版だけにある操作は、商品詳細画面を URL で開く操作。
+  TS版だけにある操作は、全商品・先頭の商品をカートに入れる操作（Cart のテストで使う）。
+  既存の部品（InventoryPage・HeaderComponent）は、説明文を役割と理由だけを書く形に直し、中身（画面の要素の探し方）を外から触れない形にした。
+  Wiki の扱いは、Wiki を両版共通の内容に直す後の作業で判断する
 
 ## 論点13: goto() と expect_on_xxx() の使い分け
 
