@@ -1,48 +1,20 @@
-// LoginFlow
 import { LoginFlow } from '../../flows/LoginFlow';
 
-/*
-================================
-Login UI Assertions
-================================
-責務：
-- Login機能のUI検証
-- Flow経由で業務レベル検証を実施
-================================
-*/
+// ログイン画面の表示や状態を確かめる関数。
+// テストからは画面の部品を直接呼ばず、ログインの操作の単位を通して確かめる
 
-/*
-================================
-ログイン成功
-================================
-*/
-export async function expectLoginSuccess(
-  loginFlow: LoginFlow
-) {
-
+export async function expectLoginSuccess(loginFlow: LoginFlow) {
   await loginFlow.expectLoginSuccess();
 }
 
-/*
-================================
-ログイン失敗
-================================
-*/
-export async function expectLoginError(
-  loginFlow: LoginFlow
-) {
-
-  await loginFlow.expectLoginError();
+export async function expectLoginErrorMessage(loginFlow: LoginFlow, message: string) {
+  await loginFlow.expectLoginErrorMessage(message);
 }
 
-/*
-================================
-ログイン画面表示
-================================
-*/
-export async function expectOnLoginPage(
-  loginFlow: LoginFlow
-) {
-
+export async function expectOnLoginPage(loginFlow: LoginFlow) {
   await loginFlow.expectOnLoginPage();
+}
+
+export async function expectUsernameRetained(loginFlow: LoginFlow, username: string) {
+  await loginFlow.expectUsernameRetained(username);
 }

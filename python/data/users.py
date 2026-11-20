@@ -10,5 +10,4 @@ from data.shared_data import load_shared_data
 #   locked：ロックされていて、ログインできないユーザー
 #   wrong_username_only：異常系のテストに使う（ユーザー名だけが誤り）
 #   wrong_password_only：異常系のテストに使う（パスワードだけが誤り）
-#   wrong_both：ユーザー名・パスワードとも誤り（TS版だけが使う）
 USERS = load_shared_data("users.json")
