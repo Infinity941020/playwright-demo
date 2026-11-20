@@ -3,6 +3,8 @@
 共通の前提：未ログイン状態でLogin画面を開いている
 
 対応する仕様書：login_spec.md
+対応するテスト：TS版は `typescript/tests/ui/login/`、Python版は `python/tests/ui/login/`（両版とも同じ9件。下の「両版のテストとの対応」）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 確定日：2026-07-30（Stage 0）
 
 ---
@@ -135,8 +137,24 @@
 | ユーザー名・パスワード両方誤り（無効×無効） | 「ユーザー名だけ誤り」「パスワードだけ誤り」で同じエラーメッセージが出ることを確認できていれば、両方誤りでも結果が変わる可能性は低く、テスト実行コストに見合う価値が低いため（decisions.md 論点11も参照） |
 | 特殊ユーザー（problem_user等。locked_out_userを除く） | 今後の拡張候補（TS版にも同時に反映する前提） |
 
+## ■ 両版のテストとの対応
+
+両版とも、テストケース8件と補助のテスト1件の、同じ9件を実装している。
+
+| テストID | TS版（typescript/tests/ui/login/） | Python版（python/tests/ui/login/） |
+|---|---|---|
+| TC-LOGIN-001 | login-success.spec.ts「TC-LOGIN-001：…」 | test_login_success.py `test_login_success_shows_inventory` |
+| TC-LOGIN-002 | login-failure.spec.ts「TC-LOGIN-002：…」 | test_login_failure.py `test_missing_username` |
+| TC-LOGIN-003 | login-failure.spec.ts「TC-LOGIN-003：…」 | test_login_failure.py `test_missing_password` |
+| TC-LOGIN-004 | login-failure.spec.ts「TC-LOGIN-004：…」 | test_login_failure.py `test_missing_username_and_password` |
+| TC-LOGIN-005 | login-failure.spec.ts「TC-LOGIN-005：…」（TC-LOGIN-006 とデータを切り替える形） | test_login_failure.py `test_single_field_wrong[TC-LOGIN-005]` |
+| TC-LOGIN-006 | login-failure.spec.ts「TC-LOGIN-006：…」（TC-LOGIN-005 とデータを切り替える形） | test_login_failure.py `test_single_field_wrong[TC-LOGIN-006]` |
+| TC-LOGIN-007 | login-failure.spec.ts「TC-LOGIN-007：…」 | test_login_failure.py `test_locked_out_user` |
+| TC-LOGIN-008 | login-failure.spec.ts「TC-LOGIN-008：…」 | test_login_failure.py `test_username_retained_after_failure` |
+| （補助） | logged-page-fixture.spec.ts「テストケース外（部品の動作確認）：…」 | test_logged_page_fixture.py `test_logged_page_starts_on_inventory_page` |
+
 ## ■ テストケース以外の補助テスト
 
-| テスト関数 | 目的 |
+| テスト | 目的 |
 |---|---|
-| test_logged_page_starts_on_inventory_page | logged_page fixture（storage_state の再利用）が正しく動くことの確認。テストケースの件数には含めない |
+| ログイン済みの画面を用意する部品の動作確認（上の表の「補助」） | 保存したログイン状態を使って、ログインの操作をしなくても商品一覧画面が開いていることの確認。テストケースの件数には含めない |
