@@ -2,7 +2,7 @@
 import { test } from '../../../fixtures/loginFixture';
 import { InventoryFlow } from '../../../flows/InventoryFlow';
 import { expectProductsDisplayed } from '../../../utils/uiAssertions/inventoryAssertions';
-import { products } from '../../../data/products';
+import { productsInDisplayOrder } from '../../../data/products';
 
 test.describe('Products画面の表示', () => {
 
@@ -10,6 +10,6 @@ test.describe('Products画面の表示', () => {
 
     const inventoryFlow = new InventoryFlow(loggedPage);
 
-    await expectProductsDisplayed(inventoryFlow, Object.values(products));
+    await expectProductsDisplayed(inventoryFlow, productsInDisplayOrder);
   });
 });

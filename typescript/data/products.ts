@@ -1,6 +1,5 @@
 // Products画面に表示される商品と、ソートの選択肢。
 // 値は両版共通の shared/data/products.json にあり、ここでは名前の書き方だけを TypeScript の書き方に直して渡す。
-// 商品は、仕様書「表示商品」の表の順（初期表示の Name (A to Z) の並び）に並べている
 import sharedProducts from '../../shared/data/products.json' with { type: 'json' };
 
 export type Product = {
@@ -28,6 +27,17 @@ export const products: {
   onesie: shared.onesie,
   redTShirt: shared.red_t_shirt,
 };
+
+// 仕様書「表示商品」の表の順（初期表示の Name (A to Z) の並び）。
+// 並び順を確かめるテストは、書いた順に頼らず、この一覧を使う
+export const productsInDisplayOrder: readonly Product[] = [
+  products.backpack,
+  products.bikeLight,
+  products.boltTShirt,
+  products.fleeceJacket,
+  products.onesie,
+  products.redTShirt,
+];
 
 // ソートの選択肢（画面に表示される文言）
 export const sortOptions: {

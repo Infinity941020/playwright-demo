@@ -26,7 +26,7 @@ export class InventoryFlow {
     await this.inventoryPage.goto();
   }
 
-  // 再読み込みした後、商品一覧画面が表示し直されたことを確かめてから次に進む
+  // 再読み込みでログイン画面へ戻された場合などに、別の画面のまま確認を続けないよう、商品一覧画面であることを確かめる
   async reloadInventory() {
 
     await this.inventoryPage.reload();
@@ -60,7 +60,7 @@ export class InventoryFlow {
   }
 
   // 商品一覧の表示を確かめる（件数、各商品の表示項目、商品名と価格の組み合わせ）
-  async expectProductsDisplayed(products: Product[]) {
+  async expectProductsDisplayed(products: readonly Product[]) {
 
     await this.inventoryPage.expectProductCount(products.length);
     await this.inventoryPage.expectAllProductElementsVisible();

@@ -6,11 +6,10 @@ import {
   expectProductPricesInOrder,
   expectSelectedSort,
 } from '../../../utils/uiAssertions/inventoryAssertions';
-import { products, sortOptions } from '../../../data/products';
+import { productsInDisplayOrder, sortOptions } from '../../../data/products';
 
-// 仕様書「表示商品」の表の順（No.1→No.6）
-const productNames = Object.values(products).map((product) => product.name);
-const prices = Object.values(products).map((product) => product.price);
+const productNames = productsInDisplayOrder.map((product) => product.name);
+const prices = productsInDisplayOrder.map((product) => product.price);
 
 // 期待する並びを作るために、「$29.99」の形の価格を数に直す
 function priceValue(price: string): number {

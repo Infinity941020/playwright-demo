@@ -78,8 +78,9 @@ class InventoryPage:
 
     def expect_all_product_elements_visible(self) -> None:
         """全商品に「画像／商品名／説明／価格／Add to cartボタン」が表示されていることを確かめる。"""
+        expect(self.inventory_items.first).to_be_visible()
         for item in self.inventory_items.all():
-            expect(item.locator("img.inventory_item_img")).to_be_visible()
+            expect(item.locator('img[data-test$="-img"]')).to_be_visible()
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()
             expect(item.locator('[data-test="inventory-item-desc"]')).to_be_visible()
             expect(item.locator('[data-test="inventory-item-price"]')).to_be_visible()

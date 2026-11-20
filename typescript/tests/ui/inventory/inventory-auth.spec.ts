@@ -5,10 +5,9 @@ import { InventoryFlow } from '../../../flows/InventoryFlow';
 import { LoginFlow } from '../../../flows/LoginFlow';
 import { expectLoginErrorMessage, expectOnLoginPage } from '../../../utils/uiAssertions/loginAssertions';
 import { messages } from '../../../data/messages';
-import { urls } from '../../../utils/urls';
 
-// 文言には、開いた画面のパス（/inventory.html）が入る
-const notLoggedInMessage = messages.login.notLoggedIn.replace('{path}', new URL(urls.inventory).pathname);
+// 期待する文言は、開く側の URL から作らず、テストケースの期待結果と同じパスを書いて別に持つ
+const notLoggedInMessage = messages.login.notLoggedIn.replace('{path}', '/inventory.html');
 
 test.describe('Products画面の認証', () => {
 

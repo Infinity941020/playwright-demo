@@ -7,7 +7,7 @@ import {
   expectRemoveButtonShown,
   expectSelectedSort,
 } from '../../../utils/uiAssertions/inventoryAssertions';
-import { products, sortOptions } from '../../../data/products';
+import { productsInDisplayOrder, products, sortOptions } from '../../../data/products';
 
 test.describe('Products画面の状態保持', () => {
 
@@ -28,9 +28,13 @@ test.describe('Products画面の状態保持', () => {
     const inventoryFlow = new InventoryFlow(loggedPage);
 
     await inventoryFlow.sortBy(sortOptions.priceDesc);
+
+    // 並べ替えが効かなくても、再読み込みの後は Name (A to Z) になるため、並べ替えが効いたことを先に確かめる
+    await expectSelectedSort(inventoryFlow, sortOptions.priceDesc);
+
     await inventoryFlow.reloadInventory();
 
     await expectSelectedSort(inventoryFlow, sortOptions.nameAsc);
-    await expectProductNamesInOrder(inventoryFlow, Object.values(products).map((product) => product.name));
+    await expectProductNamesInOrder(inventoryFlow, productsInDisplayOrder.map((product) => product.name));
   });
 });

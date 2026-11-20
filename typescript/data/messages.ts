@@ -19,7 +19,7 @@ export const messages: {
     credentialsMismatch: sharedMessages.login.credentials_mismatch,
     lockedOut: sharedMessages.login.locked_out,
 
-    // ログインせずに画面を開いたときの文言。{path} の所に、開いた画面のパス（例：/inventory.html）を入れて使う
+    // ログインせずに画面を開いたときの文言。{path} の部分に、開いた画面のパス（例：/inventory.html）を入れて使う
     notLoggedIn: sharedMessages.login.not_logged_in,
   },
 };

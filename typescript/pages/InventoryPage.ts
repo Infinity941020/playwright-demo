@@ -1,8 +1,13 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
 
+// 文字列を、正規表現の中でそのままの文字として扱えるようにする（商品名に「.」や「(」が入るため）
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // 商品一覧画面の操作と、画面の表示の確認をまとめる。
-// - 商品ごとの部分（ボタン・価格など）は、商品名で商品のカードを探してから、その中で探す
+// - 商品ごとの部分（ボタン・価格など）は、並べ替えで並び順が変わっても同じ商品を操作できるように、商品名で商品のカードを探してから、その中で探す
 // - 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
 export class InventoryPage {
 
@@ -14,9 +19,9 @@ export class InventoryPage {
   private readonly itemPrices: Locator;
   private readonly itemImages: Locator;
   private readonly itemImageLinks: Locator;
-  private readonly addToCartButton: Locator;
-  private readonly removeButton: Locator;
-  private readonly addToCartButtons: Locator;
+  private readonly itemAddToCartButton: Locator;
+  private readonly itemRemoveButton: Locator;
+  private readonly allAddToCartButtons: Locator;
   private readonly sortSelect: Locator;
   private readonly activeSortOption: Locator;
 
@@ -30,15 +35,17 @@ export class InventoryPage {
     this.itemDescriptions = page.locator('[data-test="inventory-item-desc"]');
     this.itemPrices = page.locator('[data-test="inventory-item-price"]');
 
-    // 商品画像には data-test がないため、CSS のクラスで探す
-    this.itemImages = page.locator('img.inventory_item_img');
+    // 商品画像と画像のリンクのテスト用の属性には、商品ごとに違う名前が入るため、名前の終わりの部分で探す
+    this.itemImages = page.locator('img[data-test$="-img"]');
     this.itemImageLinks = page.locator('a[data-test$="-img-link"]');
 
-    // 商品のカードの中で使う、ボタンの文言での探し方
-    this.addToCartButton = page.getByRole('button', { name: 'Add to cart', exact: true });
-    this.removeButton = page.getByRole('button', { name: 'Remove', exact: true });
+    // ボタンのテスト用の属性には商品ごとに違う名前が入るため、カードの中でボタンの文言で探す。文言で、追加済みかどうかも区別できる
+    this.itemAddToCartButton = page.getByRole('button', { name: 'Add to cart', exact: true });
+    this.itemRemoveButton = page.getByRole('button', { name: 'Remove', exact: true });
 
-    this.addToCartButtons = page.locator('[data-test^="add-to-cart"]');
+    // 画面全体の、カートに追加するボタンの一覧（どの商品かを問わずに押すときに使う）
+    this.allAddToCartButtons = page.locator('[data-test^="add-to-cart"]');
+
     this.sortSelect = page.locator('[data-test="product-sort-container"]');
     this.activeSortOption = page.locator('[data-test="active-option"]');
   }
@@ -46,7 +53,7 @@ export class InventoryPage {
   // 商品名が完全に一致する商品のカード（名前の一部が同じ、別の商品を選ばないようにする）
   private item(productName: string): Locator {
 
-    const exactName = new RegExp(`^${productName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
+    const exactName = new RegExp(`^${escapeRegExp(productName)}$`);
 
     return this.inventoryItems.filter({ has: this.itemNames.filter({ hasText: exactName }) });
   }
@@ -64,11 +71,11 @@ export class InventoryPage {
   }
 
   async addToCart(productName: string) {
-    await this.item(productName).locator(this.addToCartButton).click();
+    await this.item(productName).locator(this.itemAddToCartButton).click();
   }
 
   async removeFromCart(productName: string) {
-    await this.item(productName).locator(this.removeButton).click();
+    await this.item(productName).locator(this.itemRemoveButton).click();
   }
 
   async clickProductName(productName: string) {
@@ -82,13 +89,13 @@ export class InventoryPage {
   // 並んでいる商品を、上から順にすべてカートに追加し、追加した件数を返す
   async addAllItems() {
 
-    await expect(this.addToCartButtons.first()).toBeVisible();
+    await expect(this.allAddToCartButtons.first()).toBeVisible();
 
-    const count = await this.addToCartButtons.count();
+    const count = await this.allAddToCartButtons.count();
 
     // 押したボタンは Remove に変わり、追加用のボタンの一覧から外れるため、毎回先頭を押す
     for (let i = 0; i < count; i++) {
-      await this.addToCartButtons.first().click();
+      await this.allAddToCartButtons.first().click();
     }
 
     return count;
@@ -96,8 +103,8 @@ export class InventoryPage {
 
   async addFirstItem() {
 
-    await expect(this.addToCartButtons.first()).toBeVisible();
-    await this.addToCartButtons.first().click();
+    await expect(this.allAddToCartButtons.first()).toBeVisible();
+    await this.allAddToCartButtons.first().click();
   }
 
   // 商品一覧画面が表示されていることを確かめる（URL が完全に一致し、商品一覧が見えている）
@@ -114,13 +121,16 @@ export class InventoryPage {
   // すべての商品に、画像・商品名・説明・価格・Add to cart ボタンが表示されていることを確かめる
   async expectAllProductElementsVisible() {
 
+    // 商品がまだ表示されていないと、何も確かめずに終わってしまうため、最初の商品が表示されるのを待つ
+    await expect(this.inventoryItems.first()).toBeVisible();
+
     for (const item of await this.inventoryItems.all()) {
 
       await expect(item.locator(this.itemImages)).toBeVisible();
       await expect(item.locator(this.itemNames)).toBeVisible();
       await expect(item.locator(this.itemDescriptions)).toBeVisible();
       await expect(item.locator(this.itemPrices)).toBeVisible();
-      await expect(item.locator(this.addToCartButton)).toBeVisible();
+      await expect(item.locator(this.itemAddToCartButton)).toBeVisible();
     }
   }
 
@@ -143,11 +153,11 @@ export class InventoryPage {
   }
 
   async expectAddToCartButton(productName: string) {
-    await expect(this.item(productName).locator(this.addToCartButton)).toBeVisible();
+    await expect(this.item(productName).locator(this.itemAddToCartButton)).toBeVisible();
   }
 
   async expectRemoveButton(productName: string) {
-    await expect(this.item(productName).locator(this.removeButton)).toBeVisible();
+    await expect(this.item(productName).locator(this.itemRemoveButton)).toBeVisible();
   }
 
   // 商品詳細画面へ移ったことを確かめる（画面の中身は確かめない）
