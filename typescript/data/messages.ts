@@ -9,6 +9,7 @@ export const messages: {
     readonly passwordRequired: string;
     readonly credentialsMismatch: string;
     readonly lockedOut: string;
+    readonly notLoggedIn: string;
   };
 } = {
 
@@ -17,5 +18,8 @@ export const messages: {
     passwordRequired: sharedMessages.login.password_required,
     credentialsMismatch: sharedMessages.login.credentials_mismatch,
     lockedOut: sharedMessages.login.locked_out,
+
+    // ログインせずに画面を開いたときの文言。{path} の所に、開いた画面のパス（例：/inventory.html）を入れて使う
+    notLoggedIn: sharedMessages.login.not_logged_in,
   },
 };

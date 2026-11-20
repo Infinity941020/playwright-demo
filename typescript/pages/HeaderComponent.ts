@@ -1,49 +1,30 @@
-// PlaywrightのPage型・Locator型・expectを使用
 import { Page, Locator, expect } from '@playwright/test';
 
-/*
-================================
-HeaderComponent
-ヘッダー共通操作・検証Component
-================================
-*/
+// 各画面に共通のヘッダーにある、カートアイコンへの操作と、カートのバッジの確認をまとめる
 export class HeaderComponent {
 
-  // ================================
-  // ■ ページインスタンス
-  // ================================
-  readonly page: Page;
+  private readonly page: Page;
+  private readonly cartLink: Locator;
+  private readonly cartBadge: Locator;
 
-  // ================================
-  // ■ カートバッジ
-  // ================================
-  readonly cartBadge: Locator;
-
-  // ================================
-  // コンストラクタ
-  // ================================
   constructor(page: Page) {
 
     this.page = page;
 
+    this.cartLink = page.locator('[data-test="shopping-cart-link"]');
     this.cartBadge = page.locator('[data-test="shopping-cart-badge"]');
   }
 
-  /*
-  ================================
-  カートバッジ件数確認
-  ================================
-  */
+  async clickCartIcon() {
+    await this.cartLink.click();
+  }
+
+  // 0件のときは、バッジが表示されていないことを確かめる
   async expectBadgeCount(count: number) {
 
-    // 0件時は非表示確認
     if (count === 0) {
-
       await expect(this.cartBadge).toHaveCount(0);
-
     } else {
-
-      // 件数表示確認
       await expect(this.cartBadge).toHaveText(String(count));
     }
   }
