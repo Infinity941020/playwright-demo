@@ -1,102 +1,167 @@
-// PlaywrightのPage型・Locator型・expectを使用
 import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
 
-/*
-================================
-InventoryPage
-商品一覧画面操作用 Page Object
-================================
-*/
+// 文字列を、正規表現の中でそのままの文字として扱えるようにする（商品名に「.」や「(」が入るため）
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// 商品一覧画面の操作と、画面の表示の確認をまとめる。
+// - 商品ごとの部分（ボタン・価格など）は、並べ替えで並び順が変わっても同じ商品を操作できるように、商品名で商品のカードを探してから、その中で探す
+// - 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
 export class InventoryPage {
 
-  // ================================
-  // ■ ページインスタンス
-  // ================================
-  readonly page: Page;
+  private readonly page: Page;
+  private readonly inventoryList: Locator;
+  private readonly inventoryItems: Locator;
+  private readonly itemNames: Locator;
+  private readonly itemDescriptions: Locator;
+  private readonly itemPrices: Locator;
+  private readonly itemImages: Locator;
+  private readonly itemImageLinks: Locator;
+  private readonly itemAddToCartButton: Locator;
+  private readonly itemRemoveButton: Locator;
+  private readonly allAddToCartButtons: Locator;
+  private readonly sortSelect: Locator;
+  private readonly activeSortOption: Locator;
 
-  // ================================
-  // ■ 商品一覧
-  // ================================
-  readonly inventoryList: Locator;
-
-  // ================================
-  // ■ 商品追加ボタン（全商品分）
-  // ================================
-  readonly addToCartButtons: Locator;
-
-  // ================================
-  // コンストラクタ
-  // ================================
   constructor(page: Page) {
 
     this.page = page;
 
     this.inventoryList = page.locator('[data-test="inventory-list"]');
-    this.addToCartButtons = page.locator('[data-test^="add-to-cart"]');
+    this.inventoryItems = page.locator('[data-test="inventory-item"]');
+    this.itemNames = page.locator('[data-test="inventory-item-name"]');
+    this.itemDescriptions = page.locator('[data-test="inventory-item-desc"]');
+    this.itemPrices = page.locator('[data-test="inventory-item-price"]');
+
+    // 商品画像と画像のリンクのテスト用の属性には、商品ごとに違う名前が入るため、名前の終わりの部分で探す
+    this.itemImages = page.locator('img[data-test$="-img"]');
+    this.itemImageLinks = page.locator('a[data-test$="-img-link"]');
+
+    // ボタンのテスト用の属性には商品ごとに違う名前が入るため、カードの中でボタンの文言で探す。文言で、追加済みかどうかも区別できる
+    this.itemAddToCartButton = page.getByRole('button', { name: 'Add to cart', exact: true });
+    this.itemRemoveButton = page.getByRole('button', { name: 'Remove', exact: true });
+
+    // 画面全体の、カートに追加するボタンの一覧（どの商品かを問わずに押すときに使う）
+    this.allAddToCartButtons = page.locator('[data-test^="add-to-cart"]');
+
+    this.sortSelect = page.locator('[data-test="product-sort-container"]');
+    this.activeSortOption = page.locator('[data-test="active-option"]');
   }
 
-  /*
-  ================================
-  商品一覧画面へ遷移
-  （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
-  ================================
-  */
-  async goto() {
+  // 商品名が完全に一致する商品のカード（名前の一部が同じ、別の商品を選ばないようにする）
+  private item(productName: string): Locator {
 
+    const exactName = new RegExp(`^${escapeRegExp(productName)}$`);
+
+    return this.inventoryItems.filter({ has: this.itemNames.filter({ hasText: exactName }) });
+  }
+
+  async goto() {
     await this.page.goto(urls.inventory);
   }
 
-  /*
-  ================================
-  商品一覧画面表示確認
-  ================================
-  */
-  async expectOnPage() {
-
-    // inventory画面URL確認
-    await expect(this.page).toHaveURL(urls.inventory);
-
-    // 商品一覧表示確認
-    await expect(this.inventoryList).toBeVisible();
+  async reload() {
+    await this.page.reload();
   }
 
-  /*
-  ================================
-  全商品をカートに追加（安定版）
-  ================================
-  */
+  async selectSort(optionLabel: string) {
+    await this.sortSelect.selectOption({ label: optionLabel });
+  }
+
+  async addToCart(productName: string) {
+    await this.item(productName).locator(this.itemAddToCartButton).click();
+  }
+
+  async removeFromCart(productName: string) {
+    await this.item(productName).locator(this.itemRemoveButton).click();
+  }
+
+  async clickProductName(productName: string) {
+    await this.item(productName).locator(this.itemNames).click();
+  }
+
+  async clickProductImage(productName: string) {
+    await this.item(productName).locator(this.itemImageLinks).click();
+  }
+
+  // 並んでいる商品を、上から順にすべてカートに追加し、追加した件数を返す
   async addAllItems() {
 
-    // ボタン表示待機
-    await expect(this.addToCartButtons.first()).toBeVisible();
+    await expect(this.allAddToCartButtons.first()).toBeVisible();
 
-    // ボタン件数取得
-    const count = await this.addToCartButtons.count();
+    const count = await this.allAddToCartButtons.count();
 
-    // 先頭ボタンを順番に押下
-    // 押下後はremoveへ変化するためfirst固定
+    // 押したボタンは Remove に変わり、追加用のボタンの一覧から外れるため、毎回先頭を押す
     for (let i = 0; i < count; i++) {
-
-      // 先頭ボタン押下
-      await this.addToCartButtons.first().click();
+      await this.allAddToCartButtons.first().click();
     }
 
-    // 追加件数返却
     return count;
   }
 
-  /*
-  ================================
-  商品を1件追加
-  ================================
-  */
   async addFirstItem() {
 
-    // 最初の商品追加ボタン表示確認
-    await expect(this.addToCartButtons.first()).toBeVisible();
+    await expect(this.allAddToCartButtons.first()).toBeVisible();
+    await this.allAddToCartButtons.first().click();
+  }
 
-    // 最初の商品追加ボタン押下
-    await this.addToCartButtons.first().click();
+  // 商品一覧画面が表示されていることを確かめる（URL が完全に一致し、商品一覧が見えている）
+  async expectOnPage() {
+
+    await expect(this.page).toHaveURL(urls.inventory);
+    await expect(this.inventoryList).toBeVisible();
+  }
+
+  async expectProductCount(count: number) {
+    await expect(this.inventoryItems).toHaveCount(count);
+  }
+
+  // すべての商品に、画像・商品名・説明・価格・Add to cart ボタンが表示されていることを確かめる
+  async expectAllProductElementsVisible() {
+
+    // 商品がまだ表示されていないと、何も確かめずに終わってしまうため、最初の商品が表示されるのを待つ
+    await expect(this.inventoryItems.first()).toBeVisible();
+
+    for (const item of await this.inventoryItems.all()) {
+
+      await expect(item.locator(this.itemImages)).toBeVisible();
+      await expect(item.locator(this.itemNames)).toBeVisible();
+      await expect(item.locator(this.itemDescriptions)).toBeVisible();
+      await expect(item.locator(this.itemPrices)).toBeVisible();
+      await expect(item.locator(this.itemAddToCartButton)).toBeVisible();
+    }
+  }
+
+  async expectProductPrice(productName: string, price: string) {
+    await expect(this.item(productName).locator(this.itemPrices)).toHaveText(price);
+  }
+
+  // 商品名が、渡した順に並んでいることを確かめる
+  async expectProductNames(productNames: string[]) {
+    await expect(this.itemNames).toHaveText(productNames);
+  }
+
+  // 価格が、渡した順に並んでいることを確かめる
+  async expectProductPrices(prices: string[]) {
+    await expect(this.itemPrices).toHaveText(prices);
+  }
+
+  async expectSelectedSort(optionLabel: string) {
+    await expect(this.activeSortOption).toHaveText(optionLabel);
+  }
+
+  async expectAddToCartButton(productName: string) {
+    await expect(this.item(productName).locator(this.itemAddToCartButton)).toBeVisible();
+  }
+
+  async expectRemoveButton(productName: string) {
+    await expect(this.item(productName).locator(this.itemRemoveButton)).toBeVisible();
+  }
+
+  // 商品詳細画面へ移ったことを確かめる（画面の中身は確かめない）
+  async expectOnProductDetailPage(productId: number) {
+    await expect(this.page).toHaveURL(`${urls.inventoryItem}?id=${productId}`);
   }
 }

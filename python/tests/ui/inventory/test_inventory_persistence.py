@@ -34,6 +34,7 @@ class TestInventoryPersistence:
 
         # ソートを変えてから、再読み込みする
         inventory_flow.sort_by(SORT_OPTIONS["price_desc"])
+        expect_selected_sort(inventory_flow, SORT_OPTIONS["price_desc"])
         inventory_flow.reload_inventory()
 
         # 結果を検証する
