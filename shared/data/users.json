@@ -14,9 +14,5 @@
   "wrong_password_only": {
     "username": "standard_user",
     "password": "wrong_pass"
-  },
-  "wrong_both": {
-    "username": "wrong_user",
-    "password": "wrong_pass"
   }
 }

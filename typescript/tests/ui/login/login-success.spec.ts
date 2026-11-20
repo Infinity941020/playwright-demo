@@ -1,37 +1,17 @@
-// Playwrightのテスト機能とアサーション機能をインポート
+// ログインの正常系のテスト（ログインの手順を、画面で最初から最後まで通す）
 import { test } from '@playwright/test';
-
-// ログイン業務フローをまとめたFlowクラスをインポート
 import { LoginFlow } from '../../../flows/LoginFlow';
-
-// Login UI Assertions
 import { expectLoginSuccess } from '../../../utils/uiAssertions/loginAssertions';
-
-// テスト用ユーザーデータをインポート
 import { users } from '../../../data/users';
 
-/*
-========================================
-ログイン機能の正常系テスト
-（業務フロー単位でのE2Eテスト）
-========================================
-*/
+test.describe('ログインの正常系', () => {
 
-test('ログイン成功して商品一覧が表示されること', async ({ page }) => {
+  test('TC-LOGIN-001：正しいユーザー名・パスワードでログインできること', async ({ page }) => {
 
-  // ログインフローを生成
-  const loginFlow = new LoginFlow(page);
+    const loginFlow = new LoginFlow(page);
 
-  // ================================
-  // ■ 業務操作（ログイン実行）
-  // ================================
-  await loginFlow.login(
-    users.standard.username,
-    users.standard.password
-  );
+    await loginFlow.login(users.standard.username, users.standard.password);
 
-  // ================================
-  // ■ 検証（業務レベル）
-  // ================================
-  await expectLoginSuccess(loginFlow);
+    await expectLoginSuccess(loginFlow);
+  });
 });

@@ -1,29 +1,28 @@
-// ========================================
-// ログインユーザー情報
-// ========================================
-
-// 値は両版共通の shared/data/users.json に置いている（decisions.md 論点24）
+// ログインに使うユーザー名とパスワード。
+// 値は両版共通の shared/data/users.json にあり、ここでは名前の書き方だけを TypeScript の書き方に直して渡す
 import sharedUsers from '../../shared/data/users.json' with { type: 'json' };
 
-// ユーザー名とパスワードの組
 type User = {
   readonly username: string;
   readonly password: string;
 };
 
-// テスト用ログインユーザー定義
 export const users: {
   readonly standard: User;
   readonly locked: User;
-  readonly invalid: User;
+  readonly wrongUsernameOnly: User;
+  readonly wrongPasswordOnly: User;
 } = {
 
-  // 正常ログイン可能ユーザー
+  // ログインに成功するユーザー
   standard: sharedUsers.standard,
 
-  // ログイン不可（ロック済み）ユーザー
+  // ロックされていて、ログインできないユーザー
   locked: sharedUsers.locked,
 
-  // 異常系テスト用（存在しないユーザー。ユーザー名・パスワードとも誤り）
-  invalid: sharedUsers.wrong_both,
+  // ユーザー名だけが誤っている組（存在しないユーザー名）
+  wrongUsernameOnly: sharedUsers.wrong_username_only,
+
+  // パスワードだけが誤っている組
+  wrongPasswordOnly: sharedUsers.wrong_password_only,
 };

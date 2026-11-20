@@ -1,35 +1,15 @@
-// LoginPage（UI操作クラス）を利用するためのインポート
+import { Page } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
-
-// InventoryPage（商品一覧画面の表示確認）を利用するためのインポート
 import { InventoryPage } from '../pages/InventoryPage';
 
-// PlaywrightのPage型を使用するためのインポート
-import { Page } from '@playwright/test';
-
-/*
-================================
-LoginFlow（最終統一版）
-責務：
-- 業務単位の操作のみ提供
-- specからUI詳細を隠蔽
-- LoginPage依存をFlowで吸収
-================================
-*/
-
+// ログインの操作と、その結果の確認を、利用者の操作の単位でまとめる。
+// テストから画面の細かい操作を直接扱わずに済むようにする
 export class LoginFlow {
 
-  // LoginPageインスタンス（UI操作担当）
-  private loginPage: LoginPage;
+  private readonly loginPage: LoginPage;
 
-  // InventoryPageインスタンス（ログイン後の商品一覧画面の確認担当）
-  private inventoryPage: InventoryPage;
-
-  /*
-  ================================
-  コンストラクタ
-  ================================
-  */
+  // ログインに成功した後に移る、商品一覧画面の表示を確かめるために使う
+  private readonly inventoryPage: InventoryPage;
 
   constructor(page: Page) {
 
@@ -37,41 +17,31 @@ export class LoginFlow {
     this.inventoryPage = new InventoryPage(page);
   }
 
-  /*
-  ================================
-  ■ 業務操作
-  ================================
-  */
-
-  // ログイン実行（業務操作）
   async login(username: string, password: string) {
 
     await this.loginPage.goto();
+
+    // 画面が開けていないことを、ログインの失敗と取り違えないように、先に表示を確かめる
     await this.loginPage.expectOnPage();
+
     await this.loginPage.login(username, password);
   }
 
-  /*
-  ================================
-  ■ 検証（業務レベル）
-  ================================
-  */
-
-  // ログイン失敗検証
-  async expectLoginError() {
-
-    await this.loginPage.expectErrorVisible();
+  async expectLoginErrorMessage(message: string) {
+    await this.loginPage.expectErrorMessage(message);
   }
 
-  // ログイン成功検証
-  async expectLoginSuccess() {
+  // ログインに失敗した後も、ユーザー名の入力値が残っていることを確かめる
+  async expectUsernameRetained(username: string) {
+    await this.loginPage.expectUsernameValue(username);
+  }
 
+  // ログインに成功し、商品一覧画面へ移っていることを確かめる
+  async expectLoginSuccess() {
     await this.inventoryPage.expectOnPage();
   }
 
-  // ログイン画面表示確認
   async expectOnLoginPage() {
-
     await this.loginPage.expectOnPage();
   }
 }

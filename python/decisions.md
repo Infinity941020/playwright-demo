@@ -545,6 +545,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   TS版 data/users.ts・data/checkoutData.ts・utils/urls.ts・tsconfig.json
 - TS逆輸入候補: なし（両版共通のため）
 - 決定日: 2026-11-18
+- 追記（2026-11-20）: wrong_both は横展開3-1 で削除した。TS版の Login のテストを両版共通のテストケースに揃え、
+  「ユーザー名・パスワードとも誤り」のテスト（仕様書で対象外にしたもの）をなくしたため、使われなくなった。
+  あわせて、TS版もエラーの文言を messages.json から読むようにした（typescript/data/messages.ts）
 
 ## 論点25: CI の実行環境
 

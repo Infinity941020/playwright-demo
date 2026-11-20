@@ -8,7 +8,14 @@ ECサイト（SauceDemo）のログイン画面。ユーザー名とパスワー
 
 対象URL：https://www.saucedemo.com/
 
-TS版との対応：TS版の `pages/LoginPage.ts` に相当する画面。
+対応するコード：
+- TS版：`typescript/pages/LoginPage.ts`、`typescript/flows/LoginFlow.ts`、`typescript/utils/uiAssertions/loginAssertions.ts`、
+  テストは `typescript/tests/ui/login/`
+- Python版：`python/pages/login_page.py`、`python/flows/login_flow.py`、`python/utils/ui_assertions/login_assertions.py`、
+  テストは `python/tests/ui/login/`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
 
 実機確認：2026-11-15（Playwright調査用スクリプトにて確認）
 
@@ -114,4 +121,3 @@ TS版との対応：TS版の `pages/LoginPage.ts` に相当する画面。
 | 遷移先の画面（Products）の中身 | Products画面の仕様で扱う。本仕様ではログイン成功後に商品一覧画面へ遷移することまでを扱う |
 | 特殊ユーザー（problem_user等） | 今後の拡張候補（ロック確認用の locked_out_user は本仕様の対象） |
 | 上記「判断できない挙動」4件 | 意図された仕様か不具合かを判断できないため |
-| Chromium以外のブラウザ（Firefox・WebKit）での挙動 | 未確認。Python版のテストは Chromium で実行している |
