@@ -10,9 +10,14 @@ ECサイト（SauceDemo）の商品一覧画面。ログイン成功後に最初
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/InventoryPage.ts` に相当する画面。
-TS版ではProducts画面を独立したドメインとして扱っておらず、
-カート関連の挙動はWiki「Cart仕様」に含まれている。
+対応するコード：
+- TS版：`typescript/pages/InventoryPage.ts`、`typescript/pages/HeaderComponent.ts`、`typescript/flows/InventoryFlow.ts`、
+  `typescript/utils/uiAssertions/inventoryAssertions.ts`、テストは `typescript/tests/ui/inventory/`
+- Python版：`python/pages/inventory_page.py`、`python/pages/header_component.py`、`python/flows/inventory_flow.py`、
+  `python/utils/ui_assertions/inventory_assertions.py`、テストは `python/tests/ui/inventory/`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
 
 実機確認：2026-10-07（Playwright調査用スクリプトにて確認）
 

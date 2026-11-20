@@ -4,6 +4,8 @@
 （TC-PROD-014 のみ未ログイン状態が前提）
 
 対応する仕様書：products_spec.md
+対応するテスト：TS版は `typescript/tests/ui/inventory/`、Python版は `python/tests/ui/inventory/`（両版とも同じ14件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 ---
 
@@ -176,14 +178,14 @@
 |---|---|---|---|---|
 | TC-PROD-001 | 表示 | V-01, V-02, V-03 | 高 | 個別実装 |
 | TC-PROD-002 | ソート（初期） | S-01 | 中 | 個別実装 |
-| TC-PROD-003 | ソート（名前降順） | S-02 | 中 | Data-driven（003〜005共通化） |
-| TC-PROD-004 | ソート（価格昇順） | S-03 | 中 | Data-driven（003〜005共通化） |
-| TC-PROD-005 | ソート（価格降順） | S-04 | 中 | Data-driven（003〜005共通化） |
+| TC-PROD-003 | ソート（名前降順） | S-02 | 中 | TC-PROD-004・005 とデータを切り替えて共通化 |
+| TC-PROD-004 | ソート（価格昇順） | S-03 | 中 | TC-PROD-003・005 とデータを切り替えて共通化 |
+| TC-PROD-005 | ソート（価格降順） | S-04 | 中 | TC-PROD-003・004 とデータを切り替えて共通化 |
 | TC-PROD-006 | カート操作（追加） | C-01, C-02 | 高 | 個別実装 |
 | TC-PROD-007 | カート操作（削除） | C-03, C-04 | 中 | 個別実装 |
 | TC-PROD-008 | カート操作（0件） | C-05 | 中 | 個別実装 |
-| TC-PROD-009 | 画面遷移（商品名） | T-01 | 低 | Data-driven（009・010共通化） |
-| TC-PROD-010 | 画面遷移（商品画像） | T-02 | 低 | Data-driven（009・010共通化） |
+| TC-PROD-009 | 画面遷移（商品名） | T-01 | 低 | TC-PROD-010 とデータを切り替えて共通化 |
+| TC-PROD-010 | 画面遷移（商品画像） | T-02 | 低 | TC-PROD-009 とデータを切り替えて共通化 |
 | TC-PROD-011 | 画面遷移（カート） | T-03 | 高 | 個別実装 |
 | TC-PROD-012 | 状態保持（カート） | P-01 | 中 | 個別実装 |
 | TC-PROD-013 | 状態保持（ソート） | P-02 | 低 | 個別実装 |
@@ -193,9 +195,30 @@
 
 | 項目 | 扱い |
 |---|---|
-| 特殊ユーザー（problem_user等） | 今後の拡張候補（TS版にも同時に反映する前提） |
+| 特殊ユーザー（problem_user等） | 今後の拡張候補（両版に同時に反映する前提） |
 | 同じ価格の商品どうしの並び順 | 仕様として規定しない |
 | 商品詳細画面の中身 | 今後の拡張候補 |
 | ハンバーガーメニュー | Logout機能で扱う |
-| 全商品を追加してバッジ＝件数 | Cart画面の移植時に扱う（TS版 cart-badge.spec.ts ②） |
-| 見た目の比較（Visual Regression） | Stage 2-1で扱う |
+| 全商品を追加してバッジ＝件数 | Cart画面のテストで扱う（cart_testcases.md の TC-CART-002） |
+| 見た目の比較（Visual Regression） | 見た目の比較のテストで扱う（visual_testcases.md） |
+
+## ■ 両版のテストとの対応
+
+両版とも、テストケースの14件を実装している。
+
+| テストID | TS版（typescript/tests/ui/inventory/） | Python版（python/tests/ui/inventory/） |
+|---|---|---|
+| TC-PROD-001 | inventory-display.spec.ts「TC-PROD-001：…」 | test_inventory_display.py `test_products_displayed_as_spec` |
+| TC-PROD-002 | inventory-sort.spec.ts「TC-PROD-002：…」 | test_inventory_sort.py `test_default_sort_is_name_a_to_z` |
+| TC-PROD-003 | inventory-sort.spec.ts「TC-PROD-003：…」（TC-PROD-004・005 とデータを切り替える形） | test_inventory_sort.py `test_sort_order[TC-PROD-003]` |
+| TC-PROD-004 | inventory-sort.spec.ts「TC-PROD-004：…」（TC-PROD-003・005 とデータを切り替える形） | test_inventory_sort.py `test_sort_order[TC-PROD-004]` |
+| TC-PROD-005 | inventory-sort.spec.ts「TC-PROD-005：…」（TC-PROD-003・004 とデータを切り替える形） | test_inventory_sort.py `test_sort_order[TC-PROD-005]` |
+| TC-PROD-006 | inventory-cart.spec.ts「TC-PROD-006：…」 | test_inventory_cart.py `test_add_to_cart_changes_button_and_badge` |
+| TC-PROD-007 | inventory-cart.spec.ts「TC-PROD-007：…」 | test_inventory_cart.py `test_remove_keeps_other_items` |
+| TC-PROD-008 | inventory-cart.spec.ts「TC-PROD-008：…」 | test_inventory_cart.py `test_badge_hidden_when_cart_empty` |
+| TC-PROD-009 | inventory-navigation.spec.ts「TC-PROD-009：…」（TC-PROD-010 とデータを切り替える形） | test_inventory_navigation.py `test_open_product_detail[TC-PROD-009]` |
+| TC-PROD-010 | inventory-navigation.spec.ts「TC-PROD-010：…」（TC-PROD-009 とデータを切り替える形） | test_inventory_navigation.py `test_open_product_detail[TC-PROD-010]` |
+| TC-PROD-011 | inventory-navigation.spec.ts「TC-PROD-011：…」 | test_inventory_navigation.py `test_cart_icon_opens_cart` |
+| TC-PROD-012 | inventory-persistence.spec.ts「TC-PROD-012：…」 | test_inventory_persistence.py `test_cart_kept_after_reload` |
+| TC-PROD-013 | inventory-persistence.spec.ts「TC-PROD-013：…」 | test_inventory_persistence.py `test_sort_reset_after_reload` |
+| TC-PROD-014 | inventory-auth.spec.ts「TC-PROD-014：…」 | test_inventory_auth.py `test_redirect_to_login_when_not_logged_in` |

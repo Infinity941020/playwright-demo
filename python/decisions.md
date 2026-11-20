@@ -259,6 +259,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - TS逆輸入候補: 検討（TS版のWikiの対象ドメインにProductsを追加するか
   どうかを含む）
 - 決定日: 2026-10-07
+- 追記（2026-11-20）: 横展開3-2 で TS版にも反映した。TS版に Products画面のテスト（typescript/tests/ui/inventory/ の6ファイル）を
+  新しく作り、両版共通のテストケースと同じ14件を、Python版と同じ確かめ方で実装した（3ブラウザで実行）。
+  あわせて、TS版の InventoryPage・HeaderComponent・InventoryFlow と確認の部品に、Python版と対応する操作と確認を足した。
+  Wiki の扱いは、横展開5（Wiki を両版共通の内容に直す回）で判断する
 
 ## 論点13: goto() と expect_on_xxx() の使い分け
 
