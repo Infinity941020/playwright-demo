@@ -6,10 +6,10 @@ import { InventoryPage } from '../pages/InventoryPage';
 // テストから画面の細かい操作を直接扱わずに済むようにする
 export class LoginFlow {
 
-  private loginPage: LoginPage;
+  private readonly loginPage: LoginPage;
 
   // ログインに成功した後に移る、商品一覧画面の表示を確かめるために使う
-  private inventoryPage: InventoryPage;
+  private readonly inventoryPage: InventoryPage;
 
   constructor(page: Page) {
 
@@ -17,11 +17,13 @@ export class LoginFlow {
     this.inventoryPage = new InventoryPage(page);
   }
 
-  // ログイン画面を開いて表示を確かめてから、ログインする
   async login(username: string, password: string) {
 
     await this.loginPage.goto();
+
+    // 画面が開けていないことを、ログインの失敗と取り違えないように、先に表示を確かめる
     await this.loginPage.expectOnPage();
+
     await this.loginPage.login(username, password);
   }
 

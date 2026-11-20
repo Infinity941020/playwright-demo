@@ -5,11 +5,11 @@ import { urls } from '../utils/urls';
 // 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
 export class LoginPage {
 
-  readonly page: Page;
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-  readonly errorMessageLocator: Locator;
+  private readonly page: Page;
+  private readonly usernameInput: Locator;
+  private readonly passwordInput: Locator;
+  private readonly loginButton: Locator;
+  private readonly errorMessage: Locator;
 
   constructor(page: Page) {
 
@@ -18,7 +18,7 @@ export class LoginPage {
     this.usernameInput = page.locator('[data-test="username"]');
     this.passwordInput = page.locator('[data-test="password"]');
     this.loginButton = page.locator('[data-test="login-button"]');
-    this.errorMessageLocator = page.locator('[data-test="error"]');
+    this.errorMessage = page.locator('[data-test="error"]');
   }
 
   async goto() {
@@ -45,9 +45,9 @@ export class LoginPage {
     await this.clickLogin();
   }
 
-  // エラーの文言が、渡した文言と一字一句同じであることを確かめる
+  // エラーの文言の全体が、渡した文言と一致することを確かめる（前後の空白などの違いは区別しない）
   async expectErrorMessage(message: string) {
-    await expect(this.errorMessageLocator).toHaveText(message);
+    await expect(this.errorMessage).toHaveText(message);
   }
 
   async expectUsernameValue(username: string) {

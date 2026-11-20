@@ -1,5 +1,6 @@
 // ログインの異常系のテスト。
-// どのテストも、エラーの文言を一字一句確かめ、ログイン画面のままであることも確かめる
+// TC-LOGIN-002〜007 は、エラーの文言の全体と、ログイン画面のままであることを確かめる。
+// TC-LOGIN-008 は、エラーが出た後に、ユーザー名の入力値が残っていることを確かめる
 import { test } from '@playwright/test';
 import { LoginFlow } from '../../../flows/LoginFlow';
 import {
@@ -12,14 +13,17 @@ import { messages } from '../../../data/messages';
 
 test.describe('ログインの異常系', () => {
 
+  // TC-LOGIN-002〜007 は、エラーの文言 → ログイン画面のままであること、の順に確かめる。
+  // ボタンを押した直後は画面がまだ反応していないことがあり、ログイン画面のままの確認がすぐに通ってしまうため、失敗の表示が出てから確かめる
+
   test('TC-LOGIN-002：ユーザー名を入力せずにログインすると、失敗すること', async ({ page }) => {
 
     const loginFlow = new LoginFlow(page);
 
     await loginFlow.login('', users.standard.password);
 
-    await expectOnLoginPage(loginFlow);
     await expectLoginErrorMessage(loginFlow, messages.login.usernameRequired);
+    await expectOnLoginPage(loginFlow);
   });
 
   test('TC-LOGIN-003：パスワードを入力せずにログインすると、失敗すること', async ({ page }) => {
@@ -28,8 +32,8 @@ test.describe('ログインの異常系', () => {
 
     await loginFlow.login(users.standard.username, '');
 
-    await expectOnLoginPage(loginFlow);
     await expectLoginErrorMessage(loginFlow, messages.login.passwordRequired);
+    await expectOnLoginPage(loginFlow);
   });
 
   test('TC-LOGIN-004：ユーザー名・パスワードの両方が空だと、ユーザー名のエラーでログインに失敗すること', async ({ page }) => {
@@ -38,8 +42,8 @@ test.describe('ログインの異常系', () => {
 
     await loginFlow.login('', '');
 
-    await expectOnLoginPage(loginFlow);
     await expectLoginErrorMessage(loginFlow, messages.login.usernameRequired);
+    await expectOnLoginPage(loginFlow);
   });
 
   // ユーザー名だけ・パスワードだけが誤っている2つの組で、同じ確かめ方をする（同じエラーの文言になる）
@@ -64,8 +68,8 @@ test.describe('ログインの異常系', () => {
 
       await loginFlow.login(testCase.user.username, testCase.user.password);
 
-      await expectOnLoginPage(loginFlow);
       await expectLoginErrorMessage(loginFlow, messages.login.credentialsMismatch);
+      await expectOnLoginPage(loginFlow);
     });
   }
 
@@ -75,18 +79,18 @@ test.describe('ログインの異常系', () => {
 
     await loginFlow.login(users.locked.username, users.locked.password);
 
-    await expectOnLoginPage(loginFlow);
     await expectLoginErrorMessage(loginFlow, messages.login.lockedOut);
+    await expectOnLoginPage(loginFlow);
   });
 
-  test('TC-LOGIN-008：ログインに失敗した後も、ユーザー名の入力値が残っていること', async ({ page }) => {
+  test('TC-LOGIN-008：ログイン失敗後、ユーザー名の入力値が保持されること', async ({ page }) => {
 
     const loginFlow = new LoginFlow(page);
     const username = users.standard.username;
 
     await loginFlow.login(username, '');
 
-    // 失敗したことを先に確かめてから、入力値を確かめる
+    // テストケースの手順どおり、エラーが出たことを確かめてから、ユーザー名の入力値を確かめる
     await expectLoginErrorMessage(loginFlow, messages.login.passwordRequired);
     await expectUsernameRetained(loginFlow, username);
   });
