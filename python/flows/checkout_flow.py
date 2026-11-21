@@ -37,6 +37,7 @@ class CheckoutFlow:
         self._cart_page.set_cart_contents([product["id"] for product in products])
         self._step_one_page.goto()
         self._step_one_page.expect_on_page()
+        self._header.expect_badge_count(len(products))
 
     def access_step_one_directly(self) -> None:
         """Checkout Step One画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""
