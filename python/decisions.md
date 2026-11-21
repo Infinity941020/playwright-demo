@@ -311,8 +311,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   flows/cart_flow.py（open_cart_with：前提状態を作ってカート画面を開く）、
   tests/ui/cart/（TC-CART-003・010 以外のテスト）。
   TS版は typescript/pages/CartPage.ts・flows/CartFlow.ts・tests/ui/cart/ と、
-  flows/CheckoutFlow.ts（openStepOneWith）・tests/ui/checkout/checkout-step-one-*.spec.ts
-- TS逆輸入候補: Cart と Checkout Step One は反映済み（2026-11-21）。Checkout の Step Two・Complete と Logout は後の作業で反映する。
+  flows/CheckoutFlow.ts（openStepOneWith・openStepTwoWith）・tests/ui/checkout/checkout-step-one-*.spec.ts・checkout-step-two-*.spec.ts
+- TS逆輸入候補: Cart と Checkout の Step One・Step Two は反映済み（2026-11-21）。Checkout の Complete と Logout は後の作業で反映する。
   当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
@@ -339,6 +339,13 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   （本画面には商品の行がなく、カートが空でも先へ進めるため、書き込みが効かなくてもテストが成功してしまうのを防ぐ）。
   Python版は open_step_one_with に入れたので、それを経由する Step Two・Complete のテストの前提づくりにも効く。
   TS版の Step Two・Complete と Logout のテストへの反映は、それぞれのテストを揃えるときに行う予定。
+- 追記（2026-11-21）: TS版の Checkout Step Two のテスト（typescript/tests/ui/checkout/checkout-step-two-*.spec.ts）も、
+  同じ方式で前提の状態を作るようにした。Step Two画面は URL で直接開かず、Step One を開いて購入者情報を入れ、
+  Continue を押して開く（CheckoutFlow の openStepTwoWith。Step One の前提づくりを経由するので、バッジの件数の確認も効く）。
+  前提を作った後に、Step Two画面が表示されていることを確かめる。
+  あわせて両版とも、TC-CO2-003 の順番を Bike Light → Backpack → Onesie（商品IDでは 0→4→2）に変えた
+  （それまでの順は商品名の降順と価格の昇順に当たり、その順に並ぶ不具合を見つけられなかったため）。
+  TS版の Complete と Logout のテストへの反映は、それぞれのテストを揃えるときに行う予定。
 
 ## 論点16: Checkout画面の Page Object の構成
 

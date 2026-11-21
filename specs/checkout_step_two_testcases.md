@@ -5,10 +5,11 @@
 （TC-CO2-014 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（decisions.md 論点15）
+- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
 - Checkout Step Two画面は、Checkout Step One画面をURLで開き、購入者情報（Taro／Yamada／1000001）を入力して Continue を押して開く
   - 理由：Step One を経由せずに Step Two を直接開けることは、意図された仕様か不具合かを判断できない挙動のため（仕様書「判断できない挙動」参照）。この挙動に依存すると、SauceDemo 側で修正された場合に、全テストの前提が崩れるため
   - 受け入れるリスク：Step One の不具合で Step Two のテストもまとめて失敗する可能性がある。Step One 自体は TC-CO1 で確認しているため、失敗したときは Step One のテスト結果から原因を切り分ける
+- 前提を作った後に、Checkout Step Two画面が表示されていることを確かめる（Step One を開いた時点で、カートアイコンのバッジの件数が入れた件数と同じことも確かめる）
 
 金額の確認方法：
 - 実機で確認した金額（仕様書「実機で確認した値」）を、固定値の期待値として使う
@@ -17,6 +18,9 @@
 テストIDの付け方：Step One を「TC-CO1」、Step Two を「TC-CO2」、Complete を「TC-CO3」とする
 
 対応する仕様書：checkout_step_two_spec.md
+対応するテスト：TS版は `typescript/tests/ui/checkout/checkout-step-two-*.spec.ts`、Python版は `python/tests/ui/checkout/test_checkout_step_two_*.py`
+（両版とも同じ14件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 ---
 
@@ -73,11 +77,13 @@
 
 ## TC-CO2-003
 ■ テスト内容：カートに追加した順に表示されること
-■ 前提条件：「Sauce Labs Onesie」→「Sauce Labs Bike Light」→「Sauce Labs Backpack」の順でカートに入っている
-  （補足：この順は商品名順でも商品ID順〈2→0→4〉でもないため、カートの順で並んでいることを区別できる）
+■ 前提条件：「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」の順でカートに入っている
+  （補足：この順は、商品名の昇順（Backpack→Bike Light→Onesie）・降順（Onesie→Bike Light→Backpack）、
+  商品IDの昇順（0→2→4）・降順（4→2→0）、価格の昇順（Onesie→Bike Light→Backpack）・降順（Backpack→Bike Light→Onesie）の
+  どれにも当たらない〈商品IDでは 0→4→2〉ため、カートの順で並んでいることを区別できる）
 ■ 操作手順：
   1. 商品の並び順を確認する
-■ 期待結果：商品名の並びが「Sauce Labs Onesie」→「Sauce Labs Bike Light」→「Sauce Labs Backpack」である
+■ 期待結果：商品名の並びが「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」である
 ■ 優先度：中
 
 ---
@@ -222,12 +228,12 @@
 | TC-CO2-001 | 表示 | V-01, V-02 | 中 | 個別実装 |
 | TC-CO2-002 | 表示（全商品） | V-03, V-04 | 高 | 個別実装 |
 | TC-CO2-003 | 並び順 | O-01 | 中 | 個別実装 |
-| TC-CO2-004 | 金額（1件） | M-01 | 高 | Data-driven（004〜006共通化） |
-| TC-CO2-005 | 金額（2件） | M-01 | 高 | Data-driven（004〜006共通化） |
-| TC-CO2-006 | 金額（全6件） | M-01 | 高 | Data-driven（004〜006共通化） |
-| TC-CO2-007 | 画面遷移（Finish） | T-01 | 高 | Data-driven（007〜009共通化） |
-| TC-CO2-008 | 画面遷移（Cancel） | T-02 | 高 | Data-driven（007〜009共通化） |
-| TC-CO2-009 | 画面遷移（カートアイコン） | T-03 | 低 | Data-driven（007〜009共通化） |
+| TC-CO2-004 | 金額（1件） | M-01 | 高 | TC-CO2-005・006 とデータを切り替えて共通化 |
+| TC-CO2-005 | 金額（2件） | M-01 | 高 | TC-CO2-004・006 とデータを切り替えて共通化 |
+| TC-CO2-006 | 金額（全6件） | M-01 | 高 | TC-CO2-004・005 とデータを切り替えて共通化 |
+| TC-CO2-007 | 画面遷移（Finish） | T-01 | 高 | TC-CO2-008・009 とデータを切り替えて共通化 |
+| TC-CO2-008 | 画面遷移（Cancel） | T-02 | 高 | TC-CO2-007・009 とデータを切り替えて共通化 |
+| TC-CO2-009 | 画面遷移（カートアイコン） | T-03 | 低 | TC-CO2-007・008 とデータを切り替えて共通化 |
 | TC-CO2-010 | 画面遷移（商品名） | T-04 | 低 | 個別実装 |
 | TC-CO2-011 | 状態（Finish後） | S-01 | 高 | 個別実装 |
 | TC-CO2-012 | 状態（Cancel後） | S-02 | 中 | 個別実装 |
@@ -244,13 +250,25 @@
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 | ハンバーガーメニュー | Logout機能で扱う |
 | Complete・Products・商品詳細・Cart画面の中身 | それぞれの画面の仕様で扱う |
-| 見た目の比較（Visual Regression） | Stage 2-1で扱う |
+| 見た目の比較（Visual Regression） | 見た目の比較のテストで扱う（visual_testcases.md） |
 
-## ■ TS版テスト（Step Two に関係するもの）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの14件を実装している。
+
+| テストID | TS版（typescript/tests/ui/checkout/） | Python版（python/tests/ui/checkout/） |
 |---|---|---|
-| checkout-success.spec.ts ①〜⑥ の Finish 操作 | TC-CO2-007 | TS版は完了URLと完了見出しのみ確認。Python版は Step Two の表示・金額（TC-CO2-001〜006）と、購入後にカートが空になること（TC-CO2-011）まで確認 |
-| checkout-cancel.spec.ts ⑤ 確認画面から商品一覧へ戻る | TC-CO2-008、TC-CO2-012 | TS版はURLのみ。Python版はカートの中身が変わらないことまで確認 |
-| tests/visual/checkout-step-two-visual.spec.ts | 対象外 | Stage 2-1 で扱う |
-| tests/visual/checkout-complete-visual.spec.ts | 対象外 | Complete画面で扱う（Visual は Stage 2-1） |
+| TC-CO2-001 | checkout-step-two-display.spec.ts「TC-CO2-001：…」 | test_checkout_step_two_display.py `test_page_displayed_as_spec` |
+| TC-CO2-002 | checkout-step-two-display.spec.ts「TC-CO2-002：…」 | test_checkout_step_two_display.py `test_all_products_displayed_as_spec` |
+| TC-CO2-003 | checkout-step-two-display.spec.ts「TC-CO2-003：…」 | test_checkout_step_two_display.py `test_items_listed_in_cart_order` |
+| TC-CO2-004 | checkout-step-two-amounts.spec.ts「TC-CO2-004：…」（TC-CO2-005・006 とデータを切り替える形） | test_checkout_step_two_amounts.py `test_amounts_displayed[TC-CO2-004]` |
+| TC-CO2-005 | checkout-step-two-amounts.spec.ts「TC-CO2-005：…」（TC-CO2-004・006 とデータを切り替える形） | test_checkout_step_two_amounts.py `test_amounts_displayed[TC-CO2-005]` |
+| TC-CO2-006 | checkout-step-two-amounts.spec.ts「TC-CO2-006：…」（TC-CO2-004・005 とデータを切り替える形） | test_checkout_step_two_amounts.py `test_amounts_displayed[TC-CO2-006]` |
+| TC-CO2-007 | checkout-step-two-navigation.spec.ts「TC-CO2-007：…」（TC-CO2-008・009 とデータを切り替える形） | test_checkout_step_two_navigation.py `test_button_navigation[TC-CO2-007]` |
+| TC-CO2-008 | checkout-step-two-navigation.spec.ts「TC-CO2-008：…」（TC-CO2-007・009 とデータを切り替える形） | test_checkout_step_two_navigation.py `test_button_navigation[TC-CO2-008]` |
+| TC-CO2-009 | checkout-step-two-navigation.spec.ts「TC-CO2-009：…」（TC-CO2-007・008 とデータを切り替える形） | test_checkout_step_two_navigation.py `test_button_navigation[TC-CO2-009]` |
+| TC-CO2-010 | checkout-step-two-navigation.spec.ts「TC-CO2-010：…」 | test_checkout_step_two_navigation.py `test_open_product_detail` |
+| TC-CO2-011 | checkout-step-two-state.spec.ts「TC-CO2-011：…」 | test_checkout_step_two_state.py `test_cart_emptied_after_finish` |
+| TC-CO2-012 | checkout-step-two-state.spec.ts「TC-CO2-012：…」 | test_checkout_step_two_state.py `test_cart_unchanged_after_cancel` |
+| TC-CO2-013 | checkout-step-two-state.spec.ts「TC-CO2-013：…」 | test_checkout_step_two_state.py `test_display_kept_after_reload` |
+| TC-CO2-014 | checkout-step-two-auth.spec.ts「TC-CO2-014：…」 | test_checkout_step_two_auth.py `test_redirect_to_login_when_not_logged_in` |

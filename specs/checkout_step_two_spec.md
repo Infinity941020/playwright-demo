@@ -9,8 +9,14 @@ ECサイト（SauceDemo）の購入手続きの2画面目。カートの商品�
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/CheckoutPage.ts` のうち、Step Two に関する部分に相当する画面。
-Python版では `pages/checkout_page.py` の CheckoutStepTwoPage クラスで扱う（decisions.md 論点16）。
+対応するコード：
+- TS版：`typescript/pages/CheckoutPage.ts`（CheckoutStepTwoPage）、`typescript/flows/CheckoutFlow.ts`、
+  `typescript/utils/uiAssertions/checkoutAssertions.ts`、テストは `typescript/tests/ui/checkout/checkout-step-two-*.spec.ts`
+- Python版：`python/pages/checkout_page.py`（CheckoutStepTwoPage）、`python/flows/checkout_flow.py`、
+  `python/utils/ui_assertions/checkout_assertions.py`、テストは `python/tests/ui/checkout/test_checkout_step_two_*.py`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（テストケースの14件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（金額の組み合わせ63通り・判断できない挙動など）は、Firefox・WebKit では確かめていない）
 
 実機確認：2026-11-09（Playwright調査用スクリプトにて確認）
 
@@ -150,4 +156,3 @@ Python版では `pages/checkout_page.py` の CheckoutStepTwoPage クラスで扱
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 | 上記「判断できない挙動」6件 | 意図された仕様か不具合かを判断できないため |
 | 端数処理の方式（四捨五入か切り上げか） | 画面操作で作れる状態では区別できないため |
-| Chromium以外のブラウザ（Firefox・WebKit）での挙動 | 未確認。Python版のテストは Chromium で実行している |
