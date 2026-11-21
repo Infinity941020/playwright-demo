@@ -5,6 +5,7 @@ from playwright.sync_api import Page
 from data.products import PRODUCTS
 from flows.cart_flow import CartFlow
 from flows.inventory_flow import InventoryFlow
+from utils.ui_assertions.inventory_assertions import expect_on_cart_page
 from utils.ui_assertions.cart_assertions import (
     expect_badge_count,
     expect_cart_item_count,
@@ -26,6 +27,7 @@ class TestCartPersistence:
         inventory_flow.add_to_cart(backpack["name"])
         inventory_flow.add_to_cart(bike_light["name"])
         inventory_flow.open_cart()
+        expect_on_cart_page(inventory_flow)
         expect_cart_item_count(cart_flow, 2)
 
         # 画面を再読み込みする

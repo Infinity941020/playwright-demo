@@ -8,6 +8,7 @@ import {
   expectCartItemCount,
   expectInCart,
 } from '../../../utils/uiAssertions/cartAssertions';
+import { expectOnCartPage } from '../../../utils/uiAssertions/inventoryAssertions';
 import { products } from '../../../data/products';
 
 test.describe('カート画面の状態保持', () => {
@@ -22,7 +23,8 @@ test.describe('カート画面の状態保持', () => {
     await inventoryFlow.addToCart(bikeLight.name);
     await inventoryFlow.openCart();
 
-    // 前提の状態が作れていないまま再読み込みに進まないように、先に行の数を確かめる
+    // 前提の状態が作れていないまま再読み込みに進まないように、カート画面であることと行の数を先に確かめる
+    await expectOnCartPage(inventoryFlow);
     await expectCartItemCount(cartFlow, 2);
 
     await cartFlow.reloadCart();
