@@ -81,7 +81,8 @@ export class CartPage {
     await this.item(productName).locator(this.itemNames).click();
   }
 
-  // カート画面が表示されていることを確かめる（URL が完全に一致し、Continue Shopping ボタンが見えている）
+  // カート画面が表示されていることを確かめる。
+  // URL が一致しても画面の描画がまだのことがあるため、この画面にしかない Continue Shopping ボタンが見えることも確かめる
   async expectOnPage() {
 
     await expect(this.page).toHaveURL(urls.cart);

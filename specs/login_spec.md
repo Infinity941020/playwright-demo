@@ -15,7 +15,7 @@ ECサイト（SauceDemo）のログイン画面。ユーザー名とパスワー
   テストは `python/tests/ui/login/`
 
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
-（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
+（テストケースの8件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（判断できない挙動など）は、Firefox・WebKit では確かめていない）
 
 実機確認：2026-11-15（Playwright調査用スクリプトにて確認）
 

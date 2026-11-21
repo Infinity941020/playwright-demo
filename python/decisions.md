@@ -309,8 +309,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   書き込み処理は1か所にまとめた。
 - 影響範囲: pages/cart_page.py（set_cart_contents：書き込み処理の唯一の実装）、
   flows/cart_flow.py（open_cart_with：前提状態を作ってカート画面を開く）、
-  tests/ui/cart/（TC-CART-003・010 以外のテスト）
-- TS逆輸入候補: Cart は反映済み（2026-11-21）。Checkout・Logout は後の作業で反映する。
+  tests/ui/cart/（TC-CART-003・010 以外のテスト）。
+  TS版は typescript/pages/CartPage.ts・flows/CartFlow.ts・tests/ui/cart/ と、
+  flows/CheckoutFlow.ts（openStepOneWith）・tests/ui/checkout/checkout-step-one-*.spec.ts
+- TS逆輸入候補: Cart と Checkout Step One は反映済み（2026-11-21）。Checkout の Step Two・Complete と Logout は後の作業で反映する。
   当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
@@ -330,6 +332,13 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   TC-CART-010 の前提を、TC-CART-003 と同じく商品一覧画面での追加で作る形に変えた
   （保存領域への書き込みで作ると、画面で追加した内容が保存されない不具合を見つけられないため）。
   TS版の Checkout と Logout のテストへの反映は、それぞれの画面のテストを揃えるとき（横展開3-4・3-5）に行う予定。
+- 追記（2026-11-21）: TS版の Checkout Step One のテスト（typescript/tests/ui/checkout/checkout-step-one-*.spec.ts）も、
+  同じ方式で前提の状態を作るようにした。カートの中身はブラウザの保存領域へ直接書き込み（書き込む処理は CartPage.setCartContents の
+  1か所だけ）、Checkout Step One画面は URL で開く（CheckoutFlow の openStepOneWith）。
+  あわせて両版とも、Checkout Step One画面を開いた後に、カートアイコンのバッジの件数が入れた件数と同じことを確かめるようにした
+  （本画面には商品の行がなく、カートが空でも先へ進めるため、書き込みが効かなくてもテストが成功してしまうのを防ぐ）。
+  Python版は open_step_one_with に入れたので、それを経由する Step Two・Complete のテストの前提づくりにも効く。
+  TS版の Step Two・Complete と Logout のテストへの反映は、それぞれのテストを揃えるときに行う予定。
 
 ## 論点16: Checkout画面の Page Object の構成
 

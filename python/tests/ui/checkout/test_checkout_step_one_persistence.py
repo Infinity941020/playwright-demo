@@ -53,6 +53,12 @@ class TestCheckoutStepOnePersistence:
         checkout_flow.fill_checkout_info(
             CHECKOUT_DATA["first_name"], CHECKOUT_DATA["last_name"], CHECKOUT_DATA["postal_code"]
         )
+        expect_checkout_info_values(
+            checkout_flow,
+            CHECKOUT_DATA["first_name"],
+            CHECKOUT_DATA["last_name"],
+            CHECKOUT_DATA["postal_code"],
+        )
         checkout_flow.reload_step_one()
 
         # 結果を検証する
