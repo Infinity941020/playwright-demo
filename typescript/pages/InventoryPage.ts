@@ -1,10 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
-
-// 文字列を、正規表現の中でそのままの文字として扱えるようにする（商品名に「.」や「(」が入るため）
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+import { exactText } from '../utils/regExp';
 
 // 商品一覧画面の操作と、画面の表示の確認をまとめる。
 // - 商品ごとの部分（ボタン・価格など）は、並べ替えで並び順が変わっても同じ商品を操作できるように、商品名で商品のカードを探してから、その中で探す
@@ -53,9 +49,7 @@ export class InventoryPage {
   // 商品名が完全に一致する商品のカード（名前の一部が同じ、別の商品を選ばないようにする）
   private item(productName: string): Locator {
 
-    const exactName = new RegExp(`^${escapeRegExp(productName)}$`);
-
-    return this.inventoryItems.filter({ has: this.itemNames.filter({ hasText: exactName }) });
+    return this.inventoryItems.filter({ has: this.itemNames.filter({ hasText: exactText(productName) }) });
   }
 
   async goto() {

@@ -93,6 +93,7 @@ class CartPage:
 
     def expect_all_item_elements_visible(self) -> None:
         """全行に「数量（1）／商品名／説明／価格／Removeボタン」が表示されていることを確かめる。"""
+        expect(self.cart_items.first).to_be_visible()
         for item in self.cart_items.all():
             expect(item.locator('[data-test="item-quantity"]')).to_have_text("1")
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()

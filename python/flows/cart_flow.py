@@ -34,6 +34,7 @@ class CartFlow:
         self._cart_page.set_cart_contents([product["id"] for product in products])
         self._cart_page.goto()
         self._cart_page.expect_on_page()
+        self._cart_page.expect_item_count(len(products))
 
     def access_cart_directly(self) -> None:
         """カート画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""

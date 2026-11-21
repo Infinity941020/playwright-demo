@@ -7,6 +7,7 @@ from flows.cart_flow import CartFlow
 from flows.inventory_flow import InventoryFlow
 from utils.ui_assertions.inventory_assertions import (
     expect_add_to_cart_button_shown,
+    expect_on_inventory_page,
     expect_remove_button_shown,
 )
 
@@ -27,6 +28,7 @@ class TestCartSync:
         # Backpack を削除し、Products画面へ戻る
         cart_flow.remove_from_cart(backpack["name"])
         cart_flow.continue_shopping()
+        expect_on_inventory_page(inventory_flow)
 
         # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])

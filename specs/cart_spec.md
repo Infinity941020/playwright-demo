@@ -9,8 +9,16 @@ ECサイト（SauceDemo）のカート画面。カートに入れた商品の一
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/CartPage.ts` に相当する画面。
-TS版Wiki「Cart仕様」のうち、カートの状態（商品リスト・バッジ）に関する挙動を含む。
+対応するコード：
+- TS版：`typescript/pages/CartPage.ts`、`typescript/flows/CartFlow.ts`、`typescript/utils/uiAssertions/cartAssertions.ts`、
+  テストは `typescript/tests/ui/cart/`
+- Python版：`python/pages/cart_page.py`、`python/flows/cart_flow.py`、`python/utils/ui_assertions/cart_assertions.py`、
+  テストは `python/tests/ui/cart/`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
+
+TS版の Wiki「Cart仕様」には、本画面のカートの状態（商品リスト・バッジ）に関する挙動が含まれている。Wiki の見直しは後の作業で行う。
 
 実機確認：2026-10-07（Playwright調査用スクリプトにて確認）
 
@@ -56,6 +64,9 @@ TS版Wiki「Cart仕様」のうち、カートの状態（商品リスト・バ�
 |---|---|
 | Backpack → Bike Light → Onesie | Backpack → Bike Light → Onesie |
 | Onesie → Bike Light → Backpack | Onesie → Bike Light → Backpack |
+| Bike Light → Backpack → Onesie | Bike Light → Backpack → Onesie |
+
+（Bike Light → Backpack → Onesie の行は、2026-11-21 に手元で TC-CART-003 を実行して確かめた。TS版は Chromium・Firefox・WebKit、Python版は Chromium）
 
 ---
 
@@ -76,7 +87,7 @@ TS版Wiki「Cart仕様」のうち、カートの状態（商品リスト・バ�
 | Checkout を押下 | Checkout Step One画面（/checkout-step-one.html） |
 | 商品名をクリック | 商品詳細画面（/inventory-item.html?id=商品ID） |
 
-※ 商品IDは data/products.py の定義を参照（例：Sauce Labs Bike Light は id=0）
+※ 商品IDは両版共通の shared/data/products.json の定義を参照（例：Sauce Labs Bike Light は id=0）
 ※ 遷移先の画面（Products／Checkout／商品詳細）の中身は本仕様の対象外。本仕様では「遷移すること」までを扱う。
 ※ カートが空の状態でも Checkout ボタンは押下でき、/checkout-step-one.html に遷移する（実機確認済み。エラーや制止はない）。
   意図された仕様か不具合かを判断できないため、事実として記録するのみとし、テストの対象外とする（今後の拡張候補）。
