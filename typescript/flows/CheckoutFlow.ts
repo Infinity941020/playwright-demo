@@ -146,7 +146,7 @@ export class CheckoutFlow {
 
   async cancelFromCart() {
 
-    await this.cart.continueShopping();
+    await this.cart.clickContinueShopping();
     await this.inventory.expectOnPage();
   }
 
