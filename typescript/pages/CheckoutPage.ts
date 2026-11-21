@@ -1,5 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
+import { exactText } from '../utils/regExp';
 
 // Checkout の3つの画面（Step One・Step Two・Complete）の操作と、画面の表示の確認を、画面ごとのクラスでまとめる。
 // 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
@@ -104,67 +105,141 @@ export class CheckoutStepOnePage {
   }
 }
 
-/*
-================================
-CheckoutStepTwoPage（購入内容の確認画面）
-================================
-*/
+// Checkout Step Two画面（購入内容の確認）
 export class CheckoutStepTwoPage {
 
-  // ================================
-  // ■ ページインスタンス
-  // ================================
-  readonly page: Page;
+  private readonly page: Page;
+  private readonly title: Locator;
+  private readonly quantityLabel: Locator;
+  private readonly descriptionLabel: Locator;
+  private readonly items: Locator;
+  private readonly itemQuantities: Locator;
+  private readonly itemNames: Locator;
+  private readonly itemDescriptions: Locator;
+  private readonly itemPrices: Locator;
+  private readonly paymentLabel: Locator;
+  private readonly paymentValue: Locator;
+  private readonly shippingLabel: Locator;
+  private readonly shippingValue: Locator;
+  private readonly priceTotalLabel: Locator;
+  private readonly itemTotal: Locator;
+  private readonly tax: Locator;
+  private readonly total: Locator;
+  private readonly cancelButton: Locator;
+  private readonly finishButton: Locator;
 
-  // ================================
-  // ■ Cancel・Finishボタン
-  // ================================
-  readonly cancelButton: Locator;
-  readonly finishButton: Locator;
-
-  // ================================
-  // コンストラクタ
-  // ================================
   constructor(page: Page) {
 
     this.page = page;
 
+    this.title = page.locator('[data-test="title"]');
+    this.quantityLabel = page.locator('[data-test="cart-quantity-label"]');
+    this.descriptionLabel = page.locator('[data-test="cart-desc-label"]');
+    this.items = page.locator('[data-test="inventory-item"]');
+    this.itemQuantities = page.locator('[data-test="item-quantity"]');
+    this.itemNames = page.locator('[data-test="inventory-item-name"]');
+    this.itemDescriptions = page.locator('[data-test="inventory-item-desc"]');
+    this.itemPrices = page.locator('[data-test="inventory-item-price"]');
+    this.paymentLabel = page.locator('[data-test="payment-info-label"]');
+    this.paymentValue = page.locator('[data-test="payment-info-value"]');
+    this.shippingLabel = page.locator('[data-test="shipping-info-label"]');
+    this.shippingValue = page.locator('[data-test="shipping-info-value"]');
+    this.priceTotalLabel = page.locator('[data-test="total-info-label"]');
+    this.itemTotal = page.locator('[data-test="subtotal-label"]');
+    this.tax = page.locator('[data-test="tax-label"]');
+    this.total = page.locator('[data-test="total-label"]');
     this.cancelButton = page.locator('[data-test="cancel"]');
     this.finishButton = page.locator('[data-test="finish"]');
   }
 
-  // ================================
-  // Checkout Step Two画面へ遷移
-  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
-  // ================================
-  async goto() {
+  // 商品名が完全に一致する商品の行
+  private item(productName: string): Locator {
+    return this.items.filter({ has: this.itemNames.filter({ hasText: exactText(productName) }) });
+  }
 
+  async goto() {
     await this.page.goto(urls.checkoutStepTwo);
   }
 
-  // ================================
-  // Finishボタン押下
-  // ================================
-  async clickFinish() {
+  async reload() {
+    await this.page.reload();
+  }
 
+  async clickFinish() {
     await this.finishButton.click();
   }
 
-  // ================================
-  // Cancelボタン押下
-  // ================================
   async clickCancel() {
-
     await this.cancelButton.click();
   }
 
-  // ================================
-  // Checkout Step Two画面表示確認
-  // ================================
+  async clickProductName(productName: string) {
+    await this.item(productName).locator(this.itemNames).click();
+  }
+
+  // Checkout Step Two画面が表示されていることを確かめる。
+  // URL が一致しても画面の描画がまだのことがあるため、この画面にしかない Finish ボタンが見えることも確かめる
   async expectOnPage() {
 
     await expect(this.page).toHaveURL(urls.checkoutStepTwo);
     await expect(this.finishButton).toBeVisible();
+  }
+
+  // 仕様書の項目一覧のうち、商品の行と金額を除く項目（タイトル・一覧の見出し・支払いと配送の情報・金額の見出し・2つのボタン）を確かめる
+  async expectPageLayout() {
+
+    await expect(this.title).toHaveText('Checkout: Overview');
+    await expect(this.quantityLabel).toHaveText('QTY');
+    await expect(this.descriptionLabel).toHaveText('Description');
+    await expect(this.paymentLabel).toHaveText('Payment Information:');
+    await expect(this.paymentValue).toHaveText('SauceCard #31337');
+    await expect(this.shippingLabel).toHaveText('Shipping Information:');
+    await expect(this.shippingValue).toHaveText('Free Pony Express Delivery!');
+    await expect(this.priceTotalLabel).toHaveText('Price Total');
+    await expect(this.cancelButton).toBeVisible();
+    await expect(this.cancelButton).toHaveText('Cancel');
+    await expect(this.finishButton).toBeVisible();
+    await expect(this.finishButton).toHaveText('Finish');
+  }
+
+  async expectItemCount(count: number) {
+    await expect(this.items).toHaveCount(count);
+  }
+
+  // すべての行に、数量（1）・商品名・説明・価格が表示されていることを確かめる
+  async expectAllItemElementsVisible() {
+
+    // 行がまだ表示されていないと、何も確かめずに終わってしまうため、最初の行が表示されるのを待つ
+    await expect(this.items.first()).toBeVisible();
+
+    for (const item of await this.items.all()) {
+
+      await expect(item.locator(this.itemQuantities)).toHaveText('1');
+      await expect(item.locator(this.itemNames)).toBeVisible();
+      await expect(item.locator(this.itemDescriptions)).toBeVisible();
+      await expect(item.locator(this.itemPrices)).toBeVisible();
+    }
+  }
+
+  async expectItemPrice(productName: string, price: string) {
+    await expect(this.item(productName).locator(this.itemPrices)).toHaveText(price);
+  }
+
+  // 商品名が、渡した順に並んでいることを確かめる
+  async expectItemNames(productNames: readonly string[]) {
+    await expect(this.items.locator(this.itemNames)).toHaveText(productNames);
+  }
+
+  async expectItemListed(productName: string) {
+    await expect(this.item(productName)).toHaveCount(1);
+  }
+
+  // 小計・税・合計の表示の文言の全体を確かめる（空白の数や前後の空白の違いは区別しない）
+  async expectAmounts(itemTotal: string, tax: string, total: string) {
+
+    await expect(this.itemTotal).toHaveText(itemTotal);
+    await expect(this.tax).toHaveText(tax);
+    await expect(this.total).toHaveText(total);
   }
 }
 
