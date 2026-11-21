@@ -8,6 +8,7 @@ import {
   CheckoutCompletePage,
 } from '../pages/CheckoutPage';
 import { Product } from '../data/products';
+import { CheckoutInfo } from '../data/checkoutData';
 
 // Checkout の画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 // テストから画面の細かい操作を直接扱わずに済むようにする
@@ -21,7 +22,7 @@ export class CheckoutFlow {
   // 前提の状態を作るためと、操作の後に移るカート画面の表示を確かめるために使う
   private readonly cart: CartPage;
 
-  // 操作の後に移る商品一覧画面の表示を確かめるためと、Step Two・Complete のテストの前提を作るために使う
+  // 操作の後に移る画面（商品一覧画面・商品詳細画面）の表示を確かめるためと、Complete のテストの前提を作るために使う
   private readonly inventory: InventoryPage;
 
   constructor(page: Page) {
@@ -106,10 +107,6 @@ export class CheckoutFlow {
     await this.header.expectBadgeCount(count);
   }
 
-  async expectOnStepTwoPage() {
-    await this.stepTwo.expectOnPage();
-  }
-
   async expectOnCartPage() {
     await this.cart.expectOnPage();
   }
@@ -123,7 +120,93 @@ export class CheckoutFlow {
     await this.cart.expectItemListed(productName);
   }
 
-  // 以下は Step Two・Complete のテストが使う
+  // 渡した商品がカートに入った状態で、Step One から購入者情報を入れて Continue を押し、Checkout Step Two画面を開く。
+  // Step Two の URL を直接開けることは、意図された仕様か不具合かを判断できない挙動のため、前提づくりでは使わない
+  async openStepTwoWith(products: readonly Product[], checkoutInfo: CheckoutInfo) {
+
+    await this.openStepOneWith(products);
+    await this.fillCheckoutInfo(checkoutInfo.firstName, checkoutInfo.lastName, checkoutInfo.postalCode);
+    await this.proceedToOverviewStep();
+    await this.stepTwo.expectOnPage();
+  }
+
+  // Checkout Step Two画面の URL を開く。ログインしていない状態で開こうとしたときの確認に使う。
+  // Checkout Step Two画面が表示されるとは限らないため、表示は確かめない
+  async accessStepTwoDirectly() {
+    await this.stepTwo.goto();
+  }
+
+  // 再読み込みでログイン画面へ戻された場合などに、別の画面のまま確認を続けないよう、Checkout Step Two画面であることを確かめる
+  async reloadStepTwo() {
+
+    await this.stepTwo.reload();
+    await this.stepTwo.expectOnPage();
+  }
+
+  // Finish を押して購入を確定する（移った先の画面は確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ）
+  async completePurchase() {
+    await this.stepTwo.clickFinish();
+  }
+
+  // Cancel を押す（移った先の画面は確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ）
+  async cancelFromStepTwo() {
+    await this.stepTwo.clickCancel();
+  }
+
+  async openProductDetail(productName: string) {
+    await this.stepTwo.clickProductName(productName);
+  }
+
+  async expectOnStepTwoPage() {
+    await this.stepTwo.expectOnPage();
+  }
+
+  // 画面の項目を確かめる。商品の行と金額、バッジは含まない（それぞれ別の確認で行う）
+  async expectStepTwoPageLayout() {
+    await this.stepTwo.expectPageLayout();
+  }
+
+  // 商品の表示を確かめる（行数、各行の表示項目、商品名と価格の組み合わせ）
+  async expectStepTwoItemsDisplayed(products: readonly Product[]) {
+
+    await this.stepTwo.expectItemCount(products.length);
+    await this.stepTwo.expectAllItemElementsVisible();
+
+    for (const product of products) {
+      await this.stepTwo.expectItemPrice(product.name, product.price);
+    }
+  }
+
+  async expectStepTwoItemNamesInOrder(productNames: readonly string[]) {
+    await this.stepTwo.expectItemNames(productNames);
+  }
+
+  async expectStepTwoItemCount(count: number) {
+    await this.stepTwo.expectItemCount(count);
+  }
+
+  // 渡した商品の行があることを確かめる（並び順は問わない）
+  async expectStepTwoItemListed(productName: string) {
+    await this.stepTwo.expectItemListed(productName);
+  }
+
+  async expectStepTwoAmounts(itemTotal: string, tax: string, total: string) {
+    await this.stepTwo.expectAmounts(itemTotal, tax, total);
+  }
+
+  async expectOnCompletePage() {
+    await this.complete.expectOnPage();
+  }
+
+  async expectOnInventoryPage() {
+    await this.inventory.expectOnPage();
+  }
+
+  async expectOnProductDetailPage(productId: number) {
+    await this.inventory.expectOnProductDetailPage(productId);
+  }
+
+  // 以下は Complete のテストが使う
 
   async addSingleItem() {
 
@@ -156,22 +239,6 @@ export class CheckoutFlow {
 
     await this.cart.clickCheckout();
     await this.stepOne.expectOnPage();
-  }
-
-  // Continue を押した後に Step Two へ移ったことを、ここで確かめてから Finish を押す
-  async completePurchase() {
-
-    await this.stepTwo.expectOnPage();
-    await this.stepTwo.clickFinish();
-    await this.complete.expectOnPage();
-  }
-
-  // Step One と Step Two の Cancel は同じテスト用の属性を持つため、押す前に Step Two へ移っていることを確かめる
-  async cancelFromStepTwo() {
-
-    await this.stepTwo.expectOnPage();
-    await this.stepTwo.clickCancel();
-    await this.inventory.expectOnPage();
   }
 
   async verifyOrderComplete() {

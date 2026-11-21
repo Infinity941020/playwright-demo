@@ -8,6 +8,8 @@ from flows.checkout_flow import CheckoutFlow
 from flows.inventory_flow import InventoryFlow
 from utils.ui_assertions.checkout_assertions import (
     expect_badge_count,
+    expect_on_checkout_complete_page,
+    expect_on_inventory_page,
     expect_step_two_amounts,
     expect_step_two_item_count,
     expect_step_two_item_listed,
@@ -33,12 +35,14 @@ class TestCheckoutStepTwoState:
 
         # Finish を押す
         checkout_flow.complete_purchase()
+        expect_on_checkout_complete_page(checkout_flow)
 
         # バッジが表示されないことを検証する
         expect_badge_count(checkout_flow, 0)
 
         # Products画面を URL で開く（Complete画面での操作は、Complete画面の仕様で扱う）
         inventory_flow.access_inventory_directly()
+        expect_on_inventory_page(checkout_flow)
 
         # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
@@ -56,6 +60,7 @@ class TestCheckoutStepTwoState:
 
         # Cancel を押す
         checkout_flow.cancel_from_step_two()
+        expect_on_inventory_page(checkout_flow)
 
         # Products画面のボタンの表示とバッジを検証する
         expect_remove_button_shown(inventory_flow, backpack["name"])

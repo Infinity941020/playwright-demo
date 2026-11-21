@@ -43,9 +43,9 @@ class TestCheckoutStepTwoDisplay:
     def test_items_listed_in_cart_order(self, logged_page: Page) -> None:
         """TC-CO2-003: カートに追加した順に表示されること。"""
         checkout_flow = CheckoutFlow(logged_page)
-        products = [PRODUCTS["onesie"], PRODUCTS["bike_light"], PRODUCTS["backpack"]]
+        products = [PRODUCTS["bike_light"], PRODUCTS["backpack"], PRODUCTS["onesie"]]
 
-        # 前提状態を作る（Onesie → Bike Light → Backpack の順にカートに入れる）
+        # 前提状態を作る（Bike Light → Backpack → Onesie の順にカートに入れる）
         checkout_flow.open_step_two_with(products, CHECKOUT_DATA)
 
         # 結果を検証する
