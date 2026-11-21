@@ -54,7 +54,8 @@ export class LoginPage {
     await expect(this.usernameInput).toHaveValue(username);
   }
 
-  // ログイン画面が表示されていることを確かめる（URL が完全に一致し、入力欄とボタンが見えている）
+  // ログイン画面が表示されていることを確かめる。
+  // URL が一致しても画面の描画がまだのことがあるため、入力欄とボタンが見えることも確かめる
   async expectOnPage() {
 
     await expect(this.page).toHaveURL(urls.login);

@@ -16,7 +16,7 @@ ECサイト（SauceDemo）のカート画面。カートに入れた商品の一
   テストは `python/tests/ui/cart/`
 
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
-（テストケースの11件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（並び順の例・判断できない挙動など）は、Firefox・WebKit では確かめていない）
+（テストケースの11件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（判断できない挙動など）は、Firefox・WebKit では確かめていない）
 
 TS版の Wiki「Cart仕様」には、本画面のカートの状態（商品リスト・バッジ）に関する挙動が含まれている。Wiki の見直しは後の作業で行う。
 

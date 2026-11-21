@@ -22,7 +22,7 @@ test.describe('Checkout Step One画面とカートの関係', () => {
     await checkoutFlow.fillCheckoutInfo(checkoutData.firstName, checkoutData.lastName, checkoutData.postalCode);
     await checkoutFlow.cancelFromStepOne();
 
-    // 失敗したときに、画面が移らなかったのかを区別できるように、先にカート画面であることを確かめる
+    // 失敗したときに、画面が移らなかったのか、カートの内容が変わったのかを区別できるように、先にカート画面であることを確かめる
     await expectOnCartPage(checkoutFlow);
 
     // 並び順は TC-CART-003 で確かめるため、ここでは問わない

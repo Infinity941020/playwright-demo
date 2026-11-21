@@ -17,7 +17,7 @@ ECサイト（SauceDemo）の商品一覧画面。ログイン成功後に最初
   `python/utils/ui_assertions/inventory_assertions.py`、テストは `python/tests/ui/inventory/`
 
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
-（テストケースの14件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（判断できない挙動など）は、Firefox・WebKit では確かめていない）
+（テストケースの14件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（同じ価格の商品の並び順の観測など）は、Firefox・WebKit では確かめていない）
 
 TS版の Wiki では、Products画面は今は独立した画面として扱っておらず、Cart仕様の中に含まれている。Wiki の見直しは後の作業で行う。
 

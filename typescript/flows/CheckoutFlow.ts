@@ -158,7 +158,7 @@ export class CheckoutFlow {
     await this.stepOne.expectOnPage();
   }
 
-  // Step One と Step Two には同じテスト用の属性のボタンがあるため、押す前に Step Two へ移っていることを確かめる
+  // Continue を押した後に Step Two へ移ったことを、ここで確かめてから Finish を押す
   async completePurchase() {
 
     await this.stepTwo.expectOnPage();
