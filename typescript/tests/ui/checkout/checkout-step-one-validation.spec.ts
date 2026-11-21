@@ -26,7 +26,7 @@ test.describe('Checkout Step One画面の入力チェック', () => {
     await expectOnCheckoutStepOnePage(checkoutFlow);
   });
 
-  // 1項目だけを空欄にする3つの組で、同じ確かめ方をする
+  // 1項目だけを空欄にする3通りで、同じ確かめ方をする
   const singleFieldBlankCases = [
     {
       id: 'TC-CO1-003',

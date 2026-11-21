@@ -37,7 +37,7 @@ export class LoginPage {
     await this.loginButton.click();
   }
 
-  // ユーザー名とパスワードを入力して、ログインボタンを押す（空の文字を渡すと、その欄は空欄のまま）
+  // ユーザー名とパスワードを入力して、ログインボタンを押す（空文字を渡すと、その欄は空欄のまま）
   async login(username: string, password: string) {
 
     await this.enterUsername(username);
@@ -45,7 +45,7 @@ export class LoginPage {
     await this.clickLogin();
   }
 
-  // エラーの文言の全体が、渡した文言と一致することを確かめる（前後の空白などの違いは区別しない）
+  // エラーの文言の全体が、渡した文言と一致することを確かめる（空白の数や前後の空白の違いは区別しない）
   async expectErrorMessage(message: string) {
     await expect(this.errorMessage).toHaveText(message);
   }

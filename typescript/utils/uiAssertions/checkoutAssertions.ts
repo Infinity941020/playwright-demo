@@ -48,7 +48,7 @@ export async function expectInCart(checkoutFlow: CheckoutFlow, productName: stri
   await checkoutFlow.expectInCart(productName);
 }
 
-// 購入が完了したことを確かめる（Complete のテスト〈次の回で作り直す〉が使う）
+// 購入が完了したことを確かめる（Complete のテストが使う）
 export async function expectCheckoutComplete(checkoutFlow: CheckoutFlow) {
   await checkoutFlow.verifyOrderComplete();
 }

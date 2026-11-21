@@ -85,7 +85,7 @@ export class CheckoutFlow {
     await this.stepOne.expectOnPage();
   }
 
-  // タイトル・3つの入力欄（入力の見本の文字）・Cancel・Continue が表示されていることを確かめる
+  // 画面の項目を確かめる。バッジは含まない（ヘッダーの確認で行う）
   async expectStepOnePageLayout() {
     await this.stepOne.expectPageLayout();
   }
@@ -123,7 +123,7 @@ export class CheckoutFlow {
     await this.cart.expectItemListed(productName);
   }
 
-  // 以下は、Step Two・Complete のテスト（次の回で作り直す）が使う
+  // 以下は Step Two・Complete のテストが使う
 
   async addSingleItem() {
 
@@ -158,14 +158,18 @@ export class CheckoutFlow {
     await this.stepOne.expectOnPage();
   }
 
+  // Step One と Step Two には同じテスト用の属性のボタンがあるため、押す前に Step Two へ移っていることを確かめる
   async completePurchase() {
 
+    await this.stepTwo.expectOnPage();
     await this.stepTwo.clickFinish();
     await this.complete.expectOnPage();
   }
 
+  // Step One と Step Two の Cancel は同じテスト用の属性を持つため、押す前に Step Two へ移っていることを確かめる
   async cancelFromStepTwo() {
 
+    await this.stepTwo.expectOnPage();
     await this.stepTwo.clickCancel();
     await this.inventory.expectOnPage();
   }

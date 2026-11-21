@@ -1,5 +1,5 @@
 // 画面に表示されるエラーの文言。
-// 値は両版共通の shared/data/messages.json にあり、ここでは名前の書き方だけを TypeScript の書き方に直して渡す。
+// 値は両版共通の shared/data/messages.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す。
 // 文言を直すときは、ここではなく messages.json を、テストケースの期待結果に合わせて直す
 import sharedMessages from '../../shared/data/messages.json' with { type: 'json' };
 

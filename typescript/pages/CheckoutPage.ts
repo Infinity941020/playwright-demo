@@ -39,7 +39,7 @@ export class CheckoutStepOnePage {
     await this.page.reload();
   }
 
-  // 購入者情報を入力する（空の文字を渡すと、その欄は空欄になる）
+  // 購入者情報を入力する（空文字を渡すと、その欄は空欄になる）
   async fillInfo(firstName: string, lastName: string, postalCode: string) {
 
     await this.firstNameInput.fill(firstName);
@@ -60,14 +60,15 @@ export class CheckoutStepOnePage {
     await this.errorCloseButton.click();
   }
 
-  // Checkout Step One画面が表示されていることを確かめる（URL が完全に一致し、Continue ボタンが見えている）
+  // Checkout Step One画面が表示されていることを確かめる。
+  // URL が一致しても画面の描画がまだのことがあるため、この画面にしかない Continue ボタンが見えることも確かめる
   async expectOnPage() {
 
     await expect(this.page).toHaveURL(urls.checkoutStepOne);
     await expect(this.continueButton).toBeVisible();
   }
 
-  // タイトル・3つの入力欄（入力の見本の文字）・ボタンを確かめる
+  // 仕様書の項目一覧のうち、画面タイトル・3つの入力欄のプレースホルダー・2つのボタンを確かめる
   async expectPageLayout() {
 
     await expect(this.title).toHaveText('Checkout: Your Information');
@@ -80,12 +81,12 @@ export class CheckoutStepOnePage {
     await expect(this.cancelButton).toBeVisible();
     await expect(this.cancelButton).toHaveText('Cancel');
 
-    // Continue は入力欄の部品でできているため、文言は表示の文字ではなく値で確かめる
+    // Continue は、文言を要素の中の文字ではなく値として持つ作りのため、値で確かめる
     await expect(this.continueButton).toBeVisible();
     await expect(this.continueButton).toHaveValue('Continue');
   }
 
-  // エラーの文言の全体が、渡した文言と一致することを確かめる（前後の空白などの違いは区別しない）
+  // エラーの文言の全体が、渡した文言と一致することを確かめる（空白の数や前後の空白の違いは区別しない）
   async expectErrorMessage(message: string) {
     await expect(this.errorMessage).toHaveText(message);
   }

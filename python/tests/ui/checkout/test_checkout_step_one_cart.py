@@ -9,6 +9,7 @@ from utils.ui_assertions.checkout_assertions import (
     expect_badge_count,
     expect_cart_item_count,
     expect_in_cart,
+    expect_on_cart_page,
 )
 
 
@@ -29,6 +30,7 @@ class TestCheckoutStepOneCart:
             CHECKOUT_DATA["first_name"], CHECKOUT_DATA["last_name"], CHECKOUT_DATA["postal_code"]
         )
         checkout_flow.cancel_from_step_one()
+        expect_on_cart_page(checkout_flow)
 
         # 結果を検証する（並び順は TC-CART-003 で確かめるため、ここでは問わない）
         expect_cart_item_count(checkout_flow, 2)

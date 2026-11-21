@@ -1,5 +1,5 @@
 // ログインに使うユーザー名とパスワード。
-// 値は両版共通の shared/data/users.json にあり、ここでは名前の書き方だけを TypeScript の書き方に直して渡す
+// 値は両版共通の shared/data/users.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す
 import sharedUsers from '../../shared/data/users.json' with { type: 'json' };
 
 type User = {

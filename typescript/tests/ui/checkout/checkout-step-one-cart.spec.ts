@@ -5,6 +5,7 @@ import {
   expectBadgeCount,
   expectCartItemCount,
   expectInCart,
+  expectOnCartPage,
 } from '../../../utils/uiAssertions/checkoutAssertions';
 import { checkoutData } from '../../../data/checkoutData';
 import { products } from '../../../data/products';
@@ -20,6 +21,9 @@ test.describe('Checkout Step One画面とカートの関係', () => {
 
     await checkoutFlow.fillCheckoutInfo(checkoutData.firstName, checkoutData.lastName, checkoutData.postalCode);
     await checkoutFlow.cancelFromStepOne();
+
+    // 失敗したときに、画面が移らなかったのかを区別できるように、先にカート画面であることを確かめる
+    await expectOnCartPage(checkoutFlow);
 
     // 並び順は TC-CART-003 で確かめるため、ここでは問わない
     await expectCartItemCount(checkoutFlow, 2);
