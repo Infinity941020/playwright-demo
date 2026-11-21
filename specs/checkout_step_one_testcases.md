@@ -5,13 +5,18 @@ Checkout Step One画面（/checkout-step-one.html）を開いている
 （TC-CO1-013 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、Cart画面と同じく、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（decisions.md 論点15）
+- カートの中身は、Cart画面と同じく、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+  - 書き込みが効かずに空のカートのままテストが進まないように、Checkout Step One画面を開いた後に、カートアイコンのバッジの件数が入れた件数と同じことを確かめる
+    （本画面には商品の行がなく、カートが空でも先へ進めるため）
 - Checkout Step One画面は、URLで直接開く（Cart画面の Checkout ボタンからの遷移は TC-CART-007 で確認済みのため）
 
 入力に使う値（特に記載がない場合）：
 - 名：Taro ／ 姓：Yamada ／ 郵便番号：1000001
 
 対応する仕様書：checkout_step_one_spec.md
+対応するテスト：TS版は `typescript/tests/ui/checkout/checkout-step-one-*.spec.ts`、Python版は `python/tests/ui/checkout/test_checkout_step_one_*.py`
+（両版とも同じ13件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 テストIDの付け方：Checkout は3画面あるため、Step One を「TC-CO1」、Step Two を「TC-CO2」、Complete を「TC-CO3」とする
 
@@ -168,6 +173,8 @@ Checkout Step One画面（/checkout-step-one.html）を開いている
 ■ 前提条件：共通の前提のとおり
 ■ 操作手順：
   1. 名・姓・郵便番号を入力する
+     （補足：入力が効いたこと（3つの入力欄に値が入っていること）を確かめてから再読み込みする。
+     入力が効かなくても、再読み込みの後は空になるため）
   2. ページを再読み込みする
 ■ 期待結果：3つの入力欄がすべて空である
 ■ 優先度：低
@@ -206,14 +213,14 @@ Checkout Step One画面（/checkout-step-one.html）を開いている
 |---|---|---|---|---|
 | TC-CO1-001 | 表示 | V-01, V-02 | 中 | 個別実装 |
 | TC-CO1-002 | 入力チェック（すべて未入力） | E-01, E-04 | 高 | 個別実装 |
-| TC-CO1-003 | 入力チェック（名が未入力） | E-01 | 高 | Data-driven（003〜005共通化） |
-| TC-CO1-004 | 入力チェック（姓が未入力） | E-02 | 高 | Data-driven（003〜005共通化） |
-| TC-CO1-005 | 入力チェック（郵便番号が未入力） | E-03 | 高 | Data-driven（003〜005共通化） |
+| TC-CO1-003 | 入力チェック（名が未入力） | E-01 | 高 | TC-CO1-004・005 とデータを切り替えて共通化 |
+| TC-CO1-004 | 入力チェック（姓が未入力） | E-02 | 高 | TC-CO1-003・005 とデータを切り替えて共通化 |
+| TC-CO1-005 | 入力チェック（郵便番号が未入力） | E-03 | 高 | TC-CO1-003・004 とデータを切り替えて共通化 |
 | TC-CO1-006 | 入力チェック（エラーの切り替わり） | E-05 | 中 | 個別実装 |
 | TC-CO1-007 | エラー表示・入力値の保持 | E-06, K-01 | 中 | 個別実装 |
 | TC-CO1-008 | 画面遷移（Continue） | T-01 | 高 | 個別実装 |
-| TC-CO1-009 | 画面遷移（Cancel） | T-02 | 高 | Data-driven（009・010共通化） |
-| TC-CO1-010 | 画面遷移（カートアイコン） | T-03 | 低 | Data-driven（009・010共通化） |
+| TC-CO1-009 | 画面遷移（Cancel） | T-02 | 高 | TC-CO1-010 とデータを切り替えて共通化 |
+| TC-CO1-010 | 画面遷移（カートアイコン） | T-03 | 低 | TC-CO1-009 とデータを切り替えて共通化 |
 | TC-CO1-011 | 入力値の保持（再読み込み） | K-02 | 低 | 個別実装 |
 | TC-CO1-012 | カートとの関係 | L-01 | 中 | 個別実装 |
 | TC-CO1-013 | 認証 | A-01 | 高 | 個別実装 |
@@ -229,19 +236,25 @@ Checkout Step One画面（/checkout-step-one.html）を開いている
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 | ハンバーガーメニュー | Logout機能で扱う |
 | Step Two・Cart画面の中身 | それぞれの画面の仕様で扱う |
-| 見た目の比較（Visual Regression） | Stage 2-1で扱う |
-| 名だけ入力した途中の状態で Cancel を押すケース（TS版 checkout-cancel.spec.ts ③） | 入力の有無で Cancel の動作は変わらないため、未入力（TC-CO1-009）と全項目入力（TC-CO1-012）の2通りで確認する |
+| 見た目の比較（Visual Regression） | 見た目の比較のテストで扱う（visual_testcases.md） |
+| 名だけ入力した途中の状態で Cancel を押すケース | 入力の有無で Cancel の動作は変わらないため、未入力（TC-CO1-009）と全項目入力（TC-CO1-012）の2通りで確認する |
 
-## ■ TS版テスト（Step One に関係するもの）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの13件を実装している。
+
+| テストID | TS版（typescript/tests/ui/checkout/） | Python版（python/tests/ui/checkout/） |
 |---|---|---|
-| checkout-failure.spec.ts ① First Name未入力 | TC-CO1-003 | Python版はエラー文言まで確認（TS版はエラーが出ていることのみ） |
-| checkout-failure.spec.ts ② Last Name未入力 | TC-CO1-004 | 同上 |
-| checkout-failure.spec.ts ③ Postal Code未入力 | TC-CO1-005 | 同上 |
-| checkout-failure.spec.ts ④ 全項目未入力 | TC-CO1-002 | 同上。Python版は名のエラーが優先されることまで確認 |
-| checkout-cancel.spec.ts ② Checkout開始直後にカートへ戻る | TC-CO1-009 | |
-| checkout-cancel.spec.ts ③ 入力途中でカートへ戻る | 対象外 | 上記「対象外としたもの」参照 |
-| checkout-cancel.spec.ts ④ 入力完了後にカートへ戻る | TC-CO1-012 | Python版はカートの内容が変わらないことまで確認（TS版はURLのみ） |
-| checkout-success.spec.ts ①〜⑥ のうち Step One → Step Two の遷移 | TC-CO1-008 | 購入完了までの流れは Step Two・Complete の画面で扱う |
-| checkout-cancel.spec.ts ① ⑤ | 対象外 | Cart画面・Step Two画面からの Cancel のため、それぞれの画面で扱う |
+| TC-CO1-001 | checkout-step-one-display.spec.ts「TC-CO1-001：…」 | test_checkout_step_one_display.py `test_page_displayed_as_spec` |
+| TC-CO1-002 | checkout-step-one-validation.spec.ts「TC-CO1-002：…」 | test_checkout_step_one_validation.py `test_all_fields_blank` |
+| TC-CO1-003 | checkout-step-one-validation.spec.ts「TC-CO1-003：…」（TC-CO1-004・005 とデータを切り替える形） | test_checkout_step_one_validation.py `test_single_field_blank[TC-CO1-003]` |
+| TC-CO1-004 | checkout-step-one-validation.spec.ts「TC-CO1-004：…」（TC-CO1-003・005 とデータを切り替える形） | test_checkout_step_one_validation.py `test_single_field_blank[TC-CO1-004]` |
+| TC-CO1-005 | checkout-step-one-validation.spec.ts「TC-CO1-005：…」（TC-CO1-003・004 とデータを切り替える形） | test_checkout_step_one_validation.py `test_single_field_blank[TC-CO1-005]` |
+| TC-CO1-006 | checkout-step-one-validation.spec.ts「TC-CO1-006：…」 | test_checkout_step_one_validation.py `test_error_switches_until_all_fields_filled` |
+| TC-CO1-007 | checkout-step-one-persistence.spec.ts「TC-CO1-007：…」 | test_checkout_step_one_persistence.py `test_values_kept_after_error_and_close` |
+| TC-CO1-008 | checkout-step-one-navigation.spec.ts「TC-CO1-008：…」 | test_checkout_step_one_navigation.py `test_continue_to_step_two` |
+| TC-CO1-009 | checkout-step-one-navigation.spec.ts「TC-CO1-009：…」（TC-CO1-010 とデータを切り替える形） | test_checkout_step_one_navigation.py `test_navigation_to_cart[TC-CO1-009]` |
+| TC-CO1-010 | checkout-step-one-navigation.spec.ts「TC-CO1-010：…」（TC-CO1-009 とデータを切り替える形） | test_checkout_step_one_navigation.py `test_navigation_to_cart[TC-CO1-010]` |
+| TC-CO1-011 | checkout-step-one-persistence.spec.ts「TC-CO1-011：…」 | test_checkout_step_one_persistence.py `test_values_cleared_after_reload` |
+| TC-CO1-012 | checkout-step-one-cart.spec.ts「TC-CO1-012：…」 | test_checkout_step_one_cart.py `test_cart_unchanged_after_cancel` |
+| TC-CO1-013 | checkout-step-one-auth.spec.ts「TC-CO1-013：…」 | test_checkout_step_one_auth.py `test_redirect_to_login_when_not_logged_in` |
