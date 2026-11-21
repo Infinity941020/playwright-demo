@@ -9,8 +9,16 @@ ECサイト（SauceDemo）のカート画面。カートに入れた商品の一
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/CartPage.ts` に相当する画面。
-TS版Wiki「Cart仕様」のうち、カートの状態（商品リスト・バッジ）に関する挙動を含む。
+対応するコード：
+- TS版：`typescript/pages/CartPage.ts`、`typescript/flows/CartFlow.ts`、`typescript/utils/uiAssertions/cartAssertions.ts`、
+  テストは `typescript/tests/ui/cart/`
+- Python版：`python/pages/cart_page.py`、`python/flows/cart_flow.py`、`python/utils/ui_assertions/cart_assertions.py`、
+  テストは `python/tests/ui/cart/`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
+
+TS版の Wiki「Cart仕様」には、本画面のカートの状態（商品リスト・バッジ）に関する挙動が含まれている。Wiki の見直しは後の作業で行う。
 
 実機確認：2026-10-07（Playwright調査用スクリプトにて確認）
 

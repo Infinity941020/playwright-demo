@@ -9,11 +9,14 @@
   カートアイコンから Cart画面を開く（ブラウザの保存領域への直接書き込みでは、追加操作そのものを確認できないため）
 - それ以外のテストケース（TC-CART-001・002・004〜010）は、ログイン後にブラウザの保存領域（localStorage の cart-contents）へ
   商品IDの配列を直接書き込み、Cart画面を開くことで前提状態を作る（決定日：2026-10-07）
-  - 理由：Products画面の不具合でCart画面のテストまで失敗しないようにするため（テストの独立性、判断基準4）。
+  - 理由：Products画面の不具合でCart画面のテストまで失敗しないようにするため（テストの独立性）。
     画面操作による追加は、TC-CART-003 と Products画面のテストで確認している
   - 書き込みと画面表示が一致することは実機で確認済み（2026-10-07）
+  - 書き込みが効かずに空のカートのままテストが進まないように、Cart画面を開いた後に、商品の行の数が入れた件数と同じことを確かめる
 
 対応する仕様書：cart_spec.md
+対応するテスト：TS版は `typescript/tests/ui/cart/`、Python版は `python/tests/ui/cart/`（両版とも同じ11件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 ---
 
@@ -185,8 +188,8 @@
 | TC-CART-003 | 並び順 | O-01 | 中 | 個別実装 |
 | TC-CART-004 | 削除（1件） | R-01, R-02 | 高 | 個別実装 |
 | TC-CART-005 | 削除（最後の1件） | R-03 | 中 | 個別実装 |
-| TC-CART-006 | 画面遷移（Continue Shopping） | T-01 | 高 | Data-driven（006・007共通化） |
-| TC-CART-007 | 画面遷移（Checkout） | T-02 | 高 | Data-driven（006・007共通化） |
+| TC-CART-006 | 画面遷移（Continue Shopping） | T-01 | 高 | TC-CART-007 とデータを切り替えて共通化 |
+| TC-CART-007 | 画面遷移（Checkout） | T-02 | 高 | TC-CART-006 とデータを切り替えて共通化 |
 | TC-CART-008 | 画面遷移（商品名） | T-03 | 低 | 個別実装 |
 | TC-CART-009 | 画面連動 | L-01 | 中 | 個別実装 |
 | TC-CART-010 | 状態保持 | P-01 | 中 | 個別実装 |
@@ -201,18 +204,23 @@
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 | ハンバーガーメニュー | Logout機能で扱う |
 | Checkout画面・商品詳細画面の中身 | それぞれの画面の仕様で扱う（商品詳細は今後の拡張候補） |
-| 見た目の比較（Visual Regression） | Stage 2-1で扱う |
-| 2件続けて削除したときのバッジ件数（TS版 cart-badge.spec.ts ④） | 1件削除でバッジが1減ること（TC-CART-004）と同じ仕組みの繰り返しで、結果が変わる可能性が低いため（Login画面の「無効×無効」除外と同じ考え方） |
+| 見た目の比較（Visual Regression） | 見た目の比較のテストで扱う（visual_testcases.md） |
+| 2件続けて削除したときのバッジ件数 | 1件削除でバッジが1減ること（TC-CART-004）と同じ仕組みの繰り返しで、結果が変わる可能性が低いため（Login画面の「無効×無効」除外と同じ考え方） |
 
-## ■ TS版テスト（tests/ui/cart/ 8件）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの11件を実装している。
+
+| テストID | TS版（typescript/tests/ui/cart/） | Python版（python/tests/ui/cart/） |
 |---|---|---|
-| cart.spec.ts：商品を1つカートに追加できること | TC-CART-002（全件）、Products TC-PROD-006 | 1件の場合は全件の場合に含まれる |
-| cart.spec.ts：複数商品をカートに追加できること | TC-CART-002 | Python版は商品名・価格まで確認 |
-| cart.spec.ts：カート内商品の削除ができること | TC-CART-005 | |
-| cart-badge.spec.ts ① 1件追加時のバッジ | Products TC-PROD-006 | |
-| cart-badge.spec.ts ② 全件追加時のバッジ件数 | TC-CART-002 | |
-| cart-badge.spec.ts ③ 1件削除時のバッジ件数 | TC-CART-004 | Python版は残った商品名まで確認 |
-| cart-badge.spec.ts ④ 2件削除時のバッジ件数 | 対象外 | 上記「対象外としたもの」参照 |
-| cart-badge.spec.ts ⑤ 全件削除時はバッジ非表示 | TC-CART-005 | Python版は最後の1件の削除で確認 |
+| TC-CART-001 | cart-display.spec.ts「TC-CART-001：…」 | test_cart_display.py `test_empty_cart_displayed` |
+| TC-CART-002 | cart-display.spec.ts「TC-CART-002：…」 | test_cart_display.py `test_all_products_displayed_as_spec` |
+| TC-CART-003 | cart-order.spec.ts「TC-CART-003：…」 | test_cart_order.py `test_items_listed_in_added_order` |
+| TC-CART-004 | cart-remove.spec.ts「TC-CART-004：…」 | test_cart_remove.py `test_remove_only_selected_item` |
+| TC-CART-005 | cart-remove.spec.ts「TC-CART-005：…」 | test_cart_remove.py `test_remove_last_item` |
+| TC-CART-006 | cart-navigation.spec.ts「TC-CART-006：…」（TC-CART-007 とデータを切り替える形） | test_cart_navigation.py `test_button_navigation[TC-CART-006]` |
+| TC-CART-007 | cart-navigation.spec.ts「TC-CART-007：…」（TC-CART-006 とデータを切り替える形） | test_cart_navigation.py `test_button_navigation[TC-CART-007]` |
+| TC-CART-008 | cart-navigation.spec.ts「TC-CART-008：…」 | test_cart_navigation.py `test_open_product_detail` |
+| TC-CART-009 | cart-sync.spec.ts「TC-CART-009：…」 | test_cart_sync.py `test_remove_reflected_on_products_page` |
+| TC-CART-010 | cart-persistence.spec.ts「TC-CART-010：…」 | test_cart_persistence.py `test_cart_kept_after_reload` |
+| TC-CART-011 | cart-auth.spec.ts「TC-CART-011：…」 | test_cart_auth.py `test_redirect_to_login_when_not_logged_in` |

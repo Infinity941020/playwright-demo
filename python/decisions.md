@@ -319,6 +319,11 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   CartFlow.open_cart_with を使う。書き込み処理は引き続き CartPage.set_cart_contents の
   1か所のみ。これにより、影響範囲に flows/checkout_flow.py、tests/ui/checkout/、
   tests/ui/logout/ の該当テストが加わる。
+- 追記（2026-11-21）: TS版の Cart のテスト（typescript/tests/ui/cart/）も、同じ方式で前提の状態を作るようにした。
+  TC-CART-003 だけは商品一覧画面での操作で作り、それ以外はブラウザの保存領域へ直接書き込む。書き込む処理は TS版でも
+  CartPage.setCartContents の1か所だけ。あわせて両版とも、書き込んでカート画面を開いた後に、商品の行の数が入れた件数と
+  同じことを確かめるようにした（書き込みが効かずに空のカートのままテストが進むのを防ぐため）。
+  TS版の Checkout と Logout のテストへの反映は、それぞれの画面のテストを揃えるとき（横展開3-4・3-5）に行う予定
 
 ## 論点16: Checkout画面の Page Object の構成
 
