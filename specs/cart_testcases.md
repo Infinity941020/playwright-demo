@@ -80,7 +80,7 @@
   1. Products画面で「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」の順に Add to cart ボタンを押す
      （補足：この順は、商品名の昇順（Backpack→Bike Light→Onesie）・降順（Onesie→Bike Light→Backpack）、
      商品IDの昇順（0→2→4）・降順（4→2→0）のどれにも当たらない〈商品IDでは 0→4→2〉ため、追加順で並んでいることを区別できる）
-  2. カートアイコンを押して Cart画面を開く
+  2. カートアイコンを押して Cart画面を開き、Cart画面が表示されていることを確かめる
   3. Cart画面の商品の並び順を確認する
 ■ 期待結果：商品名の並びが「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」である
 ■ 優先度：中
@@ -159,7 +159,8 @@
 
 ## TC-CART-010
 ■ テスト内容：再読み込み後も、カートの内容が保持されること
-■ 前提条件：「Sauce Labs Backpack」→「Sauce Labs Bike Light」の順でカートに入っている
+■ 前提条件：Products画面で「Sauce Labs Backpack」→「Sauce Labs Bike Light」の順に Add to cart を押し、カートアイコンから Cart画面を開いている
+  （カート画面の表示と、商品の行が2件であることを確かめてから操作する）
 ■ 操作手順：
   1. ページを再読み込みする
 ■ 期待結果：

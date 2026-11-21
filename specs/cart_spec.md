@@ -64,6 +64,9 @@ TS版の Wiki「Cart仕様」には、本画面のカートの状態（商品リ
 |---|---|
 | Backpack → Bike Light → Onesie | Backpack → Bike Light → Onesie |
 | Onesie → Bike Light → Backpack | Onesie → Bike Light → Backpack |
+| Bike Light → Backpack → Onesie | Bike Light → Backpack → Onesie |
+
+（Bike Light → Backpack → Onesie の行は、2026-11-21 に手元で TC-CART-003 を実行して確かめた。TS版は Chromium・Firefox・WebKit、Python版は Chromium）
 
 ---
 

@@ -303,15 +303,15 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 判断: 変更（TS版はすべて画面操作で作っているが、Python版は「追加した順」を
   確かめる TC-CART-003 以外、localStorage への直接書き込みで作る）（2026-10-07 時点）
 - 理由: Products画面の不具合でCart画面のテストまで失敗しないようにするため
-  （判断基準4：テストの独立性）。画面操作による追加は TC-CART-003 と
+  （判断基準4：テストの独立性）。画面操作による追加は TC-CART-003・010 と
   Products画面のテストで確認している。書き込みと画面表示が一致することは
   実機で確認済み。SauceDemo内部のキー名（cart-contents）に依存するため、
   書き込み処理は1か所にまとめた。
 - 影響範囲: pages/cart_page.py（set_cart_contents：書き込み処理の唯一の実装）、
   flows/cart_flow.py（open_cart_with：前提状態を作ってカート画面を開く）、
-  tests/ui/cart/（TC-CART-003 以外のテスト）
+  tests/ui/cart/（TC-CART-003・010 以外のテスト）
 - TS逆輸入候補: Cart は反映済み（2026-11-21）。Checkout・Logout は後の作業で反映する。
-  当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた
+  当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
   直接書き込み）で前提状態を作っている。Checkout は CheckoutFlow.open_step_one_with
@@ -320,7 +320,7 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   1か所のみ。これにより、影響範囲に flows/checkout_flow.py、tests/ui/checkout/、
   tests/ui/logout/ の該当テストが加わる。
 - 追記（2026-11-21）: TS版の Cart のテスト（typescript/tests/ui/cart/）も、同じ方式で前提の状態を作るようにした。
-  TC-CART-003 だけは商品一覧画面での操作で作り、それ以外はブラウザの保存領域へ直接書き込む。書き込む処理は TS版でも
+  TC-CART-003 と TC-CART-010 は商品一覧画面での操作で作り、それ以外はブラウザの保存領域へ直接書き込む。書き込む処理は TS版でも
   CartPage.setCartContents の1か所だけ。あわせて両版とも、書き込んでカート画面を開いた後に、商品の行の数が入れた件数と
   同じことを確かめるようにした（書き込みが効かずに空のカートのままテストが進むのを防ぐため）。
   この行の数の確認は、Cart の前提づくり（CartFlow の openCartWith／open_cart_with）に入れた。
