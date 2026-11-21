@@ -123,7 +123,7 @@ export class CartPage {
   }
 
   // 商品名が、渡した順に並んでいることを確かめる
-  async expectItemNames(productNames: string[]) {
+  async expectItemNames(productNames: readonly string[]) {
     await expect(this.cartItems.locator(this.itemNames)).toHaveText(productNames);
   }
 

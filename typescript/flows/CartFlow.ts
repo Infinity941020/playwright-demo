@@ -12,7 +12,7 @@ export class CartFlow {
   private readonly cartPage: CartPage;
   private readonly header: HeaderComponent;
 
-  // 操作の後に移る、商品一覧画面・商品詳細画面と Checkout Step One画面の表示を確かめるために使う
+  // 操作の後に移る画面（商品一覧画面・商品詳細画面・Checkout Step One画面）の表示を確かめるために使う
   private readonly inventoryPage: InventoryPage;
   private readonly checkoutStepOnePage: CheckoutStepOnePage;
 
@@ -25,7 +25,8 @@ export class CartFlow {
   }
 
   // 渡した商品が、渡した順にカートに入った状態で、カート画面を開く。
-  // 商品一覧画面での追加の不具合でカート画面のテストまで失敗しないように、ブラウザの保存領域へ直接書き込んで作る
+  // 商品一覧画面での追加の不具合でカート画面のテストまで失敗しないように、ブラウザの保存領域へ直接書き込んで作る。
+  // 保存領域はサイトごとに分かれるため、ログイン済みの画面（SauceDemo の画面を開いた状態）から呼ぶ
   async openCartWith(products: readonly Product[]) {
 
     await this.cartPage.setCartContents(products.map((product) => product.id));
@@ -36,7 +37,8 @@ export class CartFlow {
     await this.cartPage.expectItemCount(products.length);
   }
 
-  // カート画面の URL を開く（表示は確かめないので、確かめるときは続けて表示の確認を呼ぶ）
+  // カート画面の URL を開く。ログインしていない状態で開こうとしたときの確認に使う。
+  // カート画面が表示されるとは限らないため、表示は確かめない
   async accessCartDirectly() {
     await this.cartPage.goto();
   }
@@ -84,7 +86,7 @@ export class CartFlow {
     }
   }
 
-  async expectItemNamesInOrder(productNames: string[]) {
+  async expectItemNamesInOrder(productNames: readonly string[]) {
     await this.cartPage.expectItemNames(productNames);
   }
 

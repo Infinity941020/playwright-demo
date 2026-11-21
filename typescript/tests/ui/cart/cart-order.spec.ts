@@ -13,8 +13,8 @@ test.describe('カート画面の並び順', () => {
     const inventoryFlow = new InventoryFlow(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
 
-    // 商品名の順にも商品の番号の順（2→0→4）にもならない並びにして、追加した順で並んでいることを区別できるようにする
-    const addedOrder = [products.onesie.name, products.bikeLight.name, products.backpack.name];
+    // 商品名の昇順・降順にも、商品の番号（0→4→2）の昇順・降順にも当たらない並びにして、追加した順で並んでいることを区別できるようにする
+    const addedOrder = [products.bikeLight.name, products.backpack.name, products.onesie.name];
 
     for (const productName of addedOrder) {
       await inventoryFlow.addToCart(productName);

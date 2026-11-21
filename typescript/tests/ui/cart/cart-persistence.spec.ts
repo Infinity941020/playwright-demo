@@ -1,6 +1,8 @@
-// カート画面を再読み込みした後も、カートの内容が保たれることのテスト
+// カート画面を再読み込みした後も、カートの内容が保たれることのテスト。
+// 画面で追加した内容が保存されない不具合も見つけられるように、前提の状態はブラウザの保存領域への書き込みではなく、商品一覧画面での操作で作る
 import { test } from '../../../fixtures/loginFixture';
 import { CartFlow } from '../../../flows/CartFlow';
+import { InventoryFlow } from '../../../flows/InventoryFlow';
 import {
   expectBadgeCount,
   expectCartItemCount,
@@ -13,9 +15,15 @@ test.describe('カート画面の状態保持', () => {
   test('TC-CART-010：再読み込み後も、カートの内容が保持されること', async ({ loggedPage }) => {
 
     const cartFlow = new CartFlow(loggedPage);
+    const inventoryFlow = new InventoryFlow(loggedPage);
     const { backpack, bikeLight } = products;
 
-    await cartFlow.openCartWith([backpack, bikeLight]);
+    await inventoryFlow.addToCart(backpack.name);
+    await inventoryFlow.addToCart(bikeLight.name);
+    await inventoryFlow.openCart();
+
+    // 前提の状態が作れていないまま再読み込みに進まないように、先に行の数を確かめる
+    await expectCartItemCount(cartFlow, 2);
 
     await cartFlow.reloadCart();
 

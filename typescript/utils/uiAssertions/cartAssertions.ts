@@ -16,7 +16,7 @@ export async function expectCartItemsDisplayed(cartFlow: CartFlow, products: rea
   await cartFlow.expectItemsDisplayed(products);
 }
 
-export async function expectCartItemNamesInOrder(cartFlow: CartFlow, productNames: string[]) {
+export async function expectCartItemNamesInOrder(cartFlow: CartFlow, productNames: readonly string[]) {
   await cartFlow.expectItemNamesInOrder(productNames);
 }
 

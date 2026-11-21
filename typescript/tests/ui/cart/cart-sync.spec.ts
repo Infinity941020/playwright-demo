@@ -4,6 +4,7 @@ import { CartFlow } from '../../../flows/CartFlow';
 import { InventoryFlow } from '../../../flows/InventoryFlow';
 import {
   expectAddToCartButtonShown,
+  expectOnInventoryPage,
   expectRemoveButtonShown,
 } from '../../../utils/uiAssertions/inventoryAssertions';
 import { products } from '../../../data/products';
@@ -20,6 +21,9 @@ test.describe('カート画面とProducts画面の連動', () => {
 
     await cartFlow.removeFromCart(backpack.name);
     await cartFlow.continueShopping();
+
+    // 失敗したときに、画面が移らなかったのか、ボタンの表示が戻っていないのかを区別できるように、先に商品一覧画面であることを確かめる
+    await expectOnInventoryPage(inventoryFlow);
 
     await expectAddToCartButtonShown(inventoryFlow, backpack.name);
     await expectRemoveButtonShown(inventoryFlow, bikeLight.name);

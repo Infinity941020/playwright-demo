@@ -19,11 +19,11 @@ class TestCartOrder:
         """
         inventory_flow = InventoryFlow(logged_page)
         cart_flow = CartFlow(logged_page)
-        # 商品名の順にも商品IDの順にもならない並びにする（商品IDでは 2→0→4）
+        # 商品名の順にも商品IDの順にもならない並びにする（商品IDでは 0→4→2）
         added_order = [
-            PRODUCTS["onesie"]["name"],
             PRODUCTS["bike_light"]["name"],
             PRODUCTS["backpack"]["name"],
+            PRODUCTS["onesie"]["name"],
         ]
 
         # Products画面で商品を追加し、カートアイコンからカート画面を開く
