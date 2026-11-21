@@ -84,7 +84,7 @@ TS版の Wiki「Cart仕様」には、本画面のカートの状態（商品リ
 | Checkout を押下 | Checkout Step One画面（/checkout-step-one.html） |
 | 商品名をクリック | 商品詳細画面（/inventory-item.html?id=商品ID） |
 
-※ 商品IDは data/products.py の定義を参照（例：Sauce Labs Bike Light は id=0）
+※ 商品IDは両版共通の shared/data/products.json の定義を参照（例：Sauce Labs Bike Light は id=0）
 ※ 遷移先の画面（Products／Checkout／商品詳細）の中身は本仕様の対象外。本仕様では「遷移すること」までを扱う。
 ※ カートが空の状態でも Checkout ボタンは押下でき、/checkout-step-one.html に遷移する（実機確認済み。エラーや制止はない）。
   意図された仕様か不具合かを判断できないため、事実として記録するのみとし、テストの対象外とする（今後の拡張候補）。

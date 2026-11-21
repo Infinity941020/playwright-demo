@@ -5,12 +5,15 @@
 （TC-CART-011 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- TC-CART-003 は「追加した順に並ぶこと」の確認であるため、必ず Products画面での画面操作（Add to cart）で商品を追加し、
-  カートアイコンから Cart画面を開く（ブラウザの保存領域への直接書き込みでは、追加操作そのものを確認できないため）
-- それ以外のテストケース（TC-CART-001・002・004〜010）は、ログイン後にブラウザの保存領域（localStorage の cart-contents）へ
+- TC-CART-003 と TC-CART-010 は、必ず Products画面での画面操作（Add to cart）で商品を追加し、カートアイコンから Cart画面を開く
+  - TC-CART-003：「追加した順に並ぶこと」の確認であるため（ブラウザの保存領域への直接書き込みでは、追加操作そのものを確認できない）
+  - TC-CART-010：画面で追加した内容が保存されない不具合も見つけられるようにするため
+    （保存領域へ直接書き込むと、再読み込みは書き込んだ内容を読み直すだけになり、画面の追加が保存されているかを確認できない）。
+    再読み込みの前に、商品の行が2件あることを確かめる
+- それ以外のテストケース（TC-CART-001・002・004〜009）は、ログイン後にブラウザの保存領域（localStorage の cart-contents）へ
   商品IDの配列を直接書き込み、Cart画面を開くことで前提状態を作る（決定日：2026-10-07）
   - 理由：Products画面の不具合でCart画面のテストまで失敗しないようにするため（テストの独立性）。
-    画面操作による追加は、TC-CART-003 と Products画面のテストで確認している
+    画面操作による追加は、TC-CART-003・010 と Products画面のテストで確認している
   - 書き込みと画面表示が一致することは実機で確認済み（2026-10-07）
   - 書き込みが効かずに空のカートのままテストが進まないように、Cart画面を開いた後に、商品の行の数が入れた件数と同じことを確かめる
 
@@ -74,11 +77,12 @@
 ■ テスト内容：カートに追加した順に表示されること
 ■ 前提条件：カートは空で、Products画面を開いている
 ■ 操作手順：
-  1. Products画面で「Sauce Labs Onesie」→「Sauce Labs Bike Light」→「Sauce Labs Backpack」の順に Add to cart ボタンを押す
-     （補足：この順は商品名順でも商品ID順〈2→0→4〉でもないため、追加順で並んでいることを区別できる）
+  1. Products画面で「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」の順に Add to cart ボタンを押す
+     （補足：この順は、商品名の昇順（Backpack→Bike Light→Onesie）・降順（Onesie→Bike Light→Backpack）、
+     商品IDの昇順（0→2→4）・降順（4→2→0）のどれにも当たらない〈商品IDでは 0→4→2〉ため、追加順で並んでいることを区別できる）
   2. カートアイコンを押して Cart画面を開く
   3. Cart画面の商品の並び順を確認する
-■ 期待結果：商品名の並びが「Sauce Labs Onesie」→「Sauce Labs Bike Light」→「Sauce Labs Backpack」である
+■ 期待結果：商品名の並びが「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」である
 ■ 優先度：中
 
 ---
