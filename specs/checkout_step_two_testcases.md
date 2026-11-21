@@ -80,7 +80,8 @@
 ■ 前提条件：「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」の順でカートに入っている
   （補足：この順は、商品名の昇順（Backpack→Bike Light→Onesie）・降順（Onesie→Bike Light→Backpack）、
   商品IDの昇順（0→2→4）・降順（4→2→0）、価格の昇順（Onesie→Bike Light→Backpack）・降順（Backpack→Bike Light→Onesie）の
-  どれにも当たらない〈商品IDでは 0→4→2〉ため、カートの順で並んでいることを区別できる）
+  どれにも当たらない〈商品IDでは 0→4→2〉ため、カートの順で並んでいることを区別できる。
+  このテストでは、保存されたカートの順に表示されることを確かめる。画面で追加した順に保存されることは TC-CART-003 で確かめている）
 ■ 操作手順：
   1. 商品の並び順を確認する
 ■ 期待結果：商品名の並びが「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」である
@@ -176,7 +177,7 @@
   2. Products画面をURL（/inventory.html）で開く
      （補足：Complete画面の操作は Complete画面の仕様で扱うため、ここでは使わない）
 ■ 期待結果：
-  - 手順1の後、カートアイコンのバッジが表示されない
+  - 手順1の後、Complete画面が表示され、カートアイコンのバッジが表示されない
   - 手順2の後、「Sauce Labs Backpack」と「Sauce Labs Bike Light」のボタンがどちらも「Add to cart」である
 ■ 優先度：高
 
