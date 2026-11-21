@@ -16,7 +16,7 @@ ECサイト（SauceDemo）の購入手続きの1画面目。購入者の氏名�
   `python/utils/ui_assertions/checkout_assertions.py`、テストは `python/tests/ui/checkout/test_checkout_step_one_*.py`
 
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
-（Firefox・WebKit での挙動は、TS版の自動テストで確かめている）
+（テストケースの13件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（入力の組み合わせ8通り・判断できない挙動など）は、Firefox・WebKit では確かめていない）
 
 実機確認：2026-11-08（Playwright調査用スクリプトにて確認）
 

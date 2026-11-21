@@ -309,8 +309,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   書き込み処理は1か所にまとめた。
 - 影響範囲: pages/cart_page.py（set_cart_contents：書き込み処理の唯一の実装）、
   flows/cart_flow.py（open_cart_with：前提状態を作ってカート画面を開く）、
-  tests/ui/cart/（TC-CART-003・010 以外のテスト）
-- TS逆輸入候補: Cart は反映済み（2026-11-21）。Checkout・Logout は後の作業で反映する。
+  tests/ui/cart/（TC-CART-003・010 以外のテスト）。
+  TS版は typescript/pages/CartPage.ts・flows/CartFlow.ts・tests/ui/cart/ と、
+  flows/CheckoutFlow.ts（openStepOneWith）・tests/ui/checkout/checkout-step-one-*.spec.ts
+- TS逆輸入候補: Cart と Checkout Step One は反映済み（2026-11-21）。Checkout の Step Two・Complete と Logout は後の作業で反映する。
   当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
