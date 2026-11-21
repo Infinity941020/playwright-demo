@@ -105,7 +105,7 @@ export class CheckoutStepOnePage {
   }
 }
 
-// Checkout Step Two画面（購入内容の確認）
+// Checkout Step Two画面（注文内容の確認）
 export class CheckoutStepTwoPage {
 
   private readonly page: Page;

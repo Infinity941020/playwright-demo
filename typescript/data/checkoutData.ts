@@ -2,11 +2,13 @@
 // 値は両版共通の shared/data/checkout.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す
 import sharedCheckout from '../../shared/data/checkout.json' with { type: 'json' };
 
-export const checkoutData: {
+export type CheckoutInfo = {
   readonly firstName: string;
   readonly lastName: string;
   readonly postalCode: string;
-} = {
+};
+
+export const checkoutData: CheckoutInfo = {
   firstName: sharedCheckout.first_name,
   lastName: sharedCheckout.last_name,
   postalCode: sharedCheckout.postal_code,

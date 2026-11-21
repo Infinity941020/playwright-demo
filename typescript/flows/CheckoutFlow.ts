@@ -8,13 +8,7 @@ import {
   CheckoutCompletePage,
 } from '../pages/CheckoutPage';
 import { Product } from '../data/products';
-
-// Checkout Step One画面で入力する購入者情報
-type CheckoutInfo = {
-  readonly firstName: string;
-  readonly lastName: string;
-  readonly postalCode: string;
-};
+import { CheckoutInfo } from '../data/checkoutData';
 
 // Checkout の画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 // テストから画面の細かい操作を直接扱わずに済むようにする
@@ -149,11 +143,12 @@ export class CheckoutFlow {
     await this.stepTwo.expectOnPage();
   }
 
-  // Finish を押して購入を確定する
+  // Finish を押して購入を確定する（移った先の画面は確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ）
   async completePurchase() {
     await this.stepTwo.clickFinish();
   }
 
+  // Cancel を押す（移った先の画面は確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ）
   async cancelFromStepTwo() {
     await this.stepTwo.clickCancel();
   }

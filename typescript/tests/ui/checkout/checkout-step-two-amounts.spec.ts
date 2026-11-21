@@ -8,7 +8,7 @@ import { products, productsInDisplayOrder } from '../../../data/products';
 
 test.describe('Checkout Step Two画面の金額', () => {
 
-  // 商品の件数（1件・2件・全6件）だけを切り替えて、同じ確かめ方をする
+  // カートの中身（1件・2件・全6件）と、期待する金額だけを切り替えて、同じ確かめ方をする
   const amountCases = [
     {
       id: 'TC-CO2-004',

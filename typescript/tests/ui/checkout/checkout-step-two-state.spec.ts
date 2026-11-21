@@ -4,6 +4,7 @@ import { CheckoutFlow } from '../../../flows/CheckoutFlow';
 import { InventoryFlow } from '../../../flows/InventoryFlow';
 import {
   expectBadgeCount,
+  expectOnCheckoutCompletePage,
   expectOnInventoryPage,
   expectStepTwoAmounts,
   expectStepTwoItemCount,
@@ -28,6 +29,8 @@ test.describe('Checkout Step Two画面の状態', () => {
 
     await checkoutFlow.completePurchase();
 
+    // 要素がないことの確認は、画面の切り替わりの途中で一瞬バッジがないときにも成功してしまうため、先に Complete画面であることを確かめる
+    await expectOnCheckoutCompletePage(checkoutFlow);
     await expectBadgeCount(checkoutFlow, 0);
 
     // Complete画面での操作は Complete画面のテストで確かめるため、ここでは使わずに URL で開く

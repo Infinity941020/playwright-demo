@@ -8,6 +8,7 @@ from flows.checkout_flow import CheckoutFlow
 from flows.inventory_flow import InventoryFlow
 from utils.ui_assertions.checkout_assertions import (
     expect_badge_count,
+    expect_on_checkout_complete_page,
     expect_on_inventory_page,
     expect_step_two_amounts,
     expect_step_two_item_count,
@@ -34,6 +35,7 @@ class TestCheckoutStepTwoState:
 
         # Finish を押す
         checkout_flow.complete_purchase()
+        expect_on_checkout_complete_page(checkout_flow)
 
         # バッジが表示されないことを検証する
         expect_badge_count(checkout_flow, 0)
