@@ -122,10 +122,10 @@ npx playwright test tests/ui --reporter=list
 npx playwright test tests/api --reporter=list
 ```
 
-### 特定ファイル実行（例：Checkout成功パターン）
+### 特定ファイル実行（例：Checkout Complete画面の表示）
 
 ```bash
-npx playwright test tests/ui/checkout/checkout-success.spec.ts --reporter=list
+npx playwright test tests/ui/checkout/checkout-complete-display.spec.ts --reporter=list
 ```
 
 ---

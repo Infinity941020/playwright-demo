@@ -95,7 +95,7 @@ ECサイト（SauceDemo）の購入手続きの2画面目。カートの商品�
 | 商品名をクリック | 商品詳細画面（/inventory-item.html?id=商品ID） |
 | カートアイコンをクリック | Cart画面（/cart.html） |
 
-※ Cancel の遷移先は、Step One（Cart画面へ戻る）と異なり、Products画面である（実機・TS版のコードとも一致）。
+※ Cancel の遷移先は、Step One（Cart画面へ戻る）と異なり、Products画面である（実機で確認済み。TC-CO2-008 で確かめている）。
 ※ 商品IDは、両版共通の shared/data/products.json の定義を参照（例：Sauce Labs Bike Light は id=0）。
 ※ 遷移先の画面（Complete／Products／商品詳細／Cart）の中身は本仕様の対象外。本仕様では「遷移すること」までを扱う。
 

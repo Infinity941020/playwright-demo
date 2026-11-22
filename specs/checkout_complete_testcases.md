@@ -5,16 +5,20 @@
 （TC-CO3-006 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（decisions.md 論点15）
+- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
 - Checkout Complete画面は、Checkout Step One画面をURLで開き、購入者情報（Taro／Yamada／1000001）を入力して Continue を押し、
   Checkout Step Two画面で Finish を押して開く
   - 理由：購入せずに Complete画面をURLで直接開けることは、意図された仕様か不具合かを判断できない挙動のため（仕様書「判断できない挙動」参照）。
     また、PDF出力ボタンは購入直後にしか表示されないため
   - 受け入れるリスク：Step One・Step Two の不具合で、Complete のテストもまとめて失敗する可能性がある。失敗したときは TC-CO1・TC-CO2 の結果から原因を切り分ける
+- 前提を作った後に、Checkout Complete画面が表示されていることを確かめる（Step One を開いた時点でカートアイコンのバッジの件数が入れた件数と同じこと、Step Two画面が表示されたことも確かめる）
 
 テストIDの付け方：Step One を「TC-CO1」、Step Two を「TC-CO2」、Complete を「TC-CO3」とする
 
 対応する仕様書：checkout_complete_spec.md
+対応するテスト：TS版は `typescript/tests/ui/checkout/checkout-complete-*.spec.ts`、Python版は `python/tests/ui/checkout/test_checkout_complete_*.py`
+（両版とも同じ6件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 ---
 
@@ -112,8 +116,8 @@
 | テストID | 分類 | 対応する観点 | 優先度 | 実装方針 |
 |---|---|---|---|---|
 | TC-CO3-001 | 表示 | V-01, V-02, V-03 | 高 | 個別実装 |
-| TC-CO3-002 | 画面遷移（Back Home） | T-01 | 高 | Data-driven（002・003共通化） |
-| TC-CO3-003 | 画面遷移（カートアイコン） | T-02 | 低 | Data-driven（002・003共通化） |
+| TC-CO3-002 | 画面遷移（Back Home） | T-01 | 高 | TC-CO3-003 とデータを切り替えて共通化 |
+| TC-CO3-003 | 画面遷移（カートアイコン） | T-02 | 低 | TC-CO3-002 とデータを切り替えて共通化 |
 | TC-CO3-004 | 状態（Products画面へ） | S-01 | 中 | 個別実装 |
 | TC-CO3-005 | 状態（Cart画面へ） | S-02 | 中 | 個別実装 |
 | TC-CO3-006 | 認証 | A-01 | 高 | 個別実装 |
@@ -130,11 +134,17 @@
 | PDFのダウンロードとPDFの中身 | 今後の拡張候補（仕様書「本仕様の対象外」参照） |
 | ハンバーガーメニュー | Logout 機能（logout_testcases.md）で扱う |
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
-| 見た目の比較（Visual Regression） | Stage 2-1で扱う |
+| 見た目の比較（Visual Regression） | 見た目の比較のテストで扱う（visual_testcases.md） |
 
-## ■ TS版テスト（Complete に関係するもの）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの6件を実装している。
+
+| テストID | TS版（typescript/tests/ui/checkout/） | Python版（python/tests/ui/checkout/） |
 |---|---|---|
-| checkout-success.spec.ts ①〜⑥ の完了画面の確認 | TC-CO3-001 | TS版は完了URLと見出しの表示のみ。Python版は文言、画像、ボタン、バッジまで確認 |
-| tests/visual/checkout-complete-visual.spec.ts | 対象外 | Stage 2-1 で扱う |
+| TC-CO3-001 | checkout-complete-display.spec.ts「TC-CO3-001：…」 | test_checkout_complete_display.py `test_page_displayed_as_spec` |
+| TC-CO3-002 | checkout-complete-navigation.spec.ts「TC-CO3-002：…」（TC-CO3-003 とデータを切り替える形） | test_checkout_complete_navigation.py `test_button_navigation[TC-CO3-002]` |
+| TC-CO3-003 | checkout-complete-navigation.spec.ts「TC-CO3-003：…」（TC-CO3-002 とデータを切り替える形） | test_checkout_complete_navigation.py `test_button_navigation[TC-CO3-003]` |
+| TC-CO3-004 | checkout-complete-state.spec.ts「TC-CO3-004：…」 | test_checkout_complete_state.py `test_cart_empty_after_back_home` |
+| TC-CO3-005 | checkout-complete-state.spec.ts「TC-CO3-005：…」 | test_checkout_complete_state.py `test_cart_empty_after_cart_icon` |
+| TC-CO3-006 | checkout-complete-auth.spec.ts「TC-CO3-006：…」 | test_checkout_complete_auth.py `test_redirect_to_login_when_not_logged_in` |

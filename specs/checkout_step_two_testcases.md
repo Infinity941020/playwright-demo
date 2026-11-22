@@ -81,7 +81,7 @@
   （補足：この順は、商品名の昇順（Backpack→Bike Light→Onesie）・降順（Onesie→Bike Light→Backpack）、
   商品IDの昇順（0→2→4）・降順（4→2→0）、価格の昇順（Onesie→Bike Light→Backpack）・降順（Backpack→Bike Light→Onesie）の
   どれにも当たらない〈商品IDでは 0→4→2〉ため、カートの順で並んでいることを区別できる。
-  このテストでは、保存されたカートの順に表示されることを確かめる。画面で追加した順に保存されることは TC-CART-003 で確かめている）
+  このテストでは、保存されたカートの順に表示されることを確かめる。画面で追加した順にカートに入ることは TC-CART-003、保存されることは TC-CART-010 で確かめている）
 ■ 操作手順：
   1. 商品の並び順を確認する
 ■ 期待結果：商品名の並びが「Sauce Labs Bike Light」→「Sauce Labs Backpack」→「Sauce Labs Onesie」である
