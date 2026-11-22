@@ -85,7 +85,6 @@ export async function expectOnProductDetailPage(checkoutFlow: CheckoutFlow, prod
   await checkoutFlow.expectOnProductDetailPage(productId);
 }
 
-// 購入が完了したことを確かめる（Complete のテストが使う）
-export async function expectCheckoutComplete(checkoutFlow: CheckoutFlow) {
-  await checkoutFlow.verifyOrderComplete();
+export async function expectCheckoutCompletePageLayout(checkoutFlow: CheckoutFlow) {
+  await checkoutFlow.expectCompletePageLayout();
 }

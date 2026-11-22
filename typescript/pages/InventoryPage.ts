@@ -17,7 +17,6 @@ export class InventoryPage {
   private readonly itemImageLinks: Locator;
   private readonly itemAddToCartButton: Locator;
   private readonly itemRemoveButton: Locator;
-  private readonly allAddToCartButtons: Locator;
   private readonly sortSelect: Locator;
   private readonly activeSortOption: Locator;
 
@@ -38,9 +37,6 @@ export class InventoryPage {
     // ボタンのテスト用の属性には商品ごとに違う名前が入るため、カードの中でボタンの文言で探す。文言で、追加済みかどうかも区別できる
     this.itemAddToCartButton = page.getByRole('button', { name: 'Add to cart', exact: true });
     this.itemRemoveButton = page.getByRole('button', { name: 'Remove', exact: true });
-
-    // 画面全体の、カートに追加するボタンの一覧（どの商品かを問わずに押すときに使う）
-    this.allAddToCartButtons = page.locator('[data-test^="add-to-cart"]');
 
     this.sortSelect = page.locator('[data-test="product-sort-container"]');
     this.activeSortOption = page.locator('[data-test="active-option"]');
@@ -78,27 +74,6 @@ export class InventoryPage {
 
   async clickProductImage(productName: string) {
     await this.item(productName).locator(this.itemImageLinks).click();
-  }
-
-  // 並んでいる商品を、上から順にすべてカートに追加し、追加した件数を返す
-  async addAllItems() {
-
-    await expect(this.allAddToCartButtons.first()).toBeVisible();
-
-    const count = await this.allAddToCartButtons.count();
-
-    // 押したボタンは Remove に変わり、追加用のボタンの一覧から外れるため、毎回先頭を押す
-    for (let i = 0; i < count; i++) {
-      await this.allAddToCartButtons.first().click();
-    }
-
-    return count;
-  }
-
-  async addFirstItem() {
-
-    await expect(this.allAddToCartButtons.first()).toBeVisible();
-    await this.allAddToCartButtons.first().click();
   }
 
   // 商品一覧画面が表示されていることを確かめる（URL が完全に一致し、商品一覧が見えている）
