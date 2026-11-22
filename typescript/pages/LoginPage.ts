@@ -2,7 +2,7 @@ import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
 
 // ログイン画面の入力欄・ボタンへの操作と、画面の表示の確認をまとめる。
-// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
+// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
 export class LoginPage {
 
   private readonly page: Page;

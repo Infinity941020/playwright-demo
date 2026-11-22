@@ -37,18 +37,6 @@ export async function expectOnCheckoutStepTwoPage(checkoutFlow: CheckoutFlow) {
   await checkoutFlow.expectOnStepTwoPage();
 }
 
-export async function expectOnCartPage(checkoutFlow: CheckoutFlow) {
-  await checkoutFlow.expectOnCartPage();
-}
-
-export async function expectCartItemCount(checkoutFlow: CheckoutFlow, expectedCount: number) {
-  await checkoutFlow.expectCartItemCount(expectedCount);
-}
-
-export async function expectInCart(checkoutFlow: CheckoutFlow, productName: string) {
-  await checkoutFlow.expectInCart(productName);
-}
-
 export async function expectCheckoutStepTwoPageLayout(checkoutFlow: CheckoutFlow) {
   await checkoutFlow.expectStepTwoPageLayout();
 }
@@ -77,6 +65,10 @@ export async function expectOnCheckoutCompletePage(checkoutFlow: CheckoutFlow) {
   await checkoutFlow.expectOnCompletePage();
 }
 
+export async function expectCheckoutCompletePageLayout(checkoutFlow: CheckoutFlow) {
+  await checkoutFlow.expectCompletePageLayout();
+}
+
 export async function expectOnInventoryPage(checkoutFlow: CheckoutFlow) {
   await checkoutFlow.expectOnInventoryPage();
 }
@@ -85,7 +77,14 @@ export async function expectOnProductDetailPage(checkoutFlow: CheckoutFlow, prod
   await checkoutFlow.expectOnProductDetailPage(productId);
 }
 
-// 購入が完了したことを確かめる（Complete のテストが使う）
-export async function expectCheckoutComplete(checkoutFlow: CheckoutFlow) {
-  await checkoutFlow.verifyOrderComplete();
+export async function expectOnCartPage(checkoutFlow: CheckoutFlow) {
+  await checkoutFlow.expectOnCartPage();
+}
+
+export async function expectCartItemCount(checkoutFlow: CheckoutFlow, expectedCount: number) {
+  await checkoutFlow.expectCartItemCount(expectedCount);
+}
+
+export async function expectInCart(checkoutFlow: CheckoutFlow, productName: string) {
+  await checkoutFlow.expectInCart(productName);
 }

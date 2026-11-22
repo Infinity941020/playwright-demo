@@ -311,8 +311,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   flows/cart_flow.py（open_cart_with：前提状態を作ってカート画面を開く）、
   tests/ui/cart/（TC-CART-003・010 以外のテスト）。
   TS版は typescript/pages/CartPage.ts・flows/CartFlow.ts・tests/ui/cart/ と、
-  flows/CheckoutFlow.ts（openStepOneWith・openStepTwoWith）・tests/ui/checkout/checkout-step-one-*.spec.ts・checkout-step-two-*.spec.ts
-- TS逆輸入候補: Cart と Checkout の Step One・Step Two は反映済み（2026-11-21）。Checkout の Complete と Logout は後の作業で反映する。
+  flows/CheckoutFlow.ts（openStepOneWith・openStepTwoWith・openCompleteWith）・tests/ui/checkout/checkout-step-one-*.spec.ts・
+  checkout-step-two-*.spec.ts・checkout-complete-*.spec.ts
+- TS逆輸入候補: Cart と Checkout（Step One・Step Two は 2026-11-21、Complete は 2026-11-22）は反映済み。Logout は後の作業で反映する。
   当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
@@ -346,6 +347,20 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   あわせて両版とも、TC-CO2-003 の順番を Bike Light → Backpack → Onesie（商品IDでは 0→4→2）に変えた
   （それまでの順は商品名の降順と価格の昇順に当たり、その順に並ぶ不具合を見つけられなかったため）。
   TS版の Complete と Logout のテストへの反映は、それぞれのテストを揃えるときに行う予定。
+- 追記（2026-11-22）: TS版の Checkout Complete のテスト（typescript/tests/ui/checkout/checkout-complete-*.spec.ts）も、
+  同じ方式で前提の状態を作るようにした。Complete画面は URL で直接開かず、Step Two の前提づくり（openStepTwoWith）を経由して
+  Finish を押して開く（CheckoutFlow の openCompleteWith。バッジの件数と Step Two画面の確認も効く）。
+  前提を作った後に、Complete画面が表示されていることを確かめる。
+  これで TS版の Checkout のテストは、すべてこの方式になった。商品一覧画面の操作で前提を作っていた古いテスト（checkout-success.spec.ts）と、
+  そのための部品（utils/checkoutHelper.ts、CheckoutFlow の古い操作、InventoryPage の addFirstItem・addAllItems）は削除した。
+  消したものは、CheckoutFlow の addSingleItem・addMultipleItems・addItems・goToCart・startCheckout・verifyOrderComplete、
+  確認の部品の expectCheckoutComplete、InventoryPage の allAddToCartButtons・addFirstItem・addAllItems、
+  CheckoutCompletePage の completeHeader・expectCompleteHeaderVisible、utils/checkoutHelper.ts。
+  古いテスト6件は名前（削除後購入・再追加後購入など）どおりの操作をしておらず、確かめていた内容（完了画面への遷移と見出し）は
+  TC-CO2-007・TC-CO3-001 で確かめているため、古いテストを消しても確かめる範囲は減らない。
+  画面での追加から購入完了までを1本で通すテストは、今はない。両版に1件足す（テストケースも足す）ことを、別のプルリクエストで行う。
+  あわせて両版とも、TC-CO3-004 で Back Home の後に、商品一覧画面であることを確かめてから、カートの状態を確かめるようにした。
+  TS版の Logout のテストへの反映は、そのテストを揃えるとき（横展開3-5）に行う予定。
 
 ## 論点16: Checkout画面の Page Object の構成
 
@@ -372,6 +387,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 追記（2026-11-15）: Checkout Step Two・Checkout Complete の移植で CheckoutStepTwoPage・
   CheckoutCompletePage を追加し、3クラス（CheckoutStepOnePage／CheckoutStepTwoPage／
   CheckoutCompletePage）とも pages/checkout_page.py に実装済み。
+- 追記（2026-11-22）: TS版の完了メッセージの確認（expectCompleteHeaderVisible）は削除した。
+  見出しは Complete画面の表示の確認（TC-CO3-001）で文言まで確かめるようにしたため、確かめる範囲は減っていない。
 
 ## 論点17: メニューの開閉の判定方法
 

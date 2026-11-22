@@ -10,6 +10,7 @@ from utils.ui_assertions.checkout_assertions import (
     expect_badge_count,
     expect_cart_item_count,
     expect_on_cart_page,
+    expect_on_inventory_page,
 )
 from utils.ui_assertions.inventory_assertions import expect_add_to_cart_button_shown
 
@@ -31,6 +32,7 @@ class TestCheckoutCompleteState:
         checkout_flow.back_home()
 
         # Products画面の表示を確かめてから、バッジを検証する
+        expect_on_inventory_page(checkout_flow)
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_add_to_cart_button_shown(inventory_flow, bike_light["name"])
         expect_badge_count(checkout_flow, 0)

@@ -9,8 +9,14 @@ ECサイト（SauceDemo）の購入手続きの最後の画面。Checkout Step T
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/CheckoutPage.ts` のうち、Complete に関する部分に相当する画面。
-Python版では `pages/checkout_page.py` の CheckoutCompletePage クラスで扱う（decisions.md 論点16）。
+対応するコード：
+- TS版：`typescript/pages/CheckoutPage.ts`（CheckoutCompletePage）、`typescript/flows/CheckoutFlow.ts`、
+  `typescript/utils/uiAssertions/checkoutAssertions.ts`、テストは `typescript/tests/ui/checkout/checkout-complete-*.spec.ts`
+- Python版：`python/pages/checkout_page.py`（CheckoutCompletePage）、`python/flows/checkout_flow.py`、
+  `python/utils/ui_assertions/checkout_assertions.py`、テストは `python/tests/ui/checkout/test_checkout_complete_*.py`
+
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（テストケースの6件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。購入直後以外の場面〈再読み込み・ブラウザの戻る・直接開いたとき〉での PDF出力ボタンの表示と、「判断できない挙動」は、Firefox・WebKit では確かめていない）
 
 実機確認：2026-11-09（Playwright調査用スクリプトにて確認）
 
@@ -104,4 +110,3 @@ Python版では `pages/checkout_page.py` の CheckoutCompletePage クラスで�
 | PDFのダウンロードと、PDFの中身 | ダウンロードの確認にはテストの仕組みの追加が必要で、PDFの中身も未確認のため（今後の拡張候補） |
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 | 上記「判断できない挙動」4件 | 意図された仕様か不具合かを判断できないため |
-| Chromium以外のブラウザ（Firefox・WebKit）での挙動 | 未確認。Python版のテストは Chromium で実行している |

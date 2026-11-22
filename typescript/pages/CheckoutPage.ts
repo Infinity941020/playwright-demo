@@ -3,7 +3,7 @@ import { urls } from '../utils/urls';
 import { exactText } from '../utils/regExp';
 
 // Checkout の3つの画面（Step One・Step Two・Complete）の操作と、画面の表示の確認を、画面ごとのクラスでまとめる。
-// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
+// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
 
 // Checkout Step One画面（購入者情報の入力）
 export class CheckoutStepOnePage {
@@ -243,62 +243,58 @@ export class CheckoutStepTwoPage {
   }
 }
 
-/*
-================================
-CheckoutCompletePage（購入完了画面）
-================================
-*/
+// Checkout Complete画面（購入完了）
 export class CheckoutCompletePage {
 
-  // ================================
-  // ■ ページインスタンス
-  // ================================
-  readonly page: Page;
+  private readonly page: Page;
+  private readonly title: Locator;
+  private readonly header: Locator;
+  private readonly text: Locator;
+  private readonly image: Locator;
+  private readonly backHomeButton: Locator;
+  private readonly generatePdfButton: Locator;
 
-  // ================================
-  // ■ 完了メッセージ（見出し）
-  // ================================
-  readonly completeHeader: Locator;
-
-  // ================================
-  // ■ Back Homeボタン
-  // ================================
-  readonly backHomeButton: Locator;
-
-  // ================================
-  // コンストラクタ
-  // ================================
   constructor(page: Page) {
 
     this.page = page;
 
-    this.completeHeader = page.locator('[data-test="complete-header"]');
+    this.title = page.locator('[data-test="title"]');
+    this.header = page.locator('[data-test="complete-header"]');
+    this.text = page.locator('[data-test="complete-text"]');
+    this.image = page.locator('[data-test="pony-express"]');
     this.backHomeButton = page.locator('[data-test="back-to-products"]');
+    this.generatePdfButton = page.locator('[data-test="generate-pdf-order"]');
   }
 
-  // ================================
-  // Checkout Complete画面へ遷移
-  // （表示の確認は、呼び出す側で expectOnPage() を呼んで行う）
-  // ================================
   async goto() {
-
     await this.page.goto(urls.complete);
   }
 
-  // ================================
-  // Checkout Complete画面表示確認
-  // ================================
+  async clickBackHome() {
+    await this.backHomeButton.click();
+  }
+
+  // Checkout Complete画面が表示されていることを確かめる。
+  // URL が一致しても画面の描画がまだのことがあるため、この画面にしかない Back Home ボタンが見えることも確かめる
   async expectOnPage() {
 
     await expect(this.page).toHaveURL(urls.complete);
     await expect(this.backHomeButton).toBeVisible();
   }
 
-  // ================================
-  // 完了メッセージ表示確認
-  // ================================
-  async expectCompleteHeaderVisible() {
+  // 仕様書の項目一覧のうち、カートアイコンを除く項目（タイトル・見出し・本文・画像・2つのボタン）を確かめる
+  async expectPageLayout() {
 
-    await expect(this.completeHeader).toBeVisible();
+    await expect(this.title).toHaveText('Checkout: Complete!');
+    await expect(this.header).toHaveText('Thank you for your order!');
+    await expect(this.text).toHaveText('Your order has been dispatched, and will arrive just as fast as the pony can get there!');
+
+    // 画像の読み込みの遅れは判断できない挙動のため、読み込みが終わったかどうかは確かめない。ただし読み込み前の画像は大きさが0で見えない扱いになるため、表示の確認は、確認の待ち時間の範囲で読み込みを待つ
+    await expect(this.image).toBeVisible();
+    await expect(this.image).toHaveAttribute('alt', 'Pony Express');
+    await expect(this.backHomeButton).toBeVisible();
+    await expect(this.backHomeButton).toHaveText('Back Home');
+    await expect(this.generatePdfButton).toBeVisible();
+    await expect(this.generatePdfButton).toHaveText('Generate PDF order');
   }
 }
