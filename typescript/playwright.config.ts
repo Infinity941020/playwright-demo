@@ -1,11 +1,10 @@
 import { defineConfig } from '@playwright/test';
+import { TEST_TIMEOUT_MS } from './utils/timeouts';
 
 const isCI = !!process.env.CI;
 
-// テストの実行のしかたを決める。
-// - 画面のテストは Chromium・Firefox・WebKit の3つで、API と見た目の比較のテストは Chromium だけで動かす
-// - CI では2並列で、失敗したテストを2回まで再実行する。手元では再実行せず、並列の数は Playwright の初期値（CPU の数の半分）にする
-// - テストの制限時間は30秒。ログイン状態の作り直しとログイン済みの画面を開く処理は、別の制限時間で動く（fixtures/loginFixture.ts）
+// テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、CI と手元のそれぞれについて決める。
+// 制限時間と記録の残し方の理由は python/decisions.md の論点27、見た目の比較の撮影の条件は specs/visual_spec.md にある
 
 export default defineConfig({
 
@@ -15,9 +14,11 @@ export default defineConfig({
 
   workers: isCI ? 2 : undefined,
 
-  timeout: 30 * 1000,
+  timeout: TEST_TIMEOUT_MS,
 
 
+  // 見た目の比較の基準画像のファイル名に OS やブラウザの名前を付けず、どの環境でも CI で撮った同じ基準画像と比べる
+  // （OS ごとに基準画像が分かれないようにするため）
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/__snapshots__/{arg}.png',
 
@@ -27,6 +28,7 @@ export default defineConfig({
     baseURL:
       'https://www.saucedemo.com',
 
+    // 見た目の比較を安定させるため、画面の大きさと画素の密度を固定する
     viewport: {
       width: 1280,
       height: 720,
@@ -36,11 +38,10 @@ export default defineConfig({
 
     actionTimeout: 0,
 
-    // 常に残すと実行が遅くなるため、失敗したときだけ残す（python/decisions.md の論点27）
-    trace: 'retain-on-failure',
-
     screenshot: 'off',
 
+    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（python/decisions.md の論点27）
+    trace: 'retain-on-failure',
     video: 'retain-on-failure',
 
   },

@@ -4,15 +4,12 @@ import path from 'node:path';
 import { LoginFlow } from '../flows/LoginFlow';
 import { InventoryFlow } from '../flows/InventoryFlow';
 import { users } from '../data/users';
+import { TEST_TIMEOUT_MS } from '../utils/timeouts';
 
 // ログイン済みの画面（商品一覧画面を開いた状態）をテストに渡す。
 // - ログインした状態（Cookie などの保存内容）は、テストを並列に実行する単位ごと・ブラウザごとにファイルに保存して使い回す
 // - SauceDemo のログイン状態は約10分で切れるため、ファイルを作ってから一定時間を過ぎていたら、ログインし直して作り直す
 // - この仕組みは、このファイルから読み込んだテストの定義を使うテストにだけ効く（ログインしていない状態から始めるテストには影響しない）
-
-// ログイン状態の作り直しと、ログイン済みの画面を開く処理に付ける、テストとは別の制限時間（ミリ秒）。
-// 準備が遅いときにも足りる長さにし、テストの制限時間と同じにする
-const SETUP_TIMEOUT_MS = 30_000;
 
 // 作り直すまでの時間（分）。期限の約10分より短くして余裕を持たせる。
 // 作り直しの動きを確かめるときだけ、環境変数 STORAGE_STATE_MAX_AGE_MINUTES で一時的に短くできる
@@ -80,13 +77,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 
   // テストごとに、ログインした状態のファイルが新しいことを確かめてから（古ければ作り直してから）、そのファイルを使う。
   // 閲覧環境を自分で作ると、録画などの設定が効かないため、Playwright が作るテスト用の閲覧環境に、このファイルの保存内容を読み込ませる
-  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
+  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）。
+  // 範囲の指定（テストごと）は、Playwright にもともとある部品を上書きするときに、型の定義で必要になる
   storageState: [async ({ browser, workerStorageStatePath }, use) => {
 
     await ensureFreshStorageState(browser, workerStorageStatePath);
 
     await use(workerStorageStatePath);
-  }, { scope: 'test', timeout: SETUP_TIMEOUT_MS }],
+  }, { scope: 'test', timeout: TEST_TIMEOUT_MS }],
 
   // 画面を開く時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
   loggedPage: [async ({ page }, use) => {
@@ -98,7 +96,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     await inventoryFlow.expectOnInventoryPage();
 
     await use(page);
-  }, { timeout: SETUP_TIMEOUT_MS }],
+  }, { timeout: TEST_TIMEOUT_MS }],
 });
 
 export { expect };
