@@ -3,12 +3,18 @@
 共通の前提：standard_user でログイン済みで、各テストケースの「前提条件」に記載した画面を開いている
 
 前提状態の作り方：
-- ログイン済みの状態は、これまでと同じく logged_page（保存したログイン状態の再利用）で作る
-- カートの中身が必要な場合は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（decisions.md 論点15）
+- ログイン済みの状態は、保存したログイン状態を読み込んで作り、Products画面を開いた状態から始める（ほかの画面のテストと同じ）
+- カートの中身が必要な場合は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+- Cart画面は、カートの中身を書き込んだ後に URL で開き、商品の行の数が入れた件数と同じことを確かめる（cart_testcases.md の「前提状態の作り方」と同じ）
+- Checkout Complete画面は、checkout_complete_testcases.md の「前提状態の作り方」と同じ方法で開く
+- ログアウトしても、保存したログイン状態は変わらない（ログアウトで消えるのは、テストごとのブラウザの中のログイン状態だけ）。そのため、ほかのテストと同じ保存したログイン状態を使ってよい
 
 テストIDの付け方：「TC-LOGOUT」とする
 
 対応する仕様書：logout_spec.md
+対応するテスト：TS版は `typescript/tests/ui/logout/logout-*.spec.ts`、Python版は `python/tests/ui/logout/test_logout_*.py`
+（両版とも同じ10件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
 
 ---
 
@@ -156,13 +162,13 @@
 | テストID | 分類 | 対応する観点 | 優先度 | 実装方針 |
 |---|---|---|---|---|
 | TC-LOGOUT-001 | メニュー（表示） | M-01 | 中 | 個別実装 |
-| TC-LOGOUT-002 | メニュー（×で閉じる） | M-02 | 低 | Data-driven（002・003共通化） |
-| TC-LOGOUT-003 | メニュー（Escで閉じる） | M-02 | 低 | Data-driven（002・003共通化） |
-| TC-LOGOUT-004 | Logout（Products画面から） | L-01 | 高 | Data-driven（004〜006共通化） |
-| TC-LOGOUT-005 | Logout（Cart画面から） | L-01, L-02 | 中 | Data-driven（004〜006共通化） |
-| TC-LOGOUT-006 | Logout（Complete画面から） | L-01, L-02 | 低 | Data-driven（004〜006共通化） |
-| TC-LOGOUT-007 | ログアウト後の直接アクセス（Products） | L-03 | 高 | Data-driven（007・008共通化） |
-| TC-LOGOUT-008 | ログアウト後の直接アクセス（商品詳細） | L-03 | 低 | Data-driven（007・008共通化） |
+| TC-LOGOUT-002 | メニュー（×で閉じる） | M-02 | 低 | TC-LOGOUT-003 とデータを切り替えて共通化 |
+| TC-LOGOUT-003 | メニュー（Escで閉じる） | M-02 | 低 | TC-LOGOUT-002 とデータを切り替えて共通化 |
+| TC-LOGOUT-004 | Logout（Products画面から） | L-01 | 高 | TC-LOGOUT-005・006 とデータを切り替えて共通化 |
+| TC-LOGOUT-005 | Logout（Cart画面から） | L-01, L-02 | 中 | TC-LOGOUT-004・006 とデータを切り替えて共通化 |
+| TC-LOGOUT-006 | Logout（Complete画面から） | L-01, L-02 | 低 | TC-LOGOUT-004・005 とデータを切り替えて共通化 |
+| TC-LOGOUT-007 | ログアウト後の直接アクセス（Products） | L-03 | 高 | TC-LOGOUT-008 とデータを切り替えて共通化 |
+| TC-LOGOUT-008 | ログアウト後の直接アクセス（商品詳細） | L-03 | 低 | TC-LOGOUT-007 とデータを切り替えて共通化 |
 | TC-LOGOUT-009 | ログアウト後のブラウザの「戻る」 | L-04 | 高 | 個別実装 |
 | TC-LOGOUT-010 | All Items | I-01 | 中 | 個別実装 |
 
@@ -171,7 +177,13 @@
 - **メニューが開いているかどうかの判定**：URLで開いた直後の画面では、閉じているメニューの Logout が「表示されている」と判定されてしまう（実機確認済み）。
   メニューの開閉は、表示されているかどうかではなく、メニュー領域の aria-hidden 属性（開いているとき "false"、閉じているとき "true"）で判定すること
 - **Logout を押す前に、必ずメニューを開くこと**：URLで開いた直後に、メニューを開かずに Logout を押そうとすると失敗する（実機確認済み）
+- **メニューを開く前と後の確認**：メニューを開く前に、閉じたメニューの項目が見えなくなるのを待つ（画面を開いた直後の、メニューが閉じる動きの間に開くと、項目が隠れたままになるため。仕様書「判断できない挙動」参照）。
+  開いたことは、aria-hidden と最初の項目の表示の両方で確かめる。
+  画面の中で移った直後（例：Finish で Complete画面へ移った直後）は、開く前に待っても、まれに競合が残る。起きたときは、メニューを開いた確認（最初の項目の表示）で失敗する
 - **ブラウザの「戻る」（TC-LOGOUT-009）**：ブラウザのキャッシュの仕組みに左右される可能性がある。テストが不安定になった場合は、扱いを見直す
+- **メニューが閉じていることの確認（TC-LOGOUT-002・003・010）**：先に、メニューが開いたこと（aria-hidden が "false"）を確かめておく。開かなかったときにも、閉じていると判定されて成功してしまうため
+- **ログアウトした後の確認（TC-LOGOUT-004〜009）**：ログアウトの操作の中で、ログイン画面へ戻ったことまで確かめる。
+  TC-LOGOUT-007〜009 では、ログアウトした直後もログイン画面のため、画面の確認より先に、戻された後に出るエラーの文言を確かめる
 
 ## ■ 対象外としたもの
 
@@ -185,9 +197,20 @@
 | Checkout Step Two・商品詳細画面からの All Items | 実機で未確認のため |
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
 
-## ■ TS版テスト（Logout に関係するもの）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの10件を実装している。
+ログアウトの API のテスト（TS版の `typescript/tests/api/logout-api.spec.ts`）は、画面のテストではないため、API のテスト（api_testcases.md）で扱う。
+
+| テストID | TS版（typescript/tests/ui/logout/） | Python版（python/tests/ui/logout/） |
 |---|---|---|
-| tests/ui/logout/logout.spec.ts（1件） | TC-LOGOUT-004 | TS版は URL と入力欄・ボタンの表示のみ。Python版は入力欄が空であること、エラーがないことまで確認 |
-| tests/api/logout-api.spec.ts（3件） | 対象外 | モックAPIのテストのため、Stage 2-1（APIテスト）で扱う |
+| TC-LOGOUT-001 | logout-menu.spec.ts「TC-LOGOUT-001：…」 | test_logout_menu.py `test_menu_items_displayed_in_order` |
+| TC-LOGOUT-002 | logout-menu.spec.ts「TC-LOGOUT-002：…」（TC-LOGOUT-003 とデータを切り替える形） | test_logout_menu.py `test_menu_closed[TC-LOGOUT-002]` |
+| TC-LOGOUT-003 | logout-menu.spec.ts「TC-LOGOUT-003：…」（TC-LOGOUT-002 とデータを切り替える形） | test_logout_menu.py `test_menu_closed[TC-LOGOUT-003]` |
+| TC-LOGOUT-004 | logout-success.spec.ts「TC-LOGOUT-004：…」（TC-LOGOUT-005・006 とデータを切り替える形） | test_logout_success.py `test_logout_to_empty_login_page[TC-LOGOUT-004]` |
+| TC-LOGOUT-005 | logout-success.spec.ts「TC-LOGOUT-005：…」（TC-LOGOUT-004・006 とデータを切り替える形） | test_logout_success.py `test_logout_to_empty_login_page[TC-LOGOUT-005]` |
+| TC-LOGOUT-006 | logout-success.spec.ts「TC-LOGOUT-006：…」（TC-LOGOUT-004・005 とデータを切り替える形） | test_logout_success.py `test_logout_to_empty_login_page[TC-LOGOUT-006]` |
+| TC-LOGOUT-007 | logout-access.spec.ts「TC-LOGOUT-007：…」（TC-LOGOUT-008 とデータを切り替える形） | test_logout_access.py `test_direct_access_after_logout[TC-LOGOUT-007]` |
+| TC-LOGOUT-008 | logout-access.spec.ts「TC-LOGOUT-008：…」（TC-LOGOUT-007 とデータを切り替える形） | test_logout_access.py `test_direct_access_after_logout[TC-LOGOUT-008]` |
+| TC-LOGOUT-009 | logout-access.spec.ts「TC-LOGOUT-009：…」 | test_logout_access.py `test_browser_back_after_logout` |
+| TC-LOGOUT-010 | logout-all-items.spec.ts「TC-LOGOUT-010：…」 | test_logout_all_items.py `test_all_items_from_cart` |
