@@ -58,11 +58,13 @@ class MenuPage:
     def expect_menu_opened(self) -> None:
         """メニューが開いていることを、aria-hidden と最初の項目の表示の両方で確かめる。"""
         expect(self.menu_area).to_have_attribute("aria-hidden", "false")
-        expect(self.menu_items.first).to_be_visible()
+        expect(self.menu_items.first, "メニューは開いた扱いだが項目が表示されない（logout_spec.md の判断できない挙動）").to_be_visible()
 
     def expect_menu_closed(self) -> None:
         expect(self.menu_area).to_have_attribute("aria-hidden", "true")
 
     def expect_menu_items(self, item_names: list[str]) -> None:
-        """メニューの項目が指定した順に並んでいることを確かめる。"""
+        """メニューの項目が指定した順に並び、すべて表示されていることを確かめる。"""
         expect(self.menu_items).to_have_text(item_names)
+        for item in self.menu_items.all():
+            expect(item).to_be_visible()

@@ -47,7 +47,7 @@ test.describe('ログアウト', () => {
 
       await logoutFlow.logout();
 
-      // エラーがないことは、画面が移る前でも成り立つため、先にログイン画面であることを確かめる
+      // 期待結果の URL と表示を、テストの確認として明示する（ログアウトの操作の中でも確かめている）
       await expectOnLoginPage(loginFlow);
       await expectLoginInputsEmpty(loginFlow);
       await expectNoLoginError(loginFlow);

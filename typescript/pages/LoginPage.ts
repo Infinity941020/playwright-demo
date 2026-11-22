@@ -2,7 +2,8 @@ import { Page, Locator, expect } from '@playwright/test';
 import { urls } from '../utils/urls';
 
 // ログイン画面の入力欄・ボタンへの操作と、画面の表示の確認をまとめる。
-// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
+// - 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
+// - ログアウトした後のブラウザの「戻る」も、ここで押す
 export class LoginPage {
 
   private readonly page: Page;
@@ -54,7 +55,7 @@ export class LoginPage {
     await expect(this.errorMessage).toHaveText(message);
   }
 
-  // エラー表示の要素そのものが画面にないことを確かめる
+  // エラーがないときは、エラー表示の要素が作られないため、要素がないことで確かめる
   async expectNoError() {
     await expect(this.errorMessage).toHaveCount(0);
   }
