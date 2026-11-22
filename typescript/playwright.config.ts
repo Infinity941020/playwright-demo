@@ -1,22 +1,10 @@
 import { defineConfig } from '@playwright/test';
+import { TEST_TIMEOUT_MS } from './utils/timeouts';
 
 const isCI = !!process.env.CI;
 
-/*
-========================================
-Playwright Config (PROJECT SPLIT VERSION)
-========================================
-
-目的：
-- UI：Chromium / Firefox / WebKit対応
-- API：Chromium固定
-- Visual：Chromium固定
-- OS依存snapshot差異抑制
-- CI / Local環境統一
-- Visual Regression安定運用
-
-========================================
-*/
+// テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、CI と手元のそれぞれについて決める。
+// 準備の部品の制限時間・制限時間を延ばさない理由・記録の残し方の判断は python/decisions.md の論点27、見た目の比較の撮影の条件は specs/visual_spec.md にある
 
 export default defineConfig({
 
@@ -26,9 +14,10 @@ export default defineConfig({
 
   workers: isCI ? 2 : undefined,
 
-  timeout: 30 * 1000,
+  timeout: TEST_TIMEOUT_MS,
 
 
+  // 基準画像を CI で撮った1組だけにして、どの環境でもそれと比べるため、ファイル名に OS やブラウザの名前を付けない
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/__snapshots__/{arg}.png',
 
@@ -38,6 +27,7 @@ export default defineConfig({
     baseURL:
       'https://www.saucedemo.com',
 
+    // 見た目の比較を安定させるため、画面の大きさと画素の密度を固定する
     viewport: {
       width: 1280,
       height: 720,
@@ -47,11 +37,10 @@ export default defineConfig({
 
     actionTimeout: 0,
 
-    // 手元でも CI と同じく、失敗したときだけ残す（decisions.md 論点27）
-    trace: 'retain-on-failure',
-
     screenshot: 'off',
 
+    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（python/decisions.md の論点27）
+    trace: 'retain-on-failure',
     video: 'retain-on-failure',
 
   },
@@ -69,13 +58,6 @@ export default defineConfig({
 
 
   projects: [
-
-
-    /*
-    ================================
-    UI Tests
-    ================================
-    */
 
 
     {
@@ -117,13 +99,6 @@ export default defineConfig({
     },
 
 
-    /*
-    ================================
-    API Tests
-    ================================
-    */
-
-
     {
       name: 'chromium-api',
 
@@ -135,13 +110,6 @@ export default defineConfig({
       },
 
     },
-
-
-    /*
-    ================================
-    Visual Tests
-    ================================
-    */
 
 
     {

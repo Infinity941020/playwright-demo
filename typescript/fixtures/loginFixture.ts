@@ -4,6 +4,7 @@ import path from 'node:path';
 import { LoginFlow } from '../flows/LoginFlow';
 import { InventoryFlow } from '../flows/InventoryFlow';
 import { users } from '../data/users';
+import { TEST_TIMEOUT_MS } from '../utils/timeouts';
 
 // ログイン済みの画面（商品一覧画面を開いた状態）をテストに渡す。
 // - ログインした状態（Cookie などの保存内容）は、テストを並列に実行する単位ごと・ブラウザごとにファイルに保存して使い回す
@@ -76,14 +77,17 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 
   // テストごとに、ログインした状態のファイルが新しいことを確かめてから（古ければ作り直してから）、そのファイルを使う。
   // 閲覧環境を自分で作ると、録画などの設定が効かないため、Playwright が作るテスト用の閲覧環境に、このファイルの保存内容を読み込ませる
-  storageState: async ({ browser, workerStorageStatePath }, use) => {
+  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）。
+  // 範囲の指定（テストごと）は、Playwright にもともとある部品を上書きするときに、型の定義で必要になる
+  storageState: [async ({ browser, workerStorageStatePath }, use) => {
 
     await ensureFreshStorageState(browser, workerStorageStatePath);
 
     await use(workerStorageStatePath);
-  },
+  }, { scope: 'test', timeout: TEST_TIMEOUT_MS }],
 
-  loggedPage: async ({ page }, use) => {
+  // 画面を開く時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
+  loggedPage: [async ({ page }, use) => {
 
     const inventoryFlow = new InventoryFlow(page);
 
@@ -92,7 +96,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     await inventoryFlow.expectOnInventoryPage();
 
     await use(page);
-  },
+  }, { timeout: TEST_TIMEOUT_MS }],
 });
 
 export { expect };
