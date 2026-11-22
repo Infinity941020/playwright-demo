@@ -357,7 +357,7 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   確認の部品の expectCheckoutComplete、InventoryPage の allAddToCartButtons・addFirstItem・addAllItems、
   CheckoutCompletePage の completeHeader・expectCompleteHeaderVisible、utils/checkoutHelper.ts。
   古いテスト6件は名前（削除後購入・再追加後購入など）どおりの操作をしておらず、確かめていた内容（完了画面への遷移と見出し）は
-  TC-CO2-007・TC-CO3-001 で確かめているため。
+  TC-CO2-007・TC-CO3-001 で確かめているため、古いテストを消しても確かめる範囲は減らない。
   画面での追加から購入完了までを1本で通すテストは、今はない。両版に1件足す（テストケースも足す）ことを、別のプルリクエストで行う。
   あわせて両版とも、TC-CO3-004 で Back Home の後に、商品一覧画面であることを確かめてから、カートの状態を確かめるようにした。
   TS版の Logout のテストへの反映は、そのテストを揃えるとき（横展開3-5）に行う予定。
