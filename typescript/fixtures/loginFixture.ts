@@ -11,7 +11,7 @@ import { users } from '../data/users';
 // - この仕組みは、このファイルから読み込んだテストの定義を使うテストにだけ効く（ログインしていない状態から始めるテストには影響しない）
 
 // ログイン状態の作り直しと、ログイン済みの画面を開く処理に付ける、テストとは別の制限時間（ミリ秒）。
-// 手元の Firefox で測った最大（作り直し 18.4秒、画面を開く 8.2秒）より長くし、テストの制限時間と同じにする
+// 準備が遅いときにも足りる長さにし、テストの制限時間と同じにする
 const SETUP_TIMEOUT_MS = 30_000;
 
 // 作り直すまでの時間（分）。期限の約10分より短くして余裕を持たせる。
@@ -80,7 +80,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 
   // テストごとに、ログインした状態のファイルが新しいことを確かめてから（古ければ作り直してから）、そのファイルを使う。
   // 閲覧環境を自分で作ると、録画などの設定が効かないため、Playwright が作るテスト用の閲覧環境に、このファイルの保存内容を読み込ませる
-  // 作り直しの時間がテストの制限時間に数えられ、手元の Firefox で時間切れになったため、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
+  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
   storageState: [async ({ browser, workerStorageStatePath }, use) => {
 
     await ensureFreshStorageState(browser, workerStorageStatePath);
@@ -88,7 +88,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     await use(workerStorageStatePath);
   }, { scope: 'test', timeout: SETUP_TIMEOUT_MS }],
 
-  // 画面を開く時間がテストの制限時間に数えられ、手元の Firefox で時間切れになったため、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
+  // 画面を開く時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
   loggedPage: [async ({ page }, use) => {
 
     const inventoryFlow = new InventoryFlow(page);

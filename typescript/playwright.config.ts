@@ -36,7 +36,7 @@ export default defineConfig({
 
     actionTimeout: 0,
 
-    // 手元でも CI と同じく、失敗したときだけ残す（python/decisions.md の論点27）
+    // 常に残すと実行が遅くなるため、失敗したときだけ残す（python/decisions.md の論点27）
     trace: 'retain-on-failure',
 
     screenshot: 'off',
