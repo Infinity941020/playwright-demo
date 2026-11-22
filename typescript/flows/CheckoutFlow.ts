@@ -11,7 +11,7 @@ import { Product } from '../data/products';
 import { CheckoutInfo } from '../data/checkoutData';
 
 // Checkout の画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
-// - ボタンやアイコンを押す操作は、移った先の画面を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
+// - ボタンやアイコンを押す操作は、移った先の画面を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
 // - 前提の状態を作る操作は、開いた画面が表示されたことまで確かめる
 export class CheckoutFlow {
 

@@ -3,7 +3,7 @@ import { urls } from '../utils/urls';
 import { exactText } from '../utils/regExp';
 
 // Checkout の3つの画面（Step One・Step Two・Complete）の操作と、画面の表示の確認を、画面ごとのクラスでまとめる。
-// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示の確認も呼ぶ
+// 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
 
 // Checkout Step One画面（購入者情報の入力）
 export class CheckoutStepOnePage {
@@ -289,7 +289,7 @@ export class CheckoutCompletePage {
     await expect(this.header).toHaveText('Thank you for your order!');
     await expect(this.text).toHaveText('Your order has been dispatched, and will arrive just as fast as the pony can get there!');
 
-    // 画像の読み込みの遅れは、意図された仕様か不具合かを判断できない挙動のため、読み込みの完了ではなく、表示と代替テキストを確かめる
+    // 画像の読み込みの遅れは判断できない挙動のため、読み込みが終わったかどうかは確かめない。ただし読み込み前の画像は大きさが0で見えない扱いになるため、表示の確認は、確認の待ち時間の範囲で読み込みを待つ
     await expect(this.image).toBeVisible();
     await expect(this.image).toHaveAttribute('alt', 'Pony Express');
     await expect(this.backHomeButton).toBeVisible();
