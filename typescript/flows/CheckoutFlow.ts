@@ -108,19 +108,6 @@ export class CheckoutFlow {
     await this.header.expectBadgeCount(count);
   }
 
-  async expectOnCartPage() {
-    await this.cart.expectOnPage();
-  }
-
-  async expectCartItemCount(count: number) {
-    await this.cart.expectItemCount(count);
-  }
-
-  // カートに、渡した商品の行があることを確かめる（並び順は問わない）
-  async expectInCart(productName: string) {
-    await this.cart.expectItemListed(productName);
-  }
-
   // 渡した商品がカートに入った状態で、Step One から購入者情報を入れて Continue を押し、Checkout Step Two画面を開く。
   // Step Two の URL を直接開けることは、意図された仕様か不具合かを判断できない挙動のため、前提づくりでは使わない
   async openStepTwoWith(products: readonly Product[], checkoutInfo: CheckoutInfo) {
@@ -228,5 +215,18 @@ export class CheckoutFlow {
 
   async expectOnProductDetailPage(productId: number) {
     await this.inventory.expectOnProductDetailPage(productId);
+  }
+
+  async expectOnCartPage() {
+    await this.cart.expectOnPage();
+  }
+
+  async expectCartItemCount(count: number) {
+    await this.cart.expectItemCount(count);
+  }
+
+  // カートに、渡した商品の行があることを確かめる（並び順は問わない）
+  async expectInCart(productName: string) {
+    await this.cart.expectItemListed(productName);
   }
 }

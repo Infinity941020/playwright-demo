@@ -21,7 +21,7 @@ export class InventoryFlow {
     this.cartPage = new CartPage(page);
   }
 
-  // 商品一覧画面の URL を開く（表示は確かめないので、確かめるときは続けて表示の確認を呼ぶ）
+  // 商品一覧画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）
   async accessInventoryDirectly() {
     await this.inventoryPage.goto();
   }
