@@ -13,9 +13,16 @@ ECサイト（SauceDemo）のログイン後の各画面の左上にあるメニ
 対象ユーザー：standard_user
 （problem_user等の特殊ユーザーは本仕様の対象外。今後の拡張候補とする）
 
-TS版との対応：TS版の `pages/MenuPage.ts`、`flows/LogoutFlow.ts` に相当する機能。
+対応するコード：
+- TS版：`typescript/pages/MenuPage.ts`、`typescript/flows/LogoutFlow.ts`、`typescript/utils/uiAssertions/logoutAssertions.ts`、
+  テストは `typescript/tests/ui/logout/logout-*.spec.ts`
+- Python版：`python/pages/menu_page.py`、`python/flows/logout_flow.py`、`python/utils/ui_assertions/logout_assertions.py`、
+  テストは `python/tests/ui/logout/test_logout_*.py`
 
-実機確認：2026-11-09（Playwright調査用スクリプトにて確認）
+実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
+（テストケースの10件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（テストケースにない画面〈Checkout Step One・Step Two・商品詳細〉でのメニューの項目と並び順・「判断できない挙動」など）は、Firefox・WebKit では確かめていない。ただし「判断できない挙動」のうち、画面を開いた直後にメニューを開くと項目が隠れたままになる挙動は例外で、Firefox・WebKit では起きたことをトレースで確かめ、Chromium でも同じ形の時間切れが起きている〈Chromium のトレースは見ていない〉）
+
+実機確認：2026-11-09（Playwright調査用スクリプトにて確認）、2026-11-22（メニューの競合。TS版のテストの実行とトレース、Playwright調査用スクリプトにて確認）
 
 ---
 
@@ -106,6 +113,7 @@ TS版との対応：TS版の `pages/MenuPage.ts`、`flows/LogoutFlow.ts` に相�
 | ログアウトしてもカートの中身が消えない | ログアウトでログイン状態（cookie）は消えるが、カートの中身（ブラウザの保存領域 localStorage の cart-contents）は残り、同じブラウザで再ログインするとカートが元に戻る |
 | メニューの外側をクリックしても閉じない | メニューの外側を覆う領域がなく、外側のクリックでは閉じない |
 | Products画面で All Items を押してもメニューが開いたまま | 同じ URL のため遷移が起きず、メニューも閉じない |
+| 画面を開いた直後にメニューを開くと、項目が隠れたままになる | 画面を開いた直後（約0.5秒の、メニューが閉じる動きの間）にメニューを開くと、開いた扱い（aria-hidden="false"）なのに項目が隠れたままになり、押せない。画面の中で移った直後（例：Finish で Complete画面へ移った直後）にも、閉じる動きがやり直されることがあり、その間に開くと同じことが起きる。2026-11-22 に確かめた。Firefox（URL で開いた直後）と WebKit（画面の中で移った直後）では、起きたこと（開いた扱いのまま隠れていること）をトレースで確かめた。Chromium でも、URL で開いた直後に同じ形の時間切れ（項目が見えないまま押せない）が起きている（Chromium のトレースは見ていない）。閉じる動きの時間（URL で開いてから約0.5秒後に隠れる）は Chromium で測った |
 
 ### 参考：扱わない項目で確認した挙動（今後の拡張候補の材料として記録）
 - Reset App State：カートの中身とバッジは消えるが、画面の表示は再読み込みするまで更新されない（Products画面の「Remove」ボタン、Cart画面の行、Step Two画面の行と金額が残る）。ソートの選択とログイン状態は変わらず、Products画面ではメニューが開いたまま
@@ -121,7 +129,6 @@ TS版との対応：TS版の `pages/MenuPage.ts`、`flows/LogoutFlow.ts` に相�
 | Reset App State | 画面の表示が更新されないという、判断できない挙動を含むため（今後の拡張候補） |
 | Dynamic Catalog と子項目の3画面 | 別の画面群であり、それぞれ仕様の作成が必要なため（今後の拡張候補） |
 | About | 外部サイトへの遷移のため（今後の拡張候補） |
-| 上記「判断できない挙動」3件 | 意図された仕様か不具合かを判断できないため |
+| 上記「判断できない挙動」4件 | 意図された仕様か不具合かを判断できないため |
 | 遷移先の画面（Login・Products）の中身 | それぞれの画面の仕様で扱う。本仕様では Logout 後の Login画面の状態までを扱う |
 | 特殊ユーザー（problem_user等） | 今後の拡張候補 |
-| Chromium以外のブラウザ（Firefox・WebKit）での挙動 | 未確認。Python版のテストは Chromium で実行している |

@@ -52,6 +52,10 @@ export class InventoryPage {
     await this.page.goto(urls.inventory);
   }
 
+  async gotoProductDetail(productId: number) {
+    await this.page.goto(`${urls.inventoryItem}?id=${productId}`);
+  }
+
   async reload() {
     await this.page.reload();
   }

@@ -312,8 +312,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   tests/ui/cart/（TC-CART-003・010 以外のテスト）。
   TS版は typescript/pages/CartPage.ts・flows/CartFlow.ts・tests/ui/cart/ と、
   flows/CheckoutFlow.ts（openStepOneWith・openStepTwoWith・openCompleteWith）・tests/ui/checkout/checkout-step-one-*.spec.ts・
-  checkout-step-two-*.spec.ts・checkout-complete-*.spec.ts
-- TS逆輸入候補: Cart と Checkout（Step One・Step Two は 2026-11-21、Complete は 2026-11-22）は反映済み。Logout は後の作業で反映する。
+  checkout-step-two-*.spec.ts・checkout-complete-*.spec.ts、tests/ui/logout/logout-success.spec.ts・logout-all-items.spec.ts
+- TS逆輸入候補: 反映済み（Cart と Checkout の Step One・Step Two は 2026-11-21、Checkout の Complete と Logout は 2026-11-22）。
   当初は「検討（TS版のテスト時間短縮と独立性の向上につながるが、内部キー名への依存が増える）」としていた。
 - 決定日: 2026-10-07
 - 追記（2026-11-15）: Checkout画面と Logout機能のテストも、同じ方式（localStorage への
@@ -361,6 +361,11 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   画面での追加から購入完了までを1本で通すテストは、今はない。両版に1件足す（テストケースも足す）ことを、別のプルリクエストで行う。
   あわせて両版とも、TC-CO3-004 で Back Home の後に、商品一覧画面であることを確かめてから、カートの状態を確かめるようにした。
   TS版の Logout のテストへの反映は、そのテストを揃えるとき（横展開3-5）に行う予定。
+- 追記（2026-11-22）: TS版の Logout のテスト（typescript/tests/ui/logout/）も、同じ方式で前提の状態を作るようにした。
+  Cart画面から始めるテスト（TC-LOGOUT-005。カートは空）と、カートの中身が必要なテスト（TC-LOGOUT-010）は、
+  Cart の前提づくり（CartFlow の openCartWith）でカート画面を開き、
+  Checkout Complete画面から始めるテスト（TC-LOGOUT-006）は、Complete の前提づくり（CheckoutFlow の openCompleteWith）で開く。
+  これで、TS版でもカートの中身を前提に使う画面のテストは、画面での追加そのものを確かめる TC-CART-003・010 を除き、すべてこの方式になった。
 
 ## 論点16: Checkout画面の Page Object の構成
 
@@ -399,13 +404,48 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   判定されることを実機で確認した。表示の有無では開閉を正しく判定できないため
   （判断基準4：テストの再現性）。
 - 影響範囲: pages/menu_page.py（MenuPage）、flows/logout_flow.py、
-  utils/ui_assertions/logout_assertions.py、tests/ui/logout/
-- TS逆輸入候補: 反映済み（横展開2-4）。
+  utils/ui_assertions/logout_assertions.py、tests/ui/logout/。
+  TS版は typescript/pages/MenuPage.ts・flows/LogoutFlow.ts・utils/uiAssertions/logoutAssertions.ts・tests/ui/logout/
+- TS逆輸入候補: 反映済み（部品は横展開2-4、テストは 2026-11-22）。
   TS版の MenuPage も、メニュー領域（.bm-menu-wrap）の aria-hidden 属性で開閉を判定するようにした（expectMenuOpened）。
   openMenu() はメニューボタンを押して開いたことを確かめ、logout() は Logout を押すだけにした
   （「開いていなければ開く」の判定とログイン画面の URL の確認をやめ、LogoutFlow がログイン画面の expectOnPage() を呼ぶ）。
   当初は「あり」としていた
 - 決定日: 2026-11-09
+- 追記（2026-11-22）: TS版の Logout のテストを、両版共通のテストケース（10件）に揃えた（typescript/tests/ui/logout/logout-*.spec.ts）。
+  あわせて MenuPage の操作を、Python版と同じく押すだけの形（メニューを開くボタン・×ボタン・Esc キー・All Items・Logout）にし、
+  メニューが開いたことの確認は LogoutFlow の openMenu で行う。メニューの項目を押す操作（logout・openAllItems）は、必ず openMenu を経由する。
+  メニューが閉じていることの確認（expectMenuClosed）と、項目の並びの確認（expectMenuItems）を足した。
+  項目の名前は画面のラベルなので、TS版では MenuPage に書いた（Python版はテストに書いている）。
+- 追記（2026-11-22）: 画面を開いた直後（約0.5秒の、メニューが閉じる動きの間）にメニューを開くと、aria-hidden は "false"（開いた扱い）になるのに、
+  閉じる動きの終わりにメニュー領域が隠され、項目が見えないまま押せなくなる競合があった。
+  起きたブラウザ：直す前に、TS版の Logout のテスト（30件）を手元で2回流したとき、Cart画面を開いた直後のテストで
+  Chromium（TC-LOGOUT-010）と Firefox（TC-LOGOUT-005）で1回ずつ時間切れになった。
+  原因まで確かめたブラウザ：Firefox の回のトレースで、押した後に開いた扱い（aria-hidden="false"）のまま隠れていることを確かめた。
+  閉じる動きの時間（URL で開いてから約0.5秒後に隠れる）は Chromium で測った（Chromium の回のトレースは、次の実行で上書きされて見ていない）。
+  両版とも、次のように直した。
+  ・メニューを開くボタンを押す前に、閉じたメニューの項目が見えなくなるまで待つ（閉じる動きが終わると項目が見えない扱いになることを使う。
+    固定の時間の待ちは使わない）
+  ・「メニューが開いた」の確認を、aria-hidden が "false" であることに加えて、最初の項目が見えることでも確かめる
+  項目が見えなければ開き直す、という直し方は選ばなかった。画面の不具合（開いても項目が出ない）を隠すおそれがあるため。
+  この競合は、仕様書（logout_spec.md）の「判断できない挙動」に記録した。
+  直した後に Logout のテストを3ブラウザで5回ずつ（150件）流したところ、WebKit の TC-LOGOUT-006 で1回、同じ競合が残った
+  （起きたブラウザは WebKit。原因はその回のトレースで確かめた）。
+  Finish で画面の中で Complete画面へ移った直後にも、閉じる動きがやり直されることがあり、開く前の待ちでは、やり直しの前の瞬間を見分けられない
+  （前の画面の閉じ終わった状態が残っている間に、待ちが通ってしまう）。
+  見た目の指定に使う名前（クラス）や style の値に頼らずに、閉じる動きのやり直しを見分けられる目印は見つかっていない。
+  調べた手段：失敗した回のトレースの、操作の前後の画面の記録（メニュー領域の aria-hidden・hidden・style）、
+  Finish の後のメニュー領域の属性を 25ミリ秒ごとに読む一時的な処理（Chromium 1回・WebKit 5回。いずれも変化なし）、
+  Complete画面へ移った直後にメニューを開く一時的な処理（WebKit 10回。失敗0回、うち2回は移った直後に項目が見えていた）。
+  この残る競合は、記録して受け入れることにした。起きてもまれで（150件中1件）、
+  起きたときは、メニューを開いた確認（最初の項目の表示）で、原因が分かる形で失敗するため。
+  Complete画面を開き直して前提を作る案は選ばなかった（購入せずに開く・PDF出力ボタンが消えるなど、判断できない挙動に触れるため）。
+  項目が見えないときだけ開き直す案も選ばなかった（メニューが本当に開かない不具合を隠すおそれがあるため）。
+  起きたときに既知の競合だと分かるように、最初の項目の表示の確認には「メニューは開いた扱いだが項目が表示されない（logout_spec.md の判断できない挙動）」
+  という説明を付けた（両版）。
+  見直す目安：CI の結果（HTML レポート）で、再実行で成功したテストのうち「メニューは開いた扱いだが項目が表示されない」の説明で失敗した回を、
+  プルリクエストごとに確かめる。直近10回の CI の実行で2回以上あれば、扱いを見直す。
+  Firefox の準備の長さによる時間切れ（論点27）も再実行で成功するが、失敗の説明が違う（制限時間を超えた、と出る）ので区別できる。
 
 ## 論点18: 商品一覧画面の表示確認の置き場所
 
@@ -673,3 +713,6 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: typescript/fixtures/loginFixture.ts、typescript/playwright.config.ts、typescript/tests/setup/auth.setup.ts（削除）
 - TS逆輸入候補: なし（TS版の対策）。Python版への反映は上のとおり
 - 決定日: 2026-11-19
+- 追記（2026-11-22）: Firefox では、テストの前の準備（ログイン状態の作り直し、閲覧環境を作る処理）が長く、制限時間（30秒）を超えることがある
+  （Logout のテストを3ブラウザで5回ずつ流したとき、ログイン状態の作り直しに 18.4秒、閲覧環境を作るのに 15.3秒・ページを作るのに 8.4秒かかった回が
+  時間切れになった）。全画面を揃えた後に、制限時間と作り直しの置き場所を見直す。

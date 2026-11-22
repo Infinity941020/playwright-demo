@@ -26,6 +26,11 @@ export class InventoryFlow {
     await this.inventoryPage.goto();
   }
 
+  // 商品詳細画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）
+  async accessProductDetailDirectly(productId: number) {
+    await this.inventoryPage.gotoProductDetail(productId);
+  }
+
   // 再読み込みでログイン画面へ戻された場合などに、別の画面のまま確認を続けないよう、商品一覧画面であることを確かめる
   async reloadInventory() {
 

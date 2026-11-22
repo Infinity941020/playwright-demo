@@ -44,4 +44,12 @@ export class LoginFlow {
   async expectOnLoginPage() {
     await this.loginPage.expectOnPage();
   }
+
+  async expectNoLoginError() {
+    await this.loginPage.expectNoError();
+  }
+
+  async expectLoginInputsEmpty() {
+    await this.loginPage.expectInputsEmpty();
+  }
 }

@@ -30,6 +30,14 @@ class MenuPage:
 
     # 画面の要素1つに対する操作（押す・入力するなど）を行う。
 
+    def wait_until_menu_closed(self) -> None:
+        """閉じたメニューの項目が見えなくなるまで待つ。
+
+        画面を開いた直後の、メニューが閉じる動きの間に開くと、開いた扱いなのに
+        項目が隠れたままになるため（decisions.md 論点17）。
+        """
+        expect(self.menu_items.first).to_be_hidden()
+
     def click_menu_button(self) -> None:
         self.menu_button.click()
 
@@ -48,11 +56,15 @@ class MenuPage:
     # メニューの開閉状態や項目を検証する。
 
     def expect_menu_opened(self) -> None:
+        """メニューが開いていることを、aria-hidden と最初の項目の表示の両方で確かめる。"""
         expect(self.menu_area).to_have_attribute("aria-hidden", "false")
+        expect(self.menu_items.first, "メニューは開いた扱いだが項目が表示されない（logout_spec.md の判断できない挙動）").to_be_visible()
 
     def expect_menu_closed(self) -> None:
         expect(self.menu_area).to_have_attribute("aria-hidden", "true")
 
     def expect_menu_items(self, item_names: list[str]) -> None:
-        """メニューの項目が指定した順に並んでいることを確かめる。"""
+        """メニューの項目が指定した順に並び、すべて表示されていることを確かめる。"""
         expect(self.menu_items).to_have_text(item_names)
+        for item in self.menu_items.all():
+            expect(item).to_be_visible()
