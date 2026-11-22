@@ -16,7 +16,7 @@ ECサイト（SauceDemo）の購入手続きの最後の画面。Checkout Step T
   `python/utils/ui_assertions/checkout_assertions.py`、テストは `python/tests/ui/checkout/test_checkout_complete_*.py`
 
 実行するブラウザ：TS版は Chromium・Firefox・WebKit、Python版は Chromium
-（テストケースの6件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。そのほかの実機確認（PDF出力ボタンの表示条件・判断できない挙動など）は、Firefox・WebKit では確かめていない）
+（テストケースの6件は、TS版で Chromium・Firefox・WebKit の3つで確かめている。購入直後以外の場面〈再読み込み・ブラウザの戻る・直接開いたとき〉での PDF出力ボタンの表示と、「判断できない挙動」は、Firefox・WebKit では確かめていない）
 
 実機確認：2026-11-09（Playwright調査用スクリプトにて確認）
 
