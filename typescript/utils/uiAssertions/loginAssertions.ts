@@ -18,3 +18,11 @@ export async function expectOnLoginPage(loginFlow: LoginFlow) {
 export async function expectUsernameRetained(loginFlow: LoginFlow, username: string) {
   await loginFlow.expectUsernameRetained(username);
 }
+
+export async function expectNoLoginError(loginFlow: LoginFlow) {
+  await loginFlow.expectNoLoginError();
+}
+
+export async function expectLoginInputsEmpty(loginFlow: LoginFlow) {
+  await loginFlow.expectLoginInputsEmpty();
+}

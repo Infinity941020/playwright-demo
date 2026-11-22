@@ -25,6 +25,10 @@ export class LoginPage {
     await this.page.goto(urls.login);
   }
 
+  async goBack() {
+    await this.page.goBack();
+  }
+
   async enterUsername(username: string) {
     await this.usernameInput.fill(username);
   }
@@ -50,8 +54,19 @@ export class LoginPage {
     await expect(this.errorMessage).toHaveText(message);
   }
 
+  // エラー表示の要素そのものが画面にないことを確かめる
+  async expectNoError() {
+    await expect(this.errorMessage).toHaveCount(0);
+  }
+
   async expectUsernameValue(username: string) {
     await expect(this.usernameInput).toHaveValue(username);
+  }
+
+  async expectInputsEmpty() {
+
+    await expect(this.usernameInput).toHaveValue('');
+    await expect(this.passwordInput).toHaveValue('');
   }
 
   // ログイン画面が表示されていることを確かめる。

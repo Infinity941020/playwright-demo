@@ -1,83 +1,75 @@
-// PlaywrightのPage型・Locator型・expectを使用
 import { Page, Locator, expect } from '@playwright/test';
 
-/*
-================================
-MenuPage
-サイドメニュー操作用 Page Object
-================================
-メニューの開閉は、メニュー領域の aria-hidden 属性で判定する（開いているとき "false"。decisions.md 論点17）。
-URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるため、
-表示の有無では開閉を判定できない。
-*/
+// 左上のメニューの操作と、メニューの開閉・項目の確認をまとめる。
+// - メニューの開閉は、メニュー領域の aria-hidden 属性で判定する（python/decisions.md の論点17）。
+//   URL で開いた直後の画面では、閉じているメニューの項目も「表示されている」と判定されるため、表示だけでは判定できない
+// - 項目を押す操作は、メニューが開いている前提で押す（開いていないと押せない）
 export class MenuPage {
 
-  // ================================
-  // ■ ページインスタンス
-  // ================================
-  readonly page: Page;
+  private readonly page: Page;
+  private readonly menuButton: Locator;
+  private readonly closeButton: Locator;
+  private readonly menuArea: Locator;
+  private readonly menuItems: Locator;
+  private readonly allItemsLink: Locator;
+  private readonly logoutLink: Locator;
 
-  // ================================
-  // ■ ハンバーガーメニューボタン
-  // ================================
-  // 開閉ボタン自体には data-test がないため、id で特定する
-  readonly menuButton: Locator;
-
-  // ================================
-  // ■ メニュー領域
-  // ================================
-  // メニュー領域には id・data-test がないため、CSS クラスで特定する
-  readonly menuArea: Locator;
-
-  // ================================
-  // ■ Logoutリンク
-  // ================================
-  readonly logoutLink: Locator;
-
-  // ================================
-  // コンストラクタ
-  // ================================
   constructor(page: Page) {
 
     this.page = page;
 
+    // 開くボタンと閉じるボタンにはテスト用の属性がないため、要素の id で探す
     this.menuButton = page.locator('#react-burger-menu-btn');
+    this.closeButton = page.locator('#react-burger-cross-btn');
+
+    // メニュー領域には id もテスト用の属性もないため、見た目の指定に使う名前で探す
     this.menuArea = page.locator('.bm-menu-wrap');
+
+    // Dynamic Catalog を開くと出る子の項目を含めないように、テスト用の属性の名前の終わりが「-sidebar-link」の項目だけを探す
+    this.menuItems = page.locator('[data-test$="-sidebar-link"]');
+    this.allItemsLink = page.locator('[data-test="inventory-sidebar-link"]');
     this.logoutLink = page.locator('[data-test="logout-sidebar-link"]');
   }
 
-  /*
-  ================================
-  メニューを開く
-  ================================
-  */
-  async openMenu() {
-
-    // メニュー押下
-    await this.menuButton.click();
-
-    // メニューが開いたことを確認
-    await this.expectMenuOpened();
+  // 画面を開いた直後の、メニューが閉じる動きの間に開くと、開いた扱いなのに項目が隠れたままになるため、閉じたメニューの項目が見えなくなるまで待つ
+  async waitUntilMenuClosed() {
+    await expect(this.menuItems.first()).toBeHidden();
   }
 
-  /*
-  ================================
-  Logoutリンク押下
-  （ログイン画面の表示を確かめるときは、呼び出す側で表示を確かめる処理も呼ぶ）
-  ================================
-  */
-  async logout() {
+  async clickMenuButton() {
+    await this.menuButton.click();
+  }
 
+  async clickCloseButton() {
+    await this.closeButton.click();
+  }
+
+  async pressEscape() {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async clickAllItems() {
+    await this.allItemsLink.click();
+  }
+
+  async clickLogout() {
     await this.logoutLink.click();
   }
 
-  /*
-  ================================
-  メニューが開いていることの確認
-  ================================
-  */
   async expectMenuOpened() {
 
     await expect(this.menuArea).toHaveAttribute('aria-hidden', 'false');
+
+    // 開いた扱いでも項目が隠れたままのことがあるため、最初の項目が見えることも確かめる
+    await expect(this.menuItems.first()).toBeVisible();
+  }
+
+  async expectMenuClosed() {
+    await expect(this.menuArea).toHaveAttribute('aria-hidden', 'true');
+  }
+
+  // メニューの項目が、仕様書の並び順のとおりに並んでいることを確かめる
+  async expectMenuItems() {
+    await expect(this.menuItems).toHaveText(['All Items', 'Dynamic Catalog', 'About', 'Logout', 'Reset App State']);
   }
 }

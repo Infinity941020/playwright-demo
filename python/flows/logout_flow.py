@@ -23,7 +23,8 @@ class LogoutFlow:
     # 利用者の操作の単位で、画面を操作する。
 
     def open_menu(self) -> None:
-        """メニューを開き、開いたことを確認する（aria-hidden で判定。decisions.md 論点17）。"""
+        """メニューを開き、開いたことを確認する（aria-hidden と最初の項目の表示で判定。decisions.md 論点17）。"""
+        self._menu_page.wait_until_menu_closed()
         self._menu_page.click_menu_button()
         self._menu_page.expect_menu_opened()
 

@@ -1,24 +1,16 @@
-// LogoutFlow
 import { LogoutFlow } from '../../flows/LogoutFlow';
 
-/*
-================================
-Logout UI Assertions
-================================
-責務：
-- Logout機能のUI検証
-- Flow経由で業務レベル検証を実施
-================================
-*/
+// 左上のメニューの表示や状態を確かめる関数。
+// テストからは画面の部品を直接呼ばず、メニューの操作の単位を通して確かめる
 
-/*
-================================
-ログアウト成功
-================================
-*/
-export async function expectLogoutSuccess(
-  logoutFlow: LogoutFlow
-) {
+export async function expectMenuClosed(logoutFlow: LogoutFlow) {
+  await logoutFlow.expectMenuClosed();
+}
 
-  await logoutFlow.expectOnLoginPage();
+export async function expectMenuItems(logoutFlow: LogoutFlow) {
+  await logoutFlow.expectMenuItems();
+}
+
+export async function expectOnInventoryPage(logoutFlow: LogoutFlow) {
+  await logoutFlow.expectOnInventoryPage();
 }

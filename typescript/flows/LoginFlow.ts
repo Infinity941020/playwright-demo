@@ -44,4 +44,13 @@ export class LoginFlow {
   async expectOnLoginPage() {
     await this.loginPage.expectOnPage();
   }
+
+  async expectNoLoginError() {
+    await this.loginPage.expectNoError();
+  }
+
+  // ユーザー名・パスワードの入力欄が、どちらも空であることを確かめる
+  async expectLoginInputsEmpty() {
+    await this.loginPage.expectInputsEmpty();
+  }
 }

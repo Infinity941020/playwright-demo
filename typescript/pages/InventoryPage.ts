@@ -52,6 +52,11 @@ export class InventoryPage {
     await this.page.goto(urls.inventory);
   }
 
+  // 商品詳細画面の URL を、商品の番号を付けて開く
+  async gotoProductDetail(productId: number) {
+    await this.page.goto(`${urls.inventoryItem}?id=${productId}`);
+  }
+
   async reload() {
     await this.page.reload();
   }
