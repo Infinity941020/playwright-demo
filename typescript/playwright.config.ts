@@ -4,7 +4,7 @@ import { TEST_TIMEOUT_MS } from './utils/timeouts';
 const isCI = !!process.env.CI;
 
 // テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、CI と手元のそれぞれについて決める。
-// 制限時間と記録の残し方の理由は python/decisions.md の論点27、見た目の比較の撮影の条件は specs/visual_spec.md にある
+// 準備の部品の制限時間・制限時間を延ばさない理由・記録の残し方の判断は python/decisions.md の論点27、見た目の比較の撮影の条件は specs/visual_spec.md にある
 
 export default defineConfig({
 
@@ -17,8 +17,7 @@ export default defineConfig({
   timeout: TEST_TIMEOUT_MS,
 
 
-  // 見た目の比較の基準画像のファイル名に OS やブラウザの名前を付けず、どの環境でも CI で撮った同じ基準画像と比べる
-  // （OS ごとに基準画像が分かれないようにするため）
+  // 基準画像を CI で撮った1組だけにして、どの環境でもそれと比べるため、ファイル名に OS やブラウザの名前を付けない
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/__snapshots__/{arg}.png',
 
