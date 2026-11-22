@@ -2,21 +2,10 @@ import { defineConfig } from '@playwright/test';
 
 const isCI = !!process.env.CI;
 
-/*
-========================================
-Playwright Config (PROJECT SPLIT VERSION)
-========================================
-
-目的：
-- UI：Chromium / Firefox / WebKit対応
-- API：Chromium固定
-- Visual：Chromium固定
-- OS依存snapshot差異抑制
-- CI / Local環境統一
-- Visual Regression安定運用
-
-========================================
-*/
+// テストの実行のしかたを決める。
+// - 画面のテストは Chromium・Firefox・WebKit の3つで、API と見た目の比較のテストは Chromium だけで動かす
+// - CI では2並列で、失敗したテストを2回まで再実行する。手元では再実行せず、並列の数は Playwright の初期値（CPU の数の半分）にする
+// - テストの制限時間は30秒。ログイン状態の作り直しとログイン済みの画面を開く処理は、別の制限時間で動く（fixtures/loginFixture.ts）
 
 export default defineConfig({
 
@@ -47,7 +36,7 @@ export default defineConfig({
 
     actionTimeout: 0,
 
-    // 手元でも CI と同じく、失敗したときだけ残す（decisions.md 論点27）
+    // 手元でも CI と同じく、失敗したときだけ残す（python/decisions.md の論点27）
     trace: 'retain-on-failure',
 
     screenshot: 'off',
@@ -69,13 +58,6 @@ export default defineConfig({
 
 
   projects: [
-
-
-    /*
-    ================================
-    UI Tests
-    ================================
-    */
 
 
     {
@@ -117,13 +99,6 @@ export default defineConfig({
     },
 
 
-    /*
-    ================================
-    API Tests
-    ================================
-    */
-
-
     {
       name: 'chromium-api',
 
@@ -135,13 +110,6 @@ export default defineConfig({
       },
 
     },
-
-
-    /*
-    ================================
-    Visual Tests
-    ================================
-    */
 
 
     {
