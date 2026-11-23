@@ -22,22 +22,21 @@ import { products } from '../../../data/products';
 
 test.describe('通しの購入', () => {
 
-  test('TC-FLOW-001：画面での追加から購入完了まで、画面の操作だけで通して購入できること', async ({ loggedPage }) => {
+  test('TC-FLOW-001：商品の追加から購入完了まで、画面の操作だけで通して購入できること', async ({ loggedPage }) => {
 
     const inventoryFlow = new InventoryFlow(loggedPage);
     const cartFlow = new CartFlow(loggedPage);
     const checkoutFlow = new CheckoutFlow(loggedPage);
 
-    // 商品名・商品の番号・価格のどの順（昇順・降順）にもならない並びにして、追加した順のまま引き継がれていることを区別できるようにする。
-    // 追加する商品の番号は 0→4→2
+    // 商品名・商品の番号・価格のどの昇順・降順にもならない並びにして、追加した順のまま引き継がれていることを区別できるようにする（商品の番号では 0→4→2）
     const addedOrder = [products.bikeLight.name, products.backpack.name, products.onesie.name];
 
     for (const productName of addedOrder) {
       await inventoryFlow.addToCart(productName);
     }
-    await expectBadgeCount(checkoutFlow, addedOrder.length);
+    await expectBadgeCount(checkoutFlow, 3);
 
-    // 失敗したときに、画面が移らなかったのか、移った先の中身が違うのかを区別できるように、画面が移るたびに先に移った先の画面を確かめる
+    // 失敗したときに、画面が移らなかったのか、移った先の中身が違うのかを区別できるように、画面が移るたびに、中身より先に、移った先の画面であることを確かめる
     await inventoryFlow.openCart();
     await expectOnCartPage(inventoryFlow);
     await expectCartItemNamesInOrder(cartFlow, addedOrder);
@@ -50,12 +49,12 @@ test.describe('通しの購入', () => {
     await expectOnCheckoutStepTwoPage(checkoutFlow);
     await expectStepTwoItemNamesInOrder(checkoutFlow, addedOrder);
 
-    // 期待する金額は、計算で作らず、テストケース（画面で確かめた値）と同じ値を書く
+    // 期待する金額は、確かめる側の計算と同じ誤りを持たないように、計算で作らず、画面で確かめた値（テストケースと同じ値）を書く
     await expectStepTwoAmounts(checkoutFlow, 'Item total: $47.97', 'Tax: $3.84', 'Total: $51.81');
 
     await checkoutFlow.completePurchase();
 
-    // バッジがないことは、待っている間に画面が移れば Complete画面を確かめないまま成り立つため、先に Complete画面であることを確かめる
+    // バッジがないことは、Finish の後に Checkout Complete画面以外のバッジのない画面へ移っても成り立つため、先に Checkout Complete画面であることを確かめる
     await expectOnCheckoutCompletePage(checkoutFlow);
     await expectBadgeCount(checkoutFlow, 0);
   });
