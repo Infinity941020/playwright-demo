@@ -49,7 +49,7 @@ test.describe('通しの購入', () => {
     await expectOnCheckoutStepTwoPage(checkoutFlow);
     await expectStepTwoItemNamesInOrder(checkoutFlow, addedOrder);
 
-    // 期待する金額は、確かめる側の計算と同じ誤りを持たないように、計算で作らず、画面で確かめた値（テストケースと同じ値）を書く
+    // 期待する金額は、画面の計算と同じ誤りを持たないように、計算で作らず、画面で確かめた値（テストケースと同じ値）を書く
     await expectStepTwoAmounts(checkoutFlow, 'Item total: $47.97', 'Tax: $3.84', 'Total: $51.81');
 
     await checkoutFlow.completePurchase();
