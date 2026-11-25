@@ -147,6 +147,10 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   状態を戻すには resetCartMock／resetCheckoutMock を呼ぶ必要がある
   （2026-11-15 調査。TS版での実行による確認はしていない）。
   Python版はテストごとにモックサーバーを立ち上げる方式で解決した（論点19）。
+- 追記（2026-11-25）: TS版の状態を戻す関数（mocks/handlers/cartHandlers.ts の resetCartMock、
+  checkoutHandlers.ts の resetCheckoutMock）を、どこからも呼ばれていないため消した（横展開4-1 の1つ目のプルリクエスト）。
+  呼ばれていなかったので、TS版のモックの状態がテストのあいだで残ることは、消す前と変わらない。
+  テストのあいだで状態が混ざらないことは、2つ目のプルリクエストで、テストごとにサーバーを立てるモックの作りで保証する（論点19）。
 
 ## 論点5-b: utils/loginHelper.ts 等のデッドコード
 
@@ -169,6 +173,14 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   使われていないが横展開3 で使う見込みのもの（Checkout の各画面の goto() など）は残した
   （当初は「あり（TS版でも不要コードとして削除する価値があるが、本プロジェクトのスコープ外）」としていた）
 - 決定日: 2026-07-30（初回）／2026-11-15（更新：apiConfig.ts）
+- 追記（2026-11-25）: TS版から、API 関係の使われていないものを消した（横展開4-1 の1つ目のプルリクエスト）。
+  消したもの：utils/apiConfig.ts（JSONPLACEHOLDER_BASE_URL・REQRES_BASE_URL・API_KEY）、
+  utils/apiAssertions/commonAssertions.ts の expectCreatedResource と、その中だけで使われていた expectResponseBody、
+  loginAssertions.ts の expectLoginUnauthorized と、それだけが使っていた STATUS.UNAUTHORIZED、
+  data/apiUsers.ts の inputPatterns（missingPassword・missingEmail・emptyRequest・wrongPassword）、
+  utils/apiHelper.ts の LogoutPayload の body の reason（body の型は、呼び出す側と同じ Record<string, unknown> にした）。
+  理由：どれも定義の外から使われていないため（typescript/ の .ts を、node_modules を除いて名前で検索した）。
+  状態を戻す関数は論点5-a、types/api.ts は論点6 に書いた
 
 ## 論点6: types/api.ts の型定義が実質使われていない
 
@@ -180,6 +192,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: utils/api_assertions/（返事の値を直接確かめる確認関数）
 - TS逆輸入候補: 未定
 - 決定日: 2026-11-15
+- 追記（2026-11-25）: TS版の types/api.ts（LoginRequest・UserData・SingleUserResponse）を、
+  どこからも使われていないため消した（横展開4-1 の1つ目のプルリクエスト。types/ のフォルダもなくなった）。
+  tsconfig.json の include に types/ が入っておらず、型の確認の対象にもなっていなかった
 
 ## 論点7: Lint/Formatツールが一切導入されていない
 
