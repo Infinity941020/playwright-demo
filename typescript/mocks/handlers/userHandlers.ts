@@ -1,58 +1,19 @@
-import { http, HttpResponse } from 'msw';
+import { type Handler, type MockRequest, type MockResponse, toNumber } from '../handlerTypes';
+import { mockData } from '../mockData';
 
-/*
-================================
-User Mock Handlers
-================================
-*/
+// ユーザーの情報を返す API。登録しているユーザーは1人だけで、それ以外の id は存在しないユーザーとして 404 を返す
+export function createUserHandlers(): Handler[] {
 
-export const userHandlers = [
+  function getUser(request: MockRequest): MockResponse {
 
-  /*
-  =================================
-  User取得API
-  =================================
-  */
-  http.get(
-    'http://localhost/api/users/:id',
-    async ({ params }) => {
+    const user = mockData.user.existingUser;
 
-      const id = Number(params.id);
-
-      /*
-      =================================
-      正常系：ユーザー取得成功
-      =================================
-      */
-      if (id === 2) {
-
-        return HttpResponse.json(
-          {
-            data: {
-              id: 2,
-              email: 'janet.weaver@reqres.in',
-              first_name: 'Janet',
-              last_name: 'Weaver',
-              avatar: 'https://reqres.in/img/faces/2-image.jpg',
-            }
-          },
-          {
-            status: 200
-          }
-        );
-      }
-
-      /*
-      =================================
-      異常系：存在しないユーザー
-      =================================
-      */
-      return HttpResponse.json(
-        {},
-        {
-          status: 404
-        }
-      );
+    if (toNumber(request.params.id) === user.id) {
+      return { status: 200, body: { data: { ...user } } };
     }
-  ),
-];
+
+    return { status: 404, body: {} };
+  }
+
+  return [{ method: 'GET', path: '/api/users/{id}', resolver: getUser }];
+}

@@ -3,13 +3,16 @@
 import json
 
 from mocks.handler_types import Handler, MockRequest, MockResponse
+from mocks.mock_data import MOCK_DATA
+
+_LOGOUT = MOCK_DATA["logout"]
 
 
 def create_logout_handlers() -> list[Handler]:
     def logout(request: MockRequest) -> MockResponse:
         # Authorization ヘッダーがなければ、401 を返す
         if not request.header("Authorization"):
-            return MockResponse(401, {"error": "unauthorized"})
+            return MockResponse(401, {"error": _LOGOUT["unauthorized_error"]})
 
         # 本文が空でなければ、400 を返す（TS版と同じく、読めない本文は「本文なし」とみなす）
         try:
@@ -18,7 +21,7 @@ def create_logout_handlers() -> list[Handler]:
             body = None
 
         if isinstance(body, (dict, list, str)) and len(body) > 0:
-            return MockResponse(400, {"error": "invalid request"})
+            return MockResponse(400, {"error": _LOGOUT["invalid_request_error"]})
 
         return MockResponse(200, {"success": True})
 

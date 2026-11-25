@@ -6,6 +6,9 @@
 """
 
 from mocks.handler_types import Handler, MockRequest, MockResponse, to_number
+from mocks.mock_data import MOCK_DATA
+
+_INVALID_PAYLOAD_ERROR = MOCK_DATA["cart"]["invalid_payload_error"]
 
 
 def create_cart_handlers() -> list[Handler]:
@@ -21,11 +24,11 @@ def create_cart_handlers() -> list[Handler]:
 
         # 本文がない場合（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
         if body is None:
-            return MockResponse(400, {"error": "invalid payload"})
+            return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
         # productId が指定されていない場合（TS版の !body.productId と同じく、0 も指定なしとみなす）
         if not isinstance(body, dict) or not body.get("productId"):
-            return MockResponse(400, {"error": "invalid payload"})
+            return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
         item = {
             "id": next_id,

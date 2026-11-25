@@ -4,13 +4,6 @@ Login APIテスト（ReqRes）
 ================================
 */
 
-/*
-================================
-MSW Setup
-================================
-*/
-import '../setup/msw.setup';
-
 import { test } from '../../fixtures/apiFixture';
 
 // API Logger

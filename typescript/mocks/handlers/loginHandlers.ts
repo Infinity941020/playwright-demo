@@ -1,59 +1,23 @@
-import { http, HttpResponse } from 'msw';
+import { type Handler, type MockRequest, type MockResponse, isObject } from '../handlerTypes';
+import { mockData } from '../mockData';
 
-/*
-================================
-Login Mock Handlers
-================================
-*/
+// ログインの API。正しいメールアドレスとパスワードのときだけトークンを返す
+export function createLoginHandlers(): Handler[] {
 
-export const loginHandlers = [
+  function login(request: MockRequest): MockResponse {
 
-  /*
-  =================================
-  ログインAPI（MSW化・localhost統一）
-  =================================
-  */
-  http.post(
-    'http://localhost/api/login',
-    async ({ request }) => {
+    const body = request.json();
 
-      const body = await request.json() as {
-        email?: string;
-        password?: string;
-      };
-
-      /*
-      =================================
-      正常ログイン
-      =================================
-      */
-      if (
-        body.email === 'test@example.com' &&
-        body.password === 'password123'
-      ) {
-        return HttpResponse.json(
-          {
-            token: 'mock-token',
-          },
-          {
-            status: 200,
-          }
-        );
-      }
-
-      /*
-      =================================
-      異常ログイン
-      =================================
-      */
-      return HttpResponse.json(
-        {
-          error: 'user not found',
-        },
-        {
-          status: 400,
-        }
-      );
+    if (
+      isObject(body) &&
+      body.email === mockData.login.validEmail &&
+      body.password === mockData.login.validPassword
+    ) {
+      return { status: 200, body: { token: mockData.login.token } };
     }
-  ),
-];
+
+    return { status: 400, body: { error: mockData.login.userNotFoundError } };
+  }
+
+  return [{ method: 'POST', path: '/api/login', resolver: login }];
+}

@@ -8,6 +8,9 @@
 import time
 
 from mocks.handler_types import Handler, MockRequest, MockResponse
+from mocks.mock_data import MOCK_DATA
+
+_CHECKOUT = MOCK_DATA["checkout"]
 
 
 def create_checkout_handlers() -> list[Handler]:
@@ -20,12 +23,15 @@ def create_checkout_handlers() -> list[Handler]:
         checkout_count += 1
 
         # 呼び出し回数の上限を定める（TS版と同じ。意図された仕様か不具合かを判断できない挙動）
-        if checkout_count >= 1000:
-            return MockResponse(401, {"error": "unauthorized", "message": "mock auth error"})
+        if checkout_count >= _CHECKOUT["call_limit"]:
+            return MockResponse(
+                401,
+                {"error": _CHECKOUT["call_limit_error"], "message": _CHECKOUT["call_limit_message"]},
+            )
 
         # 本文がない場合（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
         if body is None:
-            return MockResponse(400, {"error": "invalid payload"})
+            return MockResponse(400, {"error": _CHECKOUT["invalid_payload_error"]})
 
         # 必須項目がそろっているかを確かめる（TS版の !body.xxx と同じく、0 も指定なしとみなす）
         if (
@@ -34,7 +40,7 @@ def create_checkout_handlers() -> list[Handler]:
             or not body.get("userId")
             or not body.get("totalPrice")
         ):
-            return MockResponse(400, {"error": "invalid payload"})
+            return MockResponse(400, {"error": _CHECKOUT["invalid_payload_error"]})
 
         return MockResponse(
             201,

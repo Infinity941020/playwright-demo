@@ -19,6 +19,7 @@ from mocks.handlers.checkout_handlers import create_checkout_handlers
 from mocks.handlers.login_handlers import create_login_handlers
 from mocks.handlers.logout_handlers import create_logout_handlers
 from mocks.handlers.user_handlers import create_user_handlers
+from mocks.mock_data import MOCK_DATA
 
 
 class MockServer:
@@ -69,7 +70,7 @@ class MockServer:
                     # ハンドラー内の例外（JSON として読めない本文など）は 500 を返す
                     return MockResponse(500, {"error": f"{type(error).__name__}: {error}"})
         # 登録されていないメソッド・パスには、404 を返す
-        return MockResponse(404, {"error": "no mock handler"})
+        return MockResponse(404, {"error": MOCK_DATA["server"]["no_handler_error"]})
 
     def _create_request_handler(self) -> type[BaseHTTPRequestHandler]:
         resolve = self._resolve

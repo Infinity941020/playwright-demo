@@ -151,6 +151,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   checkoutHandlers.ts の resetCheckoutMock）を、どこからも呼ばれていないため消した（横展開4-1 の1つ目のプルリクエスト）。
   呼ばれていなかったので、TS版のモックの状態がテストのあいだで残ることは、消す前と変わらない。
   テストのあいだで状態が混ざらないことは、2つ目のプルリクエストで、テストごとにサーバーを立てるモックの作りで保証する（まだ行っていない。論点19）。
+- 追記（2026-11-25）: TS版のモックも、テストごとに新しいサーバーを立て、ハンドラーを新しい状態で作る形にした（横展開4-1 の2つ目のプルリクエスト。論点19）。
+  これで両版とも、テストのあいだで状態（カートの中身、id の連番、Checkout の呼び出し回数）が混ざらないことを、状態を戻す処理に頼らず、モックの作りで保証する。
+  手元で cart-api.spec.ts を1つの担当で流し、7件目の追加で返る id が 1 になること（作り直す前は 4）と、一覧に前のテストの行が出ないことを確かめた。
 
 ## 論点5-b: utils/loginHelper.ts 等のデッドコード
 
@@ -527,6 +530,21 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   test_checkout_api.py・test_logout_api.py）
 - TS逆輸入候補: 検討（TS版も同じ方式・置き場所に揃えるかは、TS版への横展開のときに判断する）
 - 決定日: 2026-11-15
+- 追記（2026-11-25）: TS版も同じ作り（テストごとに 127.0.0.1 の空いているポートで小さなサーバーを立てる）にした（横展開4-1 の2つ目のプルリクエスト）。
+  サーバーは Node の標準の機能（node:http）で作り、MSW と tests/setup/msw.setup.ts、package.json の msw は消した。
+  ファイルは Python版と1対1で見比べられる並びにした（mocks/server.ts・handlerTypes.ts・mockData.ts・handlers/ の5つ）。
+  ふるまい（返す値・状態コード・判断の順番）は Python版のハンドラーと同じにした。本文なしの POST は、両版とも「値がない」として扱い、
+  Cart・Checkout は 400 を返す（作り直す前の TS版は、本文の読み取りで例外になり 500 を返していた）。
+  登録していないメソッド・パスは、両版とも 404 {"error": "no mock handler"} を返す（作り直す前の TS版は、外の通信に流していた）。
+  モックが返す値は、両版共通の shared/data/api_mock.json にまとめ、両版のモックがここから読む。テストの期待値は JSON から読まない
+  （期待値とモックが同じ所を読むと、モックの値の誤りにテストが気づけないため）。
+  理由：状態が混ざらないことを作りで保証できる（論点5-a、specs/api_testcases.md の観点 I-01）。Python版と1対1で見比べられる。
+  登録していない通信が外へ流れなくなる。
+  選ばなかった案：MSW のまま状態を戻す、MSW の書き方のままサーバーを立てる、担当ごとに1つのサーバーを立てる。
+  状態を戻す処理に頼るか、Python版と作りが違ったままになるため。
+  影響範囲（TS版）：mocks/（server.ts・handlerTypes.ts・mockData.ts・handlers/ の5つ）、fixtures/apiFixture.ts、utils/apiHelper.ts、
+  tests/api/（読み込みと、使う部品の差し替えだけ）、tests/setup/msw.setup.ts（削除）、package.json・package-lock.json。
+  影響範囲（Python版。ふるまいは変えていない）：mocks/mock_data.py（新規）、mocks/server.py・handlers/ の5つ（返す値を JSON から読む）
 
 ## 論点20: CI の構成
 
