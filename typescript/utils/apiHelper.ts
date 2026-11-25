@@ -81,9 +81,7 @@ Logout API（最終固定版）
 */
 
 export type LogoutPayload = {
-  body?: {
-    reason?: string;
-  };
+  body?: Record<string, unknown>;
   token?: string;
 };
 

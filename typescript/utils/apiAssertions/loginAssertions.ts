@@ -22,7 +22,6 @@ HTTP Status
 const STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
 } as const;
 
 /*
@@ -64,24 +63,5 @@ export async function expectLoginBadRequest(
   expect(body.error).toBeDefined();
 
   // errorは構造のみ保証（内容固定しない）
-  expect(typeof body.error).toBe('string');
-}
-
-/*
-================================
-③ Login失敗（未認証）
-================================
-*/
-export async function expectLoginUnauthorized(
-  response: APIResponse
-): Promise<void> {
-
-  expectStatus(response, STATUS.UNAUTHORIZED);
-
-  const body = await response.json();
-
-  expect(body).toBeDefined();
-  expect(body.error).toBeDefined();
-
   expect(typeof body.error).toBe('string');
 }
