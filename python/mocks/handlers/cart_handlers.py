@@ -1,8 +1,7 @@
 """Cart Mock Handlers（TS版 mocks/handlers/cartHandlers.ts に対応）
 
 カートの中身と id の連番は、create_cart_handlers() を呼ぶたびに新しく作られる。
-モックサーバーはテストごとに新しく立ち上げるため、状態はテストをまたがない
-（TS版の resetCartMock に相当する処理は不要。decisions.md 論点5-a）。
+モックサーバーはテストごとに新しく立ち上げるため、状態はテストをまたがない。
 """
 
 from mocks.handler_types import Handler, MockRequest, MockResponse, to_number
@@ -22,18 +21,18 @@ def create_cart_handlers() -> list[Handler]:
         nonlocal next_id
         body = request.json()
 
-        # 本文がない場合（TS版は本文の読み取りエラーになり、この分岐に届かない。api_spec.md 参照）
+        # 本文がないときは、値がないとして 400 を返す
         if body is None:
             return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
-        # productId が指定されていない場合（TS版の !body.productId と同じく、0 も指定なしとみなす）
+        # productId が指定されていないときは 400 を返す（0 も指定なしとみなす。specs/api_spec.md「判断できない挙動」）
         if not isinstance(body, dict) or not body.get("productId"):
             return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
         item = {
             "id": next_id,
             "productId": body["productId"],
-            # quantity が指定されていなければ 1 にする（TS版の ?? 1 と同じく、null も指定なしとみなす）
+            # quantity が指定されていなければ 1 にする（null も指定なしとみなす）
             "quantity": body["quantity"] if body.get("quantity") is not None else 1,
         }
         next_id += 1

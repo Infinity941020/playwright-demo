@@ -10,7 +10,8 @@ import { createLogoutHandlers } from './handlers/logoutHandlers';
 
 // API のテストが通信する、モックのサーバー。
 // - 127.0.0.1 の空いているポートで立てるため、並列に動くテストどうしでポートがぶつからない
-// - 状態がテストをまたがないよう、部品がテストごとに新しく作る（作るたびに、ハンドラーも新しい状態で作る）
+// - テストごとに立てる部品（fixtures/apiFixture.ts）が、このサーバーをテストごとに新しく作る。
+//   サーバーを作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない
 export class MockServer {
 
   private readonly handlers: Handler[] = [
@@ -35,22 +36,39 @@ export class MockServer {
     return `http://${address}:${port}`;
   }
 
-  // ポートに 0 を指定して、空いているポートを割り当ててもらう
+  // ポートに 0 を指定して、空いているポートを割り当ててもらう。
+  // 1つのサーバーを2回起動すると、前に立てたサーバーを止められなくなるため、例外にする
   async start(): Promise<void> {
 
+    if (this.server) {
+      throw new Error('MockServer is already started');
+    }
+
     const server = createServer((request, response) => {
-      void this.handle(request, response);
+
+      // 本文を受け取っている途中で接続が切れたときなどの失敗を、ここで受け止めてテストの実行を止めないようにする。
+      // 返事を送れない状態のため、接続を閉じるだけにする
+      this.handle(request, response).catch(() => {
+        response.destroy();
+      });
     });
 
     await new Promise<void>((resolve, reject) => {
+
       server.once('error', reject);
-      server.listen(0, '127.0.0.1', () => resolve());
+
+      server.listen(0, '127.0.0.1', () => {
+
+        // 起動の失敗を受け取るための登録なので、起動した後は外す
+        server.off('error', reject);
+        resolve();
+      });
     });
 
     this.server = server;
   }
 
-  // 残っている接続も閉じて、停止を待つ
+  // 接続が残っていると停止が終わらないため、残っている接続も閉じてから停止を待つ
   async stop(): Promise<void> {
 
     const server = this.server;

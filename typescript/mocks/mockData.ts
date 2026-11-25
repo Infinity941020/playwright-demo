@@ -1,5 +1,7 @@
 // モックが返す値（正しい認証情報、トークン、ユーザーの値、エラーの文言など）。
-// 値は両版共通の shared/data/api_mock.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す。
+// 値は両版共通の shared/data/api_mock.json にあり、ここでは項目名の書き方を TypeScript の書き方に直して渡す。
+// ただしユーザーの値は、返事の本文にそのまま入れるものなので、JSON の項目名のまま、まとめて渡す
+// （JSON に項目を足したときに、両版の返事がずれないようにするため）。
 // テストの期待値はここから読まず、テストケースと同じ値をテストに書く（モックの値の誤りにテストが気づけるようにするため）
 import sharedApiMock from '../../shared/data/api_mock.json' with { type: 'json' };
 
@@ -13,13 +15,7 @@ export const mockData = {
   },
 
   user: {
-    existingUser: {
-      id: sharedApiMock.user.existing_user.id,
-      email: sharedApiMock.user.existing_user.email,
-      first_name: sharedApiMock.user.existing_user.first_name,
-      last_name: sharedApiMock.user.existing_user.last_name,
-      avatar: sharedApiMock.user.existing_user.avatar,
-    },
+    existingUser: sharedApiMock.user.existing_user,
   },
 
   cart: {

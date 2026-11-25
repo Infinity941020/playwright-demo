@@ -30,6 +30,7 @@
   "flows",
   "pages",
   "fixtures",
+  "mocks",
   "data",
   "utils",
   "playwright.config.ts",

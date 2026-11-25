@@ -28,7 +28,7 @@ export class MockRequest {
   }
 
   // 本文を JSON として読む。本文が空のときは、値がないとして null を返す。
-  // JSON として読めないときは例外になり、サーバーが 500 を返す
+  // JSON として読めないときは例外になる。例外をハンドラーの中で受け止めないとき（Logout 以外）は、サーバーが 500 を返す
   json(): unknown {
 
     if (this.body.length === 0) {

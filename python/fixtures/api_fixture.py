@@ -4,10 +4,9 @@
     - モックサーバーをテストごとに起動・停止する
     - モックサーバーを接続先にした APIRequestContext をテストへ提供する
 
-TS版の fixtures/apiFixture.ts に対応する。TS版は MSW で通信を横取りするが、
-Python版はテストごとに 127.0.0.1 の空いているポートでモックサーバーを立ち上げる
-（decisions.md 論点19）。テストごとに新しく立ち上げるため、モックの状態
-（カートの中身、id の連番、Checkout の呼び出し回数）はテストをまたがない（論点5-a）。
+TS版の fixtures/apiFixture.ts に対応する。テストごとに 127.0.0.1 の空いているポートでモックサーバーを
+新しく立ち上げるため、モックの状態（カートの中身、id の連番、Checkout の呼び出し回数）はテストをまたがない
+（python/decisions.md の論点5-a・19）。
 
 ブラウザは起動しない（pytest-playwright の playwright fixture から APIRequestContext を作る）。
 pytest-playwright（pytest-base-url）の base_url fixture と混同しないよう、
