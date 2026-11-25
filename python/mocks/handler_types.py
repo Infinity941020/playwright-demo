@@ -28,7 +28,7 @@ class MockRequest:
     def json(self) -> Any:
         """本文を JSON として読む。本文が空のときは None を返す。
 
-        本文が JSON として読めないときは例外になる（server.py が 500 を返す）。
+        本文が JSON として読めないときは例外になる。例外を受け止めないハンドラー（Logout 以外）では、サーバー（server.py）が 500 を返す。
         """
         if not self.body:
             return None

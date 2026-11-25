@@ -10,8 +10,8 @@ import { createLogoutHandlers } from './handlers/logoutHandlers';
 
 // API のテストが通信する、モックのサーバー。
 // - 127.0.0.1 の空いているポートで立てるため、並列に動くテストどうしでポートがぶつからない
-// - テストごとに立てる部品（fixtures/apiFixture.ts）が、このサーバーをテストごとに新しく作る。
-//   サーバーを作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない
+// - テストの準備の部品（fixtures/apiFixture.ts）が、このサーバーをテストごとに新しく作る。
+//   作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない
 export class MockServer {
 
   private readonly handlers: Handler[] = [
@@ -27,17 +27,20 @@ export class MockServer {
   // 接続先（例：http://127.0.0.1:50123）。起動した後に使う
   get baseUrl(): string {
 
-    if (!this.server) {
+    const address = this.server?.address() as AddressInfo | null | undefined;
+
+    if (!address) {
       throw new Error('MockServer is not started');
     }
 
-    const { address, port } = this.server.address() as AddressInfo;
+    const { port } = address;
 
-    return `http://${address}:${port}`;
+    return `http://${address.address}:${port}`;
   }
 
   // ポートに 0 を指定して、空いているポートを割り当ててもらう。
-  // 1つのサーバーを2回起動すると、前に立てたサーバーを止められなくなるため、例外にする
+  // 1つのサーバーを2回起動すると、前に立てたサーバーを止められなくなるため、例外にする。
+  // 起動を待っているあいだに呼ばれたときも例外にできるよう、作った直後に覚えておき、起動に失敗したら戻す
   async start(): Promise<void> {
 
     if (this.server) {
@@ -46,26 +49,47 @@ export class MockServer {
 
     const server = createServer((request, response) => {
 
-      // 本文を受け取っている途中で接続が切れたときなどの失敗を、ここで受け止めてテストの実行を止めないようにする。
-      // 返事を送れない状態のため、接続を閉じるだけにする
-      this.handle(request, response).catch(() => {
-        response.destroy();
-      });
-    });
+      // リクエストの受け取りや返事の組み立ての失敗を、ここで受け止めてテストの実行を止めないようにする。
+      // - 返事をまだ送っていなければ、ハンドラーの中の例外と同じ形で 500 を返す
+      // - 返事を送り始めていたり、接続が切れていたりすれば、返事を送れないため、接続を閉じるだけにする
+      this.handle(request, response).catch((error: unknown) => {
 
-    await new Promise<void>((resolve, reject) => {
+        if (response.headersSent || response.destroyed || request.destroyed) {
+          response.destroy();
+          return;
+        }
 
-      server.once('error', reject);
+        const payload = JSON.stringify({ error: describeError(error) });
 
-      server.listen(0, '127.0.0.1', () => {
-
-        // 起動の失敗を受け取るための登録なので、起動した後は外す
-        server.off('error', reject);
-        resolve();
+        response.writeHead(500, {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        });
+        response.end(payload);
       });
     });
 
     this.server = server;
+
+    try {
+
+      await new Promise<void>((resolve, reject) => {
+
+        server.once('error', reject);
+
+        server.listen(0, '127.0.0.1', () => {
+
+          // 起動の失敗を受け取るための登録なので、起動した後は外す
+          server.off('error', reject);
+          resolve();
+        });
+      });
+
+    } catch (error) {
+
+      this.server = undefined;
+      throw error;
+    }
   }
 
   // 接続が残っていると停止が終わらないため、残っている接続も閉じてから停止を待つ
@@ -100,10 +124,7 @@ export class MockServer {
         } catch (error) {
 
           // ハンドラーの中で起きた例外（JSON として読めない本文など）は、500 を返す
-          const name = error instanceof Error ? error.name : 'Error';
-          const message = error instanceof Error ? error.message : String(error);
-
-          return { status: 500, body: { error: `${name}: ${message}` } };
+          return { status: 500, body: { error: describeError(error) } };
         }
       }
     }
@@ -143,6 +164,15 @@ export class MockServer {
     });
     outgoing.end(payload);
   }
+}
+
+// 500 の返事に入れる文言（〈例外の名前〉: 〈中身〉）
+function describeError(error: unknown): string {
+
+  const name = error instanceof Error ? error.name : 'Error';
+  const message = error instanceof Error ? error.message : String(error);
+
+  return `${name}: ${message}`;
 }
 
 // パスがパターン（例：/api/cart/{id}）に当てはまれば、{名前} の部分の値を返す。当てはまらなければ null を返す

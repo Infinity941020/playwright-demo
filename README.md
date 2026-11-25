@@ -37,7 +37,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 - Page Object Model + Flow Layer Architecture など、責務分離を軸としたアーキテクチャ
 - Fixture / storageState
 - Data-driven testing
-- MSW（Mock Service Worker：APIモックレイヤー）
+- テストごとに手元に立てる小さなモックのサーバー（APIテスト用）
 
 ---
 
@@ -46,7 +46,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 **SauceDemo（テスト用デモサイト）**
 <https://www.saucedemo.com/>
 
-およびAPIテスト・状態制御検証用のMSW（Mock Service Worker）環境
+およびAPIテスト・状態制御検証用の、テストごとに手元に立てるモックのサーバー
 
 ---
 
@@ -67,7 +67,7 @@ APIテスト・見た目の比較テスト・CI への組み込みまで完了�
 [テスト設計方針（GitHub Wiki）](https://github.com/Infinity941020/playwright-demo/wiki/%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D%EF%BC%88%E8%A9%B3%E7%B4%B0%E8%A8%AD%E8%A8%88%EF%BC%89)
 にまとめています。
 
-API構成・MSW設計・フォルダ構成を含む全仕様一覧は
+API構成・モックの設計・フォルダ構成を含む全仕様一覧は
 [GitHub Wiki トップ](https://github.com/Infinity941020/playwright-demo/wiki)
 から辿れます。
 

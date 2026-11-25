@@ -5,7 +5,7 @@
 外部の実API（ReqRes等）には接続せず、テストごとに、テスト用の小さなモックサーバーを
 自分のPC（127.0.0.1）の空いているポートで立ち上げて通信する（CLAUDE.md「APIテストの通信方針」）。
 
-両版のモックは同じ作りで、同じリクエストに同じ返事をする。返す値（正しい認証情報、トークン、ユーザーの値、
+両版のモックは同じ作りで、テストが送る範囲のリクエストには同じ返事をする（両版で違う所は下の表）。返す値（正しい認証情報、トークン、ユーザーの値、
 エラーの文言など）は、両版共通の shared/data/api_mock.json にまとめ、両版のモックがここから読む。
 テストの期待値はこの JSON から読まず、テストケースと同じ値をテストに書く（モックの値の誤りにテストが気づけるようにするため）。
 動きを変えるときは、両版のモックを揃えて直す。
@@ -95,7 +95,7 @@ id が 2 のときの data の値（shared/data/api_mock.json の user.existing_
 | 削除（DELETE） | ― | 200 | {"success": true}。該当の id の行をカートから取り除く |
 
 - カートの id は、追加するたびに1ずつ増える連番である
-- カートの中身と id の連番は、テストごとにリセットする
+- カートの中身と id の連番は、テストごとに新しく作るため、テストをまたがない
 - TS版の Cart の一覧のテスト（Cart一覧を取得できること）は、何も追加していない空の一覧に対して確かめる形になっている。
   追加した後に一覧を確かめる形には、TS版のテストの中身を Python版にそろえるときに直す（python/decisions.md の論点19）
 
@@ -114,7 +114,7 @@ id が 2 のときの data の値（shared/data/api_mock.json の user.existing_
 | cartId・userId・totalPrice のいずれかがない | 400 | {"error": "invalid payload"} |
 | 上記以外 | 201 | {"success": true, "checkoutId": 数値, "cartId": 送った値, "userId": 送った値, "totalPrice": 送った値} |
 
-400 のときの error の文言は、2つの条件とも同じ（TS版の mocks/handlers/checkoutHandlers.ts から転記（2026-11-15））。
+400 のときの error の文言は、2つの条件とも同じ（shared/data/api_mock.json の checkout.invalid_payload_error）。
 
 ---
 
