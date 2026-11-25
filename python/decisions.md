@@ -150,7 +150,7 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 追記（2026-11-25）: TS版の状態を戻す関数（mocks/handlers/cartHandlers.ts の resetCartMock、
   checkoutHandlers.ts の resetCheckoutMock）を、どこからも呼ばれていないため消した（横展開4-1 の1つ目のプルリクエスト）。
   呼ばれていなかったので、TS版のモックの状態がテストのあいだで残ることは、消す前と変わらない。
-  テストのあいだで状態が混ざらないことは、2つ目のプルリクエストで、テストごとにサーバーを立てるモックの作りで保証する（論点19）。
+  テストのあいだで状態が混ざらないことは、2つ目のプルリクエストで、テストごとにサーバーを立てるモックの作りで保証する（まだ行っていない。論点19）。
 
 ## 論点5-b: utils/loginHelper.ts 等のデッドコード
 
@@ -177,10 +177,17 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   消したもの：utils/apiConfig.ts（JSONPLACEHOLDER_BASE_URL・REQRES_BASE_URL・API_KEY）、
   utils/apiAssertions/commonAssertions.ts の expectCreatedResource と、その中だけで使われていた expectResponseBody、
   loginAssertions.ts の expectLoginUnauthorized と、それだけが使っていた STATUS.UNAUTHORIZED、
-  data/apiUsers.ts の inputPatterns（missingPassword・missingEmail・emptyRequest・wrongPassword）、
-  utils/apiHelper.ts の LogoutPayload の body の reason（body の型は、呼び出す側と同じ Record<string, unknown> にした）。
-  理由：どれも定義の外から使われていないため（typescript/ の .ts を、node_modules を除いて名前で検索した）。
-  状態を戻す関数は論点5-a、types/api.ts は論点6 に書いた
+  data/apiUsers.ts の inputPatterns（missingPassword・missingEmail・emptyRequest・wrongPassword）。
+  理由：どれも定義の外から使われていないため。
+  消す前に名前で検索し、定義の外から使われていないことを確かめた。消した後にも検索し、0件であることを確かめた
+  （typescript/ の .ts、node_modules を除く。emptyRequest は Cart・Checkout にも同じ名前があるため、apiUsers の inputPatterns が使われていないことで確かめた）。
+  これまでの方針では、後で使う見込みのものは残していたが、今回消したものは、
+  Python版のテストにもテストケース（specs/api_testcases.md）にも対応するものがないため、3つ目のプルリクエストでも使わない。
+  型の変更：utils/apiHelper.ts の LogoutPayload の body の型を、{ reason?: string } から、
+  呼び出す側（fixtures/apiFixture.ts）と同じ Record<string, unknown> に広げた。
+  reason はどこからも使われておらず、ログアウトのモックも読んでいない。
+  また、TC-API-LOGOUT-003 は reason 以外の本文を送るため、どんな本文でも渡せる型の方がテストケースに合う。実行時の処理は変わらない。
+  状態を戻す関数は論点5-a、types/api.ts は論点6 に書いた。
 
 ## 論点6: types/api.ts の型定義が実質使われていない
 
@@ -194,7 +201,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 決定日: 2026-11-15
 - 追記（2026-11-25）: TS版の types/api.ts（LoginRequest・UserData・SingleUserResponse）を、
   どこからも使われていないため消した（横展開4-1 の1つ目のプルリクエスト。types/ のフォルダもなくなった）。
-  tsconfig.json の include に types/ が入っておらず、型の確認の対象にもなっていなかった
+  tsconfig.json の include に types/ が入っておらず、型の確認の対象にもなっていなかった。
+  TS版での扱い（上の TS逆輸入候補：未定）は、ここで消すことに決めた。
 
 ## 論点7: Lint/Formatツールが一切導入されていない
 
