@@ -204,6 +204,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   reason はどこからも使われておらず、ログアウトのモックも読んでいない。
   また、TC-API-LOGOUT-003 は reason 以外の本文を送るため、どんな本文でも渡せる型の方がテストケースに合う。実行時の処理は変わらない。
   状態を戻す関数は論点5-a、types/api.ts は論点6 に書いた。
+- 追記（2026-11-25）: TS版から、返事をコンソールに出す部品（utils/apiLogger.ts）と、返事の形を確かめる部品（utils/schema/）を消した
+  （横展開4-1 の3つ目のプルリクエスト）。apiLogger は何も確かめておらず、失敗したときは Playwright の報告と記録（trace）に通信と返事が残るため。
+  utils/schema/ は、返事の値を直接確かめる形にしたため使わなくなった（論点9）。
 
 ## 論点6: types/api.ts の型定義が実質使われていない
 
@@ -250,6 +253,9 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: utils/api_assertions/（返事の値を直接確かめる確認関数）
 - TS逆輸入候補: 未定
 - 決定日: 2026-11-15
+- 追記（2026-11-25）: TS版でも zod をやめ、返事の値を直接、完全一致で確かめる形にした（横展開4-1 の3つ目のプルリクエスト）。
+  utils/schema/（loginSchema.ts・userSchema.ts）と package.json の zod を消し、確認の部品（utils/apiAssertions/）を Python版の確認の部品と1対1の形にした。
+  あわせて、npm audit が出していた zod の high 1件（GHSA-mrhx-c7xc-m3w5）もなくなった（npm audit は0件）。
 
 ## 論点10: utils/urls.ts の参照が徹底されていない
 

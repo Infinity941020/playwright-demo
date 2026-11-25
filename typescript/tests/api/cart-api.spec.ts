@@ -1,149 +1,85 @@
-/*
-================================
-Cart APIテスト（MSW）
-================================
-*/
-
+// Cart の API のテスト
 import { test } from '../../fixtures/apiFixture';
-
-// テストデータ
-import { apiCarts } from '../../data/apiCarts';
-
-// API Logger
-import { logApiResponse } from '../../utils/apiLogger';
-
-// Assertions
 import {
   expectAddCartSuccess,
-  expectGetCartListSuccess,
+  expectCartBadRequest,
   expectDeleteCartSuccess,
-  expectCartBadRequest
+  expectGetCartListSuccess,
 } from '../../utils/apiAssertions/cartAssertions';
+import { apiCarts } from '../../data/apiCarts';
 
-/*
-================================
-Cart APIテスト
-================================
-*/
-test.describe('Cart APIテスト', () => {
+// エラーの文言は、specs/api_testcases.md の期待結果と同じにする
+const INVALID_PAYLOAD_MESSAGE = 'invalid payload';
 
-  /*
-  =================================
-  正常系：Cart追加成功
-  =================================
-  */
-  test('Cart追加が成功すること', async ({ api }) => {
+test.describe('Cart API', () => {
 
-    const response = await api.cart.add(
-      apiCarts.validCart
-    );
+  test('TC-API-CART-001：カートに追加すると、送った内容で行が作られること', async ({ api }) => {
 
-    await logApiResponse(response);
+    const payload = apiCarts.validCart;
 
-    await expectAddCartSuccess(response);
+    const response = await api.cart.add(payload);
+
+    await expectAddCartSuccess(response, payload.productId, payload.quantity);
   });
 
-  /*
-  =================================
-  異常系：productId未指定
-  =================================
-  */
-  test('productId未指定で失敗すること', async ({ api }) => {
+  // 送る本文だけを切り替えて、同じ確かめ方をする（null は本文なしで送る）
+  const badRequestCases = [
+    {
+      id: 'TC-API-CART-002',
+      title: 'productId がないと、400 とエラーが返ること',
+      payload: apiCarts.inputPatterns.missingProductId,
+    },
+    {
+      id: 'TC-API-CART-003',
+      title: 'リクエストの本文がないと、400 とエラーが返ること',
+      payload: null,
+    },
+  ];
 
-    const response = await api.cart.add(
-      apiCarts.inputPatterns.missingProductId
-    );
+  for (const badRequestCase of badRequestCases) {
 
-    await logApiResponse(response);
+    test(`${badRequestCase.id}：${badRequestCase.title}`, async ({ api }) => {
 
-    await expectCartBadRequest(response);
+      const response = await api.cart.add(badRequestCase.payload);
+
+      await expectCartBadRequest(response, INVALID_PAYLOAD_MESSAGE);
+    });
+  }
+
+  test('TC-API-CART-004：quantity を省略すると、quantity が 1 になること', async ({ api }) => {
+
+    const payload = apiCarts.inputPatterns.missingQuantity;
+
+    const response = await api.cart.add(payload);
+
+    await expectAddCartSuccess(response, payload.productId, 1);
   });
 
-  /*
-  =================================
-  正常系：quantity未指定時デフォルト補完
-  =================================
-  */
-  test('quantity未指定でもデフォルト1で追加されること', async ({ api }) => {
+  test('TC-API-CART-005：一覧に、追加した行だけが返ること', async ({ api }) => {
 
-    const response = await api.cart.add(
-      apiCarts.inputPatterns.missingQuantity
-    );
+    const items = apiCarts.listItems;
 
-    await logApiResponse(response);
-
-    await expectAddCartSuccess(response);
-  });
-
-  /*
-  =================================
-  異常系：空リクエスト
-  =================================
-  */
-  test('空リクエストで失敗すること', async ({ api }) => {
-
-    const response = await api.cart.add(
-      apiCarts.inputPatterns.emptyRequest
-    );
-
-    await logApiResponse(response);
-
-    await expectCartBadRequest(response);
-  });
-
-  /*
-  =================================
-  正常系：Cart一覧取得
-  =================================
-  */
-  test('Cart一覧を取得できること', async ({ api }) => {
+    for (const item of items) {
+      await api.cart.add(item);
+    }
 
     const response = await api.cart.get();
 
-    await logApiResponse(response);
-
-    await expectGetCartListSuccess(response);
+    // ほかのテストで追加した行が含まれないことも、行の数で確かめる
+    await expectGetCartListSuccess(response, items);
   });
 
-  /*
-  =================================
-  正常系：Cart削除
-  =================================
-  */
-  test('Cart削除が成功すること', async ({ api }) => {
+  test('TC-API-CART-006：削除すると、一覧からその行がなくなること', async ({ api }) => {
 
-    const createResponse = await api.cart.add(
-      apiCarts.validCart
-    );
+    const [firstItem, secondItem] = apiCarts.deleteItems;
 
-    const createdBody = await createResponse.json();
+    const firstId = (await (await api.cart.add(firstItem)).json()).id;
+    await api.cart.add(secondItem);
 
-    const response = await api.cart.delete(
-      createdBody.id
-    );
+    const deleteResponse = await api.cart.delete(firstId);
+    const listResponse = await api.cart.get();
 
-    await logApiResponse(response);
-
-    await expectDeleteCartSuccess(response);
+    await expectDeleteCartSuccess(deleteResponse);
+    await expectGetCartListSuccess(listResponse, [{ productId: secondItem.productId }]);
   });
-
-  /*
-  =================================
-  MSW動作確認
-  =================================
-  */
-  test('MSW動作確認（Cart追加）', async ({ api }) => {
-
-    const response = await api.cart.add({
-      productId: 1,
-      quantity: 1,
-    });
-
-    await logApiResponse(response);
-
-    const body = await response.json();
-
-    console.log('MSW CHECK:', body);
-  });
-
 });

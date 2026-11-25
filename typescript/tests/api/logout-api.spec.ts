@@ -1,77 +1,36 @@
-/*
-================================
-Logout APIテスト（MSW）
-================================
-*/
-
+// Logout の API のテスト
 import { test } from '../../fixtures/apiFixture';
-
-// API Logger
-import { logApiResponse } from '../../utils/apiLogger';
-
-// Assertions
 import {
+  expectLogoutBadRequest,
   expectLogoutSuccess,
   expectLogoutUnauthorized,
-  expectLogoutBadRequest,
 } from '../../utils/apiAssertions/logoutAssertions';
 
-/*
-================================
-Logout APIテスト
-================================
-*/
-test.describe('Logout APIテスト（MSW）', () => {
+// Authorization ヘッダーの値（モックはヘッダーの有無だけを見る）
+const TOKEN = 'Bearer mock-token';
 
-  /*
-  ================================
-  正常系：ログアウト成功
-  ================================
-  */
-  test('ログアウト成功', async ({ api }) => {
+test.describe('Logout API', () => {
 
-    const response = await api.logout({
-      body: {},
-      token: 'Bearer mock-token',
-    });
+  test('TC-API-LOGOUT-001：トークンがあり本文が空なら、ログアウトできること', async ({ api }) => {
 
-    await logApiResponse(response);
+    // テストケースの操作のとおり、本文は渡さない（渡さないと本文なしで送る）
+    const response = await api.logout({ token: TOKEN });
 
     await expectLogoutSuccess(response);
   });
 
-  /*
-  ================================
-  未認証
-  ================================
-  */
-  test('未認証ログアウト（401）', async ({ api }) => {
+  test('TC-API-LOGOUT-002：トークンがないと、401 とエラーが返ること', async ({ api }) => {
 
-    const response = await api.logout({
-      body: {},
-      token: undefined,
-    });
+    // テストケースの操作のとおり、トークンも本文も渡さない
+    const response = await api.logout();
 
-    await logApiResponse(response);
-
-    await expectLogoutUnauthorized(response);
+    await expectLogoutUnauthorized(response, 'unauthorized');
   });
 
-  /*
-  ================================
-  不正リクエスト
-  ================================
-  */
-  test('不正リクエスト（400）', async ({ api }) => {
+  test('TC-API-LOGOUT-003：本文が空でないと、400 とエラーが返ること', async ({ api }) => {
 
-    const response = await api.logout({
-      body: { invalid: 'data' },
-      token: 'Bearer mock-token',
-    });
+    const response = await api.logout({ body: { invalid: 'data' }, token: TOKEN });
 
-    await logApiResponse(response);
-
-    await expectLogoutBadRequest(response);
+    await expectLogoutBadRequest(response, 'invalid request');
   });
-
 });

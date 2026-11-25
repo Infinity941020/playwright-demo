@@ -2,12 +2,15 @@
 
 共通の前提：
 - テストの開始時に、モックサーバーが 127.0.0.1 の空いているポートで起動している
-- モックの状態（カートの中身、id の連番、Checkout の呼び出し回数）は、テストごとにリセットされている
+- モックの状態（カートの中身、id の連番、Checkout の呼び出し回数）は、テストごとに新しいサーバーを立てるため、テストをまたがない
 - リクエストは Playwright の APIRequestContext で送る
 
 対応する仕様書：api_spec.md
+対応するテスト：TS版は `typescript/tests/api/*-api.spec.ts`、Python版は `python/tests/api/test_*_api.py`
+（両版とも同じ18件。下の「両版のテストとの対応」を参照）
+実行するブラウザ：TS版は chromium-api のプロジェクトだけで実行する。両版とも、API のテストはブラウザを開かない
 
-テストで使う値の注意：productId などに 0 を使わない（TS版のモックは 0 を「値がない」とみなす場合があるため。仕様書「判断できない挙動」参照）
+テストで使う値の注意：productId などに 0 を使わない（モックは 0 を「値がない」とみなすため。仕様書「判断できない挙動」参照）
 
 テストIDの付け方：API ごとに「TC-API-LOGIN」「TC-API-USER」「TC-API-CART」「TC-API-CHECKOUT」「TC-API-LOGOUT」とする
 
@@ -231,26 +234,31 @@
 
 | 項目 | 理由 |
 |---|---|
-| TS版の「MSW動作確認（Cart追加）」（cart-api.spec.ts:142） | 何も確かめていない（アサーションがない）テストのため |
+| 返事を何も確かめないテスト、{} を送る「空リクエスト」のテスト | テストケースにないため（{} を送ったときは、TC-API-CART-002・TC-API-CHECKOUT-002〜004 と同じ分岐を通る） |
 | 仕様書「判断できない挙動」（存在しない id の削除、値が 0 の扱い、呼び出し回数の上限、checkoutId の値） | 意図された仕様か判断できないため |
 | 外部の実APIとの通信 | Stage 3 で任意に扱う（backlog.md 参照） |
 
-## ■ TS版テスト（tests/api/ 19件）との対応
+## ■ 両版のテストとの対応
 
-| TS版のテスト | 対応するPython版のテストケース | 備考 |
+両版とも、テストケースの18件を実装している。
+
+| テストID | TS版（typescript/tests/api/） | Python版（python/tests/api/） |
 |---|---|---|
-| login-api ログイン成功 | TC-API-LOGIN-001 | Python版はトークンの値まで確認 |
-| login-api ログイン失敗（不正認証） | TC-API-LOGIN-002 | Python版はエラー文言まで確認 |
-| user-api 単一ユーザー情報を取得できること | TC-API-USER-001 | Python版は値まで確認 |
-| user-api 存在しないユーザーID | TC-API-USER-002 | |
-| cart-api Cart追加が成功すること | TC-API-CART-001 | Python版は送った値と一致することまで確認 |
-| cart-api productId未指定で失敗すること | TC-API-CART-002 | Python版はエラー文言まで確認 |
-| cart-api 空リクエストで失敗すること | TC-API-CART-002 | Python版はエラー文言まで確認。TS版は {} を送っている。Python版の TC-API-CART-003 は本文なし（TS版にはないケース） |
-| cart-api quantity未指定でもデフォルト1で追加されること | TC-API-CART-004 | TS版は quantity > 0 のみ確認。Python版は 1 であることを確認 |
-| cart-api Cart一覧を取得できること | TC-API-CART-005 | TS版は items が配列であることのみ確認。Python版は件数と中身まで確認 |
-| cart-api Cart削除が成功すること | TC-API-CART-006 | TS版は削除後の一覧を確認していない。Python版は一覧からなくなることまで確認 |
-| cart-api MSW動作確認（Cart追加） | 対象外 | 上記「対象外としたもの」参照 |
-| checkout-api Checkoutが成功すること | TC-API-CHECKOUT-001 | Python版は success と、送った値と一致することまで確認 |
-| checkout-api cartId・userId・totalPrice未指定（3件） | TC-API-CHECKOUT-002〜004 | Python版はエラー文言まで確認 |
-| checkout-api 空リクエストパターン | TC-API-CHECKOUT-002〜004 | Python版はエラー文言まで確認。TS版は {} を送っている。Python版の TC-API-CHECKOUT-005 は本文なし（TS版にはないケース） |
-| logout-api ログアウト成功、未認証、不正リクエスト（3件） | TC-API-LOGOUT-001〜003 | Python版はエラー文言まで確認 |
+| TC-API-LOGIN-001 | login-api.spec.ts「TC-API-LOGIN-001：…」 | test_login_api.py `test_login_success` |
+| TC-API-LOGIN-002 | login-api.spec.ts「TC-API-LOGIN-002：…」 | test_login_api.py `test_login_failure` |
+| TC-API-USER-001 | user-api.spec.ts「TC-API-USER-001：…」 | test_user_api.py `test_get_existing_user` |
+| TC-API-USER-002 | user-api.spec.ts「TC-API-USER-002：…」 | test_user_api.py `test_get_missing_user` |
+| TC-API-CART-001 | cart-api.spec.ts「TC-API-CART-001：…」 | test_cart_api.py `test_add_cart` |
+| TC-API-CART-002 | cart-api.spec.ts「TC-API-CART-002：…」（TC-API-CART-003 とデータを切り替える形） | test_cart_api.py `test_add_cart_bad_request[TC-API-CART-002]` |
+| TC-API-CART-003 | cart-api.spec.ts「TC-API-CART-003：…」（TC-API-CART-002 とデータを切り替える形） | test_cart_api.py `test_add_cart_bad_request[TC-API-CART-003]` |
+| TC-API-CART-004 | cart-api.spec.ts「TC-API-CART-004：…」 | test_cart_api.py `test_add_cart_without_quantity` |
+| TC-API-CART-005 | cart-api.spec.ts「TC-API-CART-005：…」 | test_cart_api.py `test_get_cart_list` |
+| TC-API-CART-006 | cart-api.spec.ts「TC-API-CART-006：…」 | test_cart_api.py `test_delete_cart` |
+| TC-API-CHECKOUT-001 | checkout-api.spec.ts「TC-API-CHECKOUT-001：…」 | test_checkout_api.py `test_checkout_success` |
+| TC-API-CHECKOUT-002 | checkout-api.spec.ts「TC-API-CHECKOUT-002：…」（TC-API-CHECKOUT-003〜005 とデータを切り替える形） | test_checkout_api.py `test_checkout_bad_request[TC-API-CHECKOUT-002]` |
+| TC-API-CHECKOUT-003 | checkout-api.spec.ts「TC-API-CHECKOUT-003：…」（同上） | test_checkout_api.py `test_checkout_bad_request[TC-API-CHECKOUT-003]` |
+| TC-API-CHECKOUT-004 | checkout-api.spec.ts「TC-API-CHECKOUT-004：…」（同上） | test_checkout_api.py `test_checkout_bad_request[TC-API-CHECKOUT-004]` |
+| TC-API-CHECKOUT-005 | checkout-api.spec.ts「TC-API-CHECKOUT-005：…」（同上） | test_checkout_api.py `test_checkout_bad_request[TC-API-CHECKOUT-005]` |
+| TC-API-LOGOUT-001 | logout-api.spec.ts「TC-API-LOGOUT-001：…」 | test_logout_api.py `test_logout_success` |
+| TC-API-LOGOUT-002 | logout-api.spec.ts「TC-API-LOGOUT-002：…」 | test_logout_api.py `test_logout_without_token` |
+| TC-API-LOGOUT-003 | logout-api.spec.ts「TC-API-LOGOUT-003：…」 | test_logout_api.py `test_logout_with_body` |

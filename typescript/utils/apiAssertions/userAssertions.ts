@@ -1,55 +1,29 @@
-// Playwright APIレスポンス型
 import { APIResponse, expect } from '@playwright/test';
-
-// 共通ステータス検証
 import { expectStatus } from './commonAssertions';
 
-// schema
-import { userSchema } from '../schema/userSchema';
+// User の API の返事を確かめる
 
-/*
-================================
-User API Assertions
-================================
-JSONPlaceholder /users/{id} 検証（Aルート）
-・正常系のみschema検証
-・存在しないユーザーは入力パターン扱い
-================================
-*/
+const STATUS = {
+  OK: 200,
+  NOT_FOUND: 404,
+} as const;
 
-const USER_SUCCESS_STATUS = 200;
-const USER_NOT_FOUND_STATUS = 404;
+// ユーザーの情報を取得できたこと（200、5つの項目と値が期待値と同じ）
+export async function expectSingleUserResponse(response: APIResponse, user: Record<string, unknown>) {
 
-/*
-================================
-正常系：単一ユーザー取得
-================================
-*/
-export async function expectSingleUserResponse(
-  response: APIResponse
-) {
-
-  expectStatus(response, USER_SUCCESS_STATUS);
+  expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
-  // schemaによる構造保証
-  userSchema.parse(body);
+  expect(body.data).toEqual(user);
 }
 
-/*
-================================
-入力パターン：存在しないユーザー
-================================
-*/
-export async function expectUserNotFoundPattern(
-  response: APIResponse
-) {
+// 存在しないユーザーとして、404 と空のオブジェクトが返ったこと
+export async function expectUserNotFound(response: APIResponse) {
 
-  expectStatus(response, USER_NOT_FOUND_STATUS);
+  expectStatus(response, STATUS.NOT_FOUND);
 
   const body = await response.json();
 
-  // JSONPlaceholderは {}
   expect(body).toEqual({});
 }
