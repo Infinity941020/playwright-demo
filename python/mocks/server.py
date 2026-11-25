@@ -4,9 +4,8 @@
     - handlers/ 配下の各 API のハンドラーをまとめて登録する
     - 127.0.0.1 の空いているポートでサーバーを別スレッドで起動・停止する
 
-TS版の MSW はテストのプロセスの中で通信を横取りするが、Python版の Playwright では
-APIRequestContext の通信を横取りできないため、実際に小さなサーバーを立てる（decisions.md 論点19）。
-状態がテストをまたがないよう、fixture がテストごとに新しいインスタンスを作る。
+API のテストの通信は、テストごとに 127.0.0.1 の空いているポートで立てるこのサーバーが受ける（python/decisions.md の論点19）。
+テストの準備の部品（fixtures/api_fixture.py）が、テストごとに新しく作る。作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない。
 """
 
 import json
@@ -19,6 +18,7 @@ from mocks.handlers.checkout_handlers import create_checkout_handlers
 from mocks.handlers.login_handlers import create_login_handlers
 from mocks.handlers.logout_handlers import create_logout_handlers
 from mocks.handlers.user_handlers import create_user_handlers
+from mocks.mock_data import MOCK_DATA
 
 
 class MockServer:
@@ -69,7 +69,7 @@ class MockServer:
                     # ハンドラー内の例外（JSON として読めない本文など）は 500 を返す
                     return MockResponse(500, {"error": f"{type(error).__name__}: {error}"})
         # 登録されていないメソッド・パスには、404 を返す
-        return MockResponse(404, {"error": "no mock handler"})
+        return MockResponse(404, {"error": MOCK_DATA["server"]["no_handler_error"]})
 
     def _create_request_handler(self) -> type[BaseHTTPRequestHandler]:
         resolve = self._resolve

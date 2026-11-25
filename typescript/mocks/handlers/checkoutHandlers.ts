@@ -1,145 +1,54 @@
-import { http, HttpResponse } from 'msw';
+import { type Handler, type MockRequest, type MockResponse, hasValue, isObject } from '../handlerTypes';
+import { mockData } from '../mockData';
 
-/*
-================================
-Checkout Mock DB
-================================
-Checkout状態をMSW内で管理
-================================
-*/
-let checkoutCount = 0;
+// 購入の API。
+// 呼び出し回数は、この関数を呼ぶたびに 0 から数え直す。サーバーはテストごとに新しく立てるため、回数はテストをまたがない
+export function createCheckoutHandlers(): Handler[] {
 
-/*
-================================
-Checkout Request型
-================================
-MSW Request Body定義
-================================
-*/
-type CheckoutRequestBody = {
-  cartId?: number;
-  userId?: number;
-  totalPrice?: number;
-};
+  let checkoutCount = 0;
 
-/*
-================================
-Checkout API URL
-================================
-MSW intercept対象URL
-================================
-*/
-const CHECKOUT_API_URL =
-  'http://localhost/api/checkout';
+  function checkout(request: MockRequest): MockResponse {
 
-/*
-================================
-Checkout Handlers
-================================
-MSW Checkout API定義
-================================
-*/
-export const checkoutHandlers = [
+    const body = request.json();
 
-  /*
-  ================================
-  Checkout実行API
-  ================================
-  */
-  http.post(
-    CHECKOUT_API_URL,
-    async ({ request }) => {
+    checkoutCount += 1;
 
-      /*
-      ================================
-      Request Body取得
-      ================================
-      */
-      const body =
-        (await request.json()) as CheckoutRequestBody | null;
-
-      /*
-      ================================
-      Checkout実行回数加算
-      ================================
-      */
-      checkoutCount++;
-
-      /*
-      ================================
-      疑似認証エラー再現
-      ================================
-      大量実行時の異常系テスト用
-      ================================
-      */
-      if (checkoutCount >= 1000) {
-
-        return HttpResponse.json(
-          {
-            error: 'unauthorized',
-            message: 'mock auth error',
-          },
-          {
-            status: 401,
-          }
-        );
-      }
-
-      /*
-      ================================
-      空Requestチェック
-      ================================
-      */
-      if (!body) {
-
-        return HttpResponse.json(
-          {
-            error: 'invalid payload',
-          },
-          {
-            status: 400,
-          }
-        );
-      }
-
-      /*
-      ================================
-      必須項目チェック
-      ================================
-      */
-      if (
-        !body.cartId ||
-        !body.userId ||
-        !body.totalPrice
-      ) {
-
-        return HttpResponse.json(
-          {
-            error: 'invalid payload',
-          },
-          {
-            status: 400,
-          }
-        );
-      }
-
-      /*
-      ================================
-      Checkout成功レスポンス
-      ================================
-      */
-      return HttpResponse.json(
-        {
-          success: true,
-          checkoutId: Date.now(),
-          cartId: body.cartId,
-          userId: body.userId,
-          totalPrice: body.totalPrice,
-        },
-        {
-          status: 201,
-        }
-      );
+    // 呼び出し回数の上限（意図された仕様か不具合かを判断できない挙動。specs/api_spec.md）
+    if (checkoutCount >= mockData.checkout.callLimit) {
+      return {
+        status: 401,
+        body: { error: mockData.checkout.callLimitError, message: mockData.checkout.callLimitMessage },
+      };
     }
-  ),
-];
+
+    if (body === null) {
+      return { status: 400, body: { error: mockData.checkout.invalidPayloadError } };
+    }
+
+    // 0 も指定なしとみなす（specs/api_spec.md「判断できない挙動」）
+    if (
+      !isObject(body) ||
+      !hasValue(body.cartId) ||
+      !hasValue(body.userId) ||
+      !hasValue(body.totalPrice)
+    ) {
+      return { status: 400, body: { error: mockData.checkout.invalidPayloadError } };
+    }
+
+    return {
+      status: 201,
+      body: {
+        success: true,
+
+        // 呼び出した時刻をミリ秒で入れる（意図された仕様か不具合かを判断できない挙動。specs/api_spec.md）
+        checkoutId: Date.now(),
+
+        cartId: body.cartId,
+        userId: body.userId,
+        totalPrice: body.totalPrice,
+      },
+    };
+  }
+
+  return [{ method: 'POST', path: '/api/checkout', resolver: checkout }];
+}

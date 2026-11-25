@@ -4,13 +4,6 @@ Logout APIテスト（MSW）
 ================================
 */
 
-/*
-================================
-MSW Setup
-================================
-*/
-import '../setup/msw.setup';
-
 import { test } from '../../fixtures/apiFixture';
 
 // API Logger

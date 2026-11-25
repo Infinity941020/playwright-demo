@@ -1,29 +1,29 @@
 # API仕様書：モックAPI（Login・User・Cart・Checkout・Logout）
 
 ## ■ 概要
-Python版のAPIテストが通信する、モックAPIの仕様。
-外部の実API（ReqRes等）には接続せず、テストの実行時に、テスト用の小さなモックサーバーを
+両版（TS版・Python版）のAPIテストが通信する、モックAPIの仕様。
+外部の実API（ReqRes等）には接続せず、テストごとに、テスト用の小さなモックサーバーを
 自分のPC（127.0.0.1）の空いているポートで立ち上げて通信する（CLAUDE.md「APIテストの通信方針」）。
 
-モックAPIの返事は、TS版のモック（mocks/handlers/ 配下の MSW ハンドラー）と同じにする。
-TS版とPython版で返事がずれないよう、変更するときは両方を揃える。
+両版のモックは同じ作りで、テストが送る範囲のリクエストには同じ返事をする（両版で違う所は下の表）。返す値（正しい認証情報、トークン、ユーザーの値、
+エラーの文言など）は、両版共通の shared/data/api_mock.json にまとめ、両版のモックがここから読む。
+テストの期待値はこの JSON から読まず、テストケースと同じ値をテストに書く（モックの値の誤りにテストが気づけるようにするため）。
+動きを変えるときは、両版のモックを揃えて直す。
 
 | 項目 | 内容 |
 |---|---|
 | 接続先 | http://127.0.0.1:〈テスト開始時に決まるポート〉/api |
-| 通信の方法 | Playwright の APIRequestContext（TS版と同じ） |
-| モックの作り方 | Python標準ライブラリの HTTP サーバー。API ごとにファイルを分ける（TS版の mocks/handlers/ に対応） |
-| モックの状態 | テストごとにリセットする（decisions.md 論点5-a） |
+| 通信の方法 | Playwright の APIRequestContext |
+| モックの作り方 | 各言語の標準の機能の HTTP サーバー（TS版は Node の http、Python版は Python標準ライブラリ）。API ごとにファイルを分ける |
+| モックの状態 | テストごとに新しいサーバーを立て、ハンドラーも新しい状態で作るため、テストをまたがない（python/decisions.md 論点5-a・19） |
+| 登録していないメソッド・パス | 404 {"error": "no mock handler"} を返す（外の通信には流さない） |
+| GET・POST・DELETE 以外のメソッド（PUT など） | TS版は 404 {"error": "no mock handler"}、Python版は標準の部品が 501（JSON ではない返事）を返し、両版で違う（どのテストも送らない。Python版を見直すときに 404 にそろえる。python/decisions.md の論点19） |
+| ハンドラーの中で起きた例外 | 500 {"error": "〈例外の名前〉: 〈例外の中身〉"} を返す（JSON として読めない本文など。中身の文は言語によって違う）。Logout は、読めない本文を本文なしとみなす（500 にならない） |
+| テストが送らない入力 | UTF-8 でない本文、先頭の BOM、NaN・Infinity の書き方、とても大きな数、本文の長さを付けない分割送信、全角などの数字の id では、両版の返事が違うことがある |
 | ファイルの置き場所 | 画面のテストとは分け、API専用のものは専用のフォルダにまとめる（下の「■ ファイルの置き場所」参照） |
 
-TS版との違い：TS版のモックは、テストを実行するプロセスの中で通信を横取りする方式（サーバーは立てない）。
-Python版の Playwright では、この方式で APIRequestContext の通信を横取りできないことを実機で確認したため、
-実際に小さなサーバーを立てる方式にする（2026-11-15 調査）。
-
-本文なしのリクエスト：Python版のモックは、Cart・Checkout に本文なしで送られた場合、仕様の表のとおり
-400 {"error": "invalid payload"} を返す。TS版のハンドラーは最初に本文を JSON として読むため、本文が空だと
-読み取りエラーになり、400 を返す分岐に届かない（MSW の仕様から 500 になると考えられる。TS版での実行による
-確認はしていない）。Python版は仕様書の意図（本文がなければ 400）に合わせた。
+本文なしのリクエスト：本文が空のときは「値がない」として扱う。Cart・Checkout に本文なしで送られた場合は、
+仕様の表のとおり 400 {"error": "invalid payload"} を返す。
 
 対応するTS版：tests/api/ 配下の5ファイル、mocks/handlers/ 配下の5ファイル
 
@@ -31,7 +31,8 @@ Python版の Playwright では、この方式で APIRequestContext の通信を�
 
 | 置き場所 | 中身 | 対応するTS版 |
 |---|---|---|
-| python/mocks/ | モックサーバー（server.py）と、API ごとの返事（handlers/ 配下） | mocks/ |
+| python/mocks/ | モックサーバー（server.py）、ハンドラーの形と値の判定（handler_types.py）、返す値の読み込み（mock_data.py）、API ごとの返事（handlers/ 配下） | mocks/（server.ts・handlerTypes.ts・mockData.ts・handlers/ 配下） |
+| shared/data/api_mock.json | モックが返す値（両版共通） | 同じファイルを読む |
 | python/fixtures/api_fixture.py | モックサーバーの起動と APIRequestContext の準備 | fixtures/apiFixture.ts |
 | python/utils/api_helper.py | API の呼び出し | utils/apiHelper.ts |
 | python/utils/api_assertions/ | API ごとの確認関数 | utils/apiAssertions/ |
@@ -67,7 +68,7 @@ Python版の Playwright では、この方式で APIRequestContext の通信を�
 | id が 2 | 200 | {"data": {"id", "email", "first_name", "last_name", "avatar"}}（値は下の表） |
 | 上記以外 | 404 | {}（空のオブジェクト） |
 
-id が 2 のときの data の値（TS版の mocks/handlers/userHandlers.ts から転記（2026-11-15））：
+id が 2 のときの data の値（shared/data/api_mock.json の user.existing_user）：
 
 | 項目 | 値 |
 |---|---|
@@ -94,7 +95,9 @@ id が 2 のときの data の値（TS版の mocks/handlers/userHandlers.ts か�
 | 削除（DELETE） | ― | 200 | {"success": true}。該当の id の行をカートから取り除く |
 
 - カートの id は、追加するたびに1ずつ増える連番である
-- カートの中身と id の連番は、テストごとにリセットする
+- カートの中身と id の連番は、テストごとに新しく作るため、テストをまたがない
+- TS版の Cart の一覧のテスト（Cart一覧を取得できること）は、何も追加していない空の一覧に対して確かめる形になっている。
+  追加した後に一覧を確かめる形には、TS版のテストの中身を Python版にそろえるときに直す（python/decisions.md の論点19）
 
 ---
 
@@ -111,7 +114,7 @@ id が 2 のときの data の値（TS版の mocks/handlers/userHandlers.ts か�
 | cartId・userId・totalPrice のいずれかがない | 400 | {"error": "invalid payload"} |
 | 上記以外 | 201 | {"success": true, "checkoutId": 数値, "cartId": 送った値, "userId": 送った値, "totalPrice": 送った値} |
 
-400 のときの error の文言は、2つの条件とも同じ（TS版の mocks/handlers/checkoutHandlers.ts から転記（2026-11-15））。
+400 のときの error の文言は、2つの条件とも同じ（shared/data/api_mock.json の checkout.invalid_payload_error）。
 
 ---
 
@@ -130,15 +133,15 @@ id が 2 のときの data の値（TS版の mocks/handlers/userHandlers.ts か�
 
 ---
 
-## ■ TS版のモックにある、意図された仕様か判断できない挙動
+## ■ モックにある、意図された仕様か判断できない挙動
 
-TS版のモックと返事を揃えるため、Python版のモックも同じ動きにするが、テストの対象には含めない。
+両版のモックとも同じ動きにするが、テストの対象には含めない。
 
 | 挙動 | 内容 |
 |---|---|
 | 存在しない id の削除 | Cart の DELETE で、存在しない id を指定しても 200 {"success": true} を返す |
-| 値が 0 の扱い | Checkout で cartId・userId・totalPrice のいずれかが 0 の場合も「ない」とみなして 400 を返す |
-| 呼び出し回数の上限 | Checkout は呼ばれるたびに回数を数え、1000回以上で 401 を返す（Python版はテストごとに回数をリセットする） |
+| 値が 0 の扱い | Cart の productId、Checkout の cartId・userId・totalPrice のいずれかが 0 の場合も「ない」とみなして 400 を返す |
+| 呼び出し回数の上限 | Checkout は呼ばれるたびに回数を数え、1000回以上で 401 を返す（回数はテストごとに 0 から数え直す） |
 | checkoutId の値 | 呼び出した時刻（ミリ秒）を checkoutId にしている |
 
 ---

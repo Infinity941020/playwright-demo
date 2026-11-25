@@ -1,76 +1,40 @@
-import { http, HttpResponse } from 'msw';
+import { type Handler, type MockRequest, type MockResponse, isObject } from '../handlerTypes';
+import { mockData } from '../mockData';
 
-/*
-================================
-Logout Mock API
-================================
-ステートレス設計（Fixture前提）
-================================
-*/
+// 本文が空でないかどうか。中身のあるオブジェクト・配列・文字列だけを「空でない」とみなす
+function isNonEmptyBody(body: unknown): boolean {
 
-/*
-================================
-API URL
-================================
-*/
-const LOGOUT_API_URL = 'http://localhost/api/logout';
+  if (typeof body === 'string' || Array.isArray(body)) {
+    return body.length > 0;
+  }
 
-/*
-================================
-Logout Handlers
-================================
-*/
-export const logoutHandlers = [
-  http.post(LOGOUT_API_URL, async ({ request }) => {
+  return isObject(body) && Object.keys(body).length > 0;
+}
 
-    /*
-    ================================
-    Authorizationチェック
-    ================================
-    */
-    const auth = request.headers.get('authorization');
+// ログアウトの API。トークンがあり、本文が空のときだけ成功する
+export function createLogoutHandlers(): Handler[] {
 
-    if (!auth) {
-      return HttpResponse.json(
-        {
-          error: 'unauthorized',
-        },
-        {
-          status: 401,
-        }
-      );
+  function logout(request: MockRequest): MockResponse {
+
+    if (!request.header('Authorization')) {
+      return { status: 401, body: { error: mockData.logout.unauthorizedError } };
     }
 
-    /*
-    ================================
-    bodyチェック（保険）
-    ================================
-    */
-    const body = await request.json().catch(() => null);
+    // JSON として読めない本文は、本文なしとみなす
+    let body: unknown;
 
-    if (body && Object.keys(body).length > 0) {
-      return HttpResponse.json(
-        {
-          error: 'invalid request',
-        },
-        {
-          status: 400,
-        }
-      );
+    try {
+      body = request.json();
+    } catch {
+      body = null;
     }
 
-    /*
-    ================================
-    成功レスポンス
-    ================================
-    */
-    return HttpResponse.json(
-      {
-        success: true,
-      },
-      {
-        status: 200,
-      }
-    );
-  }),
-];
+    if (isNonEmptyBody(body)) {
+      return { status: 400, body: { error: mockData.logout.invalidRequestError } };
+    }
+
+    return { status: 200, body: { success: true } };
+  }
+
+  return [{ method: 'POST', path: '/api/logout', resolver: logout }];
+}

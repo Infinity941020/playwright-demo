@@ -1,219 +1,64 @@
-import { http, HttpResponse } from 'msw';
+import { type Handler, type MockRequest, type MockResponse, hasValue, isObject, toNumber } from '../handlerTypes';
+import { mockData } from '../mockData';
 
-/*
-================================
-Cart型定義
-================================
-*/
-
-/*
-================================
-Cart Item型
-================================
-Cart保存データ
-================================
-*/
 type CartItem = {
   id: number;
-  productId: number;
-  quantity: number;
+  productId: unknown;
+  quantity: unknown;
 };
 
-/*
-================================
-Cart Request型
-================================
-Cart追加API request body
-================================
-*/
-type CartRequestBody = {
-  productId?: number;
-  quantity?: number;
-};
+// カートの API（一覧・追加・削除）。
+// カートの中身と id の連番は、この関数を呼ぶたびに新しく作る。サーバーはテストごとに新しく立てるため、状態はテストをまたがない
+export function createCartHandlers(): Handler[] {
 
-/*
-================================
-Mock DB
-================================
-Cart状態保持
-================================
-*/
-let cart: CartItem[] = [];
+  const cart: CartItem[] = [];
+  let nextId = 1;
 
-/*
-================================
-Mock ID採番
-================================
-MSW内で一意ID管理
-================================
-*/
-let currentCartId = 1;
+  function getCart(_request: MockRequest): MockResponse {
+    return { status: 200, body: { items: cart } };
+  }
 
-/*
-================================
-Cart API URL
-================================
-MSW intercept対象URL
-================================
-*/
-const CART_API_URL = 'http://localhost/api/cart';
+  function addCart(request: MockRequest): MockResponse {
 
-/*
-================================
-Cart Handlers
-================================
-MSW Cart API定義
-================================
-*/
-export const cartHandlers = [
+    const body = request.json();
 
-  /*
-  ================================
-  Cart一覧取得
-  ================================
-  */
-  http.get(CART_API_URL, async () => {
-
-    return HttpResponse.json(
-      {
-        items: cart,
-      },
-      {
-        status: 200,
-      }
-    );
-  }),
-
-  /*
-  ================================
-  Cart追加
-  ================================
-  */
-  http.post(CART_API_URL, async ({ request }) => {
-
-    /*
-    ================================
-    Request Body取得
-    ================================
-    */
-    const body = (await request.json()) as CartRequestBody | null;
-
-    /*
-    ================================
-    payload未指定
-    ================================
-    */
-    if (!body) {
-
-      return HttpResponse.json(
-        {
-          error: 'invalid payload',
-        },
-        {
-          status: 400,
-        }
-      );
+    if (body === null) {
+      return { status: 400, body: { error: mockData.cart.invalidPayloadError } };
     }
 
-    /*
-    ================================
-    productId未指定
-    ================================
-    */
-    if (!body.productId) {
-
-      return HttpResponse.json(
-        {
-          error: 'invalid payload',
-        },
-        {
-          status: 400,
-        }
-      );
+    // 0 も指定なしとみなす（specs/api_spec.md「判断できない挙動」）
+    if (!isObject(body) || !hasValue(body.productId)) {
+      return { status: 400, body: { error: mockData.cart.invalidPayloadError } };
     }
 
-    /*
-    ================================
-    Cart Item生成
-    ================================
-    */
     const item: CartItem = {
-
-      /*
-      ================================
-      Mock採番ID
-      ================================
-      */
-      id: currentCartId++,
-
-      /*
-      ================================
-      商品ID
-      ================================
-      */
+      id: nextId,
       productId: body.productId,
 
-      /*
-      ================================
-      quantity未指定時は1
-      ================================
-      */
-      quantity: body.quantity ?? 1,
+      // 指定されていないとき（null も含む）は 1 にする
+      quantity: body.quantity !== undefined && body.quantity !== null ? body.quantity : 1,
     };
 
-    /*
-    ================================
-    Mock DB保存
-    ================================
-    */
+    nextId += 1;
     cart.push(item);
 
-    /*
-    ================================
-    作成成功レスポンス
-    ================================
-    */
-    return HttpResponse.json(
-      item,
-      {
-        status: 201,
-      }
-    );
-  }),
+    return { status: 201, body: item };
+  }
 
-  /*
-  ================================
-  Cart削除
-  ================================
-  */
-  http.delete(`${CART_API_URL}/:id`, async ({ params }) => {
+  // 存在しない id でも 200 を返す（意図された仕様か不具合かを判断できない挙動。specs/api_spec.md）
+  function deleteCart(request: MockRequest): MockResponse {
 
-    /*
-    ================================
-    path parameter取得
-    ================================
-    */
-    const id = Number(params.id);
+    const cartId = toNumber(request.params.id);
+    const remaining = cart.filter((item) => item.id !== cartId);
 
-    /*
-    ================================
-    Cart削除
-    ================================
-    */
-    cart = cart.filter((item) => item.id !== id);
+    cart.splice(0, cart.length, ...remaining);
 
-    /*
-    ================================
-    削除成功
-    ================================
-    */
-    return HttpResponse.json(
-      {
-        success: true,
-      },
-      {
-        status: 200,
-      }
-    );
-  }),
-];
+    return { status: 200, body: { success: true } };
+  }
+
+  return [
+    { method: 'GET', path: '/api/cart', resolver: getCart },
+    { method: 'POST', path: '/api/cart', resolver: addCart },
+    { method: 'DELETE', path: '/api/cart/{id}', resolver: deleteCart },
+  ];
+}

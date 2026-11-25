@@ -3,7 +3,7 @@
 責務:
     - handlers/ 配下の各ハンドラーと server.py が共通で使う型を定義する
 
-TS版では MSW が提供する http.get／http.post／HttpResponse に相当する。
+TS版の mocks/handlerTypes.ts に対応する。
 """
 
 import json
@@ -28,7 +28,7 @@ class MockRequest:
     def json(self) -> Any:
         """本文を JSON として読む。本文が空のときは None を返す。
 
-        本文が JSON として読めないときは例外になる（server.py が 500 を返す）。
+        本文が JSON として読めないときは例外になる。例外を受け止めないハンドラー（Logout 以外）では、サーバー（server.py）が 500 を返す。
         """
         if not self.body:
             return None
@@ -50,7 +50,7 @@ class Handler:
 
 
 def to_number(value: str) -> float | None:
-    """パスの値を数値にする（TS版の Number(params.id) に相当。数値でなければ None）。"""
+    """パスの値を数値にする（数値でなければ None）。"""
     try:
         return float(value)
     except ValueError:

@@ -1,11 +1,7 @@
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
-/*
-================================
-Base URL（MSW統一）
-================================
-*/
-const BASE_URL = 'http://localhost/api';
+// パスだけを持つ。接続先（ホストとポート）は、テストごとに立てるモックのサーバーに合わせて、通信の部品が決める（fixtures/apiFixture.ts）
+const BASE_PATH = '/api';
 
 /*
 ================================
@@ -16,7 +12,7 @@ export function executeLoginApi(
   request: APIRequestContext,
   payload: Record<string, unknown>
 ): Promise<APIResponse> {
-  return request.post(`${BASE_URL}/login`, {
+  return request.post(`${BASE_PATH}/login`, {
     data: payload,
   });
 }
@@ -30,7 +26,7 @@ export function executeGetUserApi(
   request: APIRequestContext,
   userId: number
 ): Promise<APIResponse> {
-  return request.get(`${BASE_URL}/users/${userId}`);
+  return request.get(`${BASE_PATH}/users/${userId}`);
 }
 
 /*
@@ -42,7 +38,7 @@ export function executeAddCartApi(
   request: APIRequestContext,
   payload: Record<string, unknown>
 ): Promise<APIResponse> {
-  return request.post(`${BASE_URL}/cart`, {
+  return request.post(`${BASE_PATH}/cart`, {
     data: payload,
   });
 }
@@ -50,14 +46,14 @@ export function executeAddCartApi(
 export function executeGetCartApi(
   request: APIRequestContext
 ): Promise<APIResponse> {
-  return request.get(`${BASE_URL}/cart`);
+  return request.get(`${BASE_PATH}/cart`);
 }
 
 export function executeDeleteCartApi(
   request: APIRequestContext,
   cartId: number
 ): Promise<APIResponse> {
-  return request.delete(`${BASE_URL}/cart/${cartId}`);
+  return request.delete(`${BASE_PATH}/cart/${cartId}`);
 }
 
 /*
@@ -69,7 +65,7 @@ export function executeCheckoutApi(
   request: APIRequestContext,
   payload: Record<string, unknown>
 ): Promise<APIResponse> {
-  return request.post(`${BASE_URL}/checkout`, {
+  return request.post(`${BASE_PATH}/checkout`, {
     data: payload,
   });
 }
@@ -89,7 +85,7 @@ export function executeLogoutApi(
   request: APIRequestContext,
   payload: LogoutPayload = {}
 ): Promise<APIResponse> {
-  return request.post(`${BASE_URL}/logout`, {
+  return request.post(`${BASE_PATH}/logout`, {
     data: payload.body ?? {},
     headers: payload.token
       ? { Authorization: payload.token }
