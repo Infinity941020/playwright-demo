@@ -180,9 +180,16 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   data/apiUsers.ts の inputPatterns（missingPassword・missingEmail・emptyRequest・wrongPassword）。
   理由：どれも定義の外から使われていないため。
   消す前に名前で検索し、定義の外から使われていないことを確かめた。消した後にも検索し、0件であることを確かめた
-  （typescript/ の .ts、node_modules を除く。emptyRequest は Cart・Checkout にも同じ名前があるため、apiUsers の inputPatterns が使われていないことで確かめた）。
-  これまでの方針では、後で使う見込みのものは残していたが、今回消したものは、
-  Python版のテストにもテストケース（specs/api_testcases.md）にも対応するものがないため、3つ目のプルリクエストでも使わない。
+  （typescript/ の .ts、node_modules を除く。emptyRequest は Cart・Checkout にも同じ名前があるため、apiUsers の inputPatterns が使われていないことで確かめた。
+  UNAUTHORIZED は、logoutAssertions.ts の別の定義〈ログアウトの 401 の確認で使う。今回の対象ではない〉だけが出る）。
+  これまでの方針では、後で使う見込みのものは残していたが、今回消したものは、次の理由で3つ目のプルリクエストでも使わない。
+  ・ログインの入力の不足（missingPassword・missingEmail・emptyRequest）・ログインの 401（expectLoginUnauthorized）・ログアウトの reason：
+    Python版のテストにもテストケース（specs/api_testcases.md）にもない。
+  ・作成の返事に id があるかの汎用の確認（expectCreatedResource・expectResponseBody）：Python版は Cart の確認の部品の中で id を確かめている。
+    3つ目でも Cart の確認の部品として書くため、汎用の部品は使わない。
+  ・ユーザーの返事の型（UserData・SingleUserResponse）：Python版は値を直接確かめる形（論点6）のため使わない。
+  ・wrongPassword：TC-API-LOGIN-002 とメールアドレスの値が違う（wrongPassword は test@example.com、TC-API-LOGIN-002 は invalid@test.com）ため使えない。
+    3つ目で、TC-API-LOGIN-002 の値のデータを足す。
   型の変更：utils/apiHelper.ts の LogoutPayload の body の型を、{ reason?: string } から、
   呼び出す側（fixtures/apiFixture.ts）と同じ Record<string, unknown> に広げた。
   reason はどこからも使われておらず、ログアウトのモックも読んでいない。
