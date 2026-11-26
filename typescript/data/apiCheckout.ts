@@ -3,10 +3,10 @@
 // （モックは 0 を「値がない」とみなすため。specs/api_spec.md「判断できない挙動」）
 export const apiCheckout = {
 
-  // 正しい内容の購入（TC-API-CHECKOUT-001）
+  // 正しい内容で購入する値（TC-API-CHECKOUT-001）
   validCheckout: { cartId: 1, userId: 2, totalPrice: 3000 },
 
-  // 必須項目のどれかがない購入（TC-API-CHECKOUT-002〜004）
+  // 必須項目を1つずつ省いて送る値（TC-API-CHECKOUT-002〜004）
   inputPatterns: {
     missingCartId: { userId: 2, totalPrice: 3000 },
     missingUserId: { cartId: 1, totalPrice: 3000 },

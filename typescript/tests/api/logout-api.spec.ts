@@ -21,7 +21,6 @@ test.describe('Logout API', () => {
 
   test('TC-API-LOGOUT-002：トークンがないと、401 とエラーが返ること', async ({ api }) => {
 
-    // テストケースの操作のとおり、トークンも本文も渡さない
     const response = await api.logout();
 
     await expectLogoutUnauthorized(response, 'unauthorized');

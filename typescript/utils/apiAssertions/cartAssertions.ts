@@ -16,7 +16,7 @@ export async function expectAddCartSuccess(response: APIResponse, productId: num
 
   const body = await response.json();
 
-  expect(Number.isInteger(body.id)).toBe(true);
+  expect(Number.isInteger(body.id), `id が整数であること（実際の値：${JSON.stringify(body.id)}）`).toBe(true);
   expect(body.productId).toBe(productId);
   expect(body.quantity).toBe(quantity);
 }

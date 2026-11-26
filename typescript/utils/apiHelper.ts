@@ -1,8 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 // API ごとにリクエストを送る。
-// - パスだけを持つ。接続先（ホストとポート）は、テストごとに立てるモックのサーバーに合わせて、通信の部品が決める（fixtures/apiFixture.ts）
-// - 本文に null を渡すと、本文なしで送る（本文がないときの返事を確かめるため）
+// パスだけを持つ。接続先（ホストとポート）は、テストごとに立てるモックのサーバーに合わせて、通信の部品が決める（fixtures/apiFixture.ts）
 const BASE_PATH = '/api';
 
 export type ApiPayload = Record<string, unknown>;
@@ -16,6 +15,7 @@ export function executeGetUserApi(request: APIRequestContext, userId: number): P
   return request.get(`${BASE_PATH}/users/${userId}`);
 }
 
+// 本文に null を渡すと、本文なしで送る（本文がないときの返事を確かめるため）
 export function executeAddCartApi(request: APIRequestContext, payload: ApiPayload | null): Promise<APIResponse> {
   return request.post(`${BASE_PATH}/cart`, { data: payload ?? undefined });
 }
@@ -28,6 +28,7 @@ export function executeDeleteCartApi(request: APIRequestContext, cartId: number)
   return request.delete(`${BASE_PATH}/cart/${cartId}`);
 }
 
+// 本文に null を渡すと、本文なしで送る（本文がないときの返事を確かめるため）
 export function executeCheckoutApi(request: APIRequestContext, payload: ApiPayload | null): Promise<APIResponse> {
   return request.post(`${BASE_PATH}/checkout`, { data: payload ?? undefined });
 }

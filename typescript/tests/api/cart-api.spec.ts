@@ -65,7 +65,7 @@ test.describe('Cart API', () => {
 
     const response = await api.cart.get();
 
-    // ほかのテストで追加した行が含まれないことも、行の数で確かめる
+    // 追加していない行が混ざらないことも、行の数で確かめる
     await expectGetCartListSuccess(response, items);
   });
 

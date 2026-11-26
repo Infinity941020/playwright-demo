@@ -3,10 +3,10 @@
 // （モックは 0 を「値がない」とみなすため。specs/api_spec.md「判断できない挙動」）
 export const apiCarts = {
 
-  // 正しい内容の追加（TC-API-CART-001）
+  // 正しい内容で追加する値（TC-API-CART-001）
   validCart: { productId: 4, quantity: 2 },
 
-  // 入力の組み合わせを変える追加（TC-API-CART-002・004）
+  // 項目を省いて送る値（TC-API-CART-002・004）
   inputPatterns: {
     missingProductId: { quantity: 1 },
     missingQuantity: { productId: 4 },

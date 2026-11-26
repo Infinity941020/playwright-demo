@@ -25,7 +25,6 @@ type ApiFixture = {
 
   apiRequestContext: APIRequestContext;
 
-  // 本文に null を渡すと、本文なしで送る
   api: {
     login: (payload: ApiPayload) => Promise<APIResponse>;
 
@@ -34,12 +33,14 @@ type ApiFixture = {
     };
 
     cart: {
+      // 本文に null を渡すと、本文なしで送る
       add: (payload: ApiPayload | null) => Promise<APIResponse>;
       get: () => Promise<APIResponse>;
       delete: (cartId: number) => Promise<APIResponse>;
     };
 
     checkout: {
+      // 本文に null を渡すと、本文なしで送る
       create: (payload: ApiPayload | null) => Promise<APIResponse>;
     };
 
@@ -97,5 +98,3 @@ export const test = base.extend<ApiFixture>({
     });
   },
 });
-
-export { expect } from '@playwright/test';
