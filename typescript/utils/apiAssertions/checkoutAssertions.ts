@@ -21,7 +21,10 @@ export async function expectCheckoutSuccess(
   const body = await response.json();
 
   expect(body.success).toBe(true);
-  expect(Number.isInteger(body.checkoutId), `checkoutId が整数であること（実際の値：${JSON.stringify(body.checkoutId)}）`).toBe(true);
+  expect(
+    Number.isInteger(body.checkoutId),
+    `checkoutId が整数であること（実際の値：${JSON.stringify(body.checkoutId)}）`,
+  ).toBe(true);
   expect(body.cartId).toBe(cartId);
   expect(body.userId).toBe(userId);
   expect(body.totalPrice).toBe(totalPrice);

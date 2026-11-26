@@ -1,7 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 // API ごとにリクエストを送る。
-// パスだけを持つ。接続先（ホストとポート）は、テストごとに立てるモックのサーバーに合わせて、通信の部品が決める（fixtures/apiFixture.ts）
+// この部品はパスだけを持ち、接続先（ホストとポート）は、テストごとに立てるモックのサーバーに合わせて、通信の部品が決める（fixtures/apiFixture.ts）
 const BASE_PATH = '/api';
 
 export type ApiPayload = Record<string, unknown>;
