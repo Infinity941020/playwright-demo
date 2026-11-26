@@ -1,81 +1,41 @@
-/*
-================================
-Checkout API Assertions（MSW統一版）
-================================
-*/
-
 import { APIResponse, expect } from '@playwright/test';
-
-// 共通
-// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
-/*
-================================
-HTTP Status
-================================
-*/
+// Checkout の API の返事を確かめる
+
 const STATUS = {
-  OK: 201,
+  CREATED: 201,
   BAD_REQUEST: 400,
 } as const;
 
-/*
-================================
-① Checkout成功
-================================
-*/
+// 購入できたこと（201、success が true、checkoutId が整数、送った値が返る）
 export async function expectCheckoutSuccess(
-  response: APIResponse
-): Promise<void> {
+  response: APIResponse,
+  cartId: number,
+  userId: number,
+  totalPrice: number,
+) {
 
-  expectStatus(response, STATUS.OK);
+  expectStatus(response, STATUS.CREATED);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-
-  /*
-  ================================
-  成功レスポンス必須項目
-  ================================
-  */
-  expect(body.checkoutId).toBeDefined();
-  expect(body.cartId).toBeDefined();
-  expect(body.userId).toBeDefined();
-  expect(body.totalPrice).toBeDefined();
-
-  /*
-  ================================
-  型保証（最低限）
-  ================================
-  */
-  expect(typeof body.checkoutId).toBe('number');
-  expect(typeof body.cartId).toBe('number');
-  expect(typeof body.userId).toBe('number');
-  expect(typeof body.totalPrice).toBe('number');
+  expect(body.success).toBe(true);
+  expect(
+    Number.isInteger(body.checkoutId),
+    `checkoutId が整数であること（実際の値：${JSON.stringify(body.checkoutId)}）`,
+  ).toBe(true);
+  expect(body.cartId).toBe(cartId);
+  expect(body.userId).toBe(userId);
+  expect(body.totalPrice).toBe(totalPrice);
 }
 
-/*
-================================
-② Checkout失敗（不正リクエスト）
-================================
-*/
-export async function expectCheckoutBadRequest(
-  response: APIResponse
-): Promise<void> {
+// 購入できなかったこと（400、エラーの文言が期待値と同じ）
+export async function expectCheckoutBadRequest(response: APIResponse, error: string) {
 
   expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-  expect(body.error).toBeDefined();
-
-  /*
-  ================================
-  エラー形式統一（MSW仕様）
-  ================================
-  */
-  expect(typeof body.error).toBe('string');
+  expect(body.error).toBe(error);
 }

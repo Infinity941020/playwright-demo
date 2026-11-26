@@ -1,61 +1,21 @@
-/*
-================================
-Login APIテスト（ReqRes）
-================================
-*/
-
+// Login の API のテスト
 import { test } from '../../fixtures/apiFixture';
-
-// API Logger
-import { logApiResponse } from '../../utils/apiLogger';
-
-// テストデータ
+import { expectLoginBadRequest, expectLoginSuccess } from '../../utils/apiAssertions/loginAssertions';
 import { apiUsers } from '../../data/apiUsers';
 
-// Assertions（ReqRes版）
-import {
-  expectLoginSuccess,
-  expectLoginBadRequest
-} from '../../utils/apiAssertions/loginAssertions';
+test.describe('Login API', () => {
 
-/*
-================================
-Login APIテスト
-================================
-*/
-test.describe('Login APIテスト（ReqRes）', () => {
+  test('TC-API-LOGIN-001：正しい認証情報でログインすると、トークンが返ること', async ({ api }) => {
 
-  /*
-  =================================
-  正常系：ログイン成功
-  =================================
-  */
-  test('ログイン成功', async ({ api }) => {
+    const response = await api.login(apiUsers.validUser);
 
-    const response = await api.login(
-      apiUsers.validUser
-    );
-
-    await logApiResponse(response);
-
-    await expectLoginSuccess(response);
+    await expectLoginSuccess(response, 'mock-token');
   });
 
-  /*
-  =================================
-  異常系：ログイン失敗
-  =================================
-  */
-  test('ログイン失敗（不正認証）', async ({ api }) => {
+  test('TC-API-LOGIN-002：誤った認証情報でログインすると、400 とエラーが返ること', async ({ api }) => {
 
-    const response = await api.login({
-      email: 'invalid@test.com',
-      password: 'wrong-password'
-    });
+    const response = await api.login(apiUsers.invalidUser);
 
-    await logApiResponse(response);
-
-    await expectLoginBadRequest(response);
+    await expectLoginBadRequest(response, 'user not found');
   });
-
 });

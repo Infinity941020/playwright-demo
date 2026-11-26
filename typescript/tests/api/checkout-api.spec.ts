@@ -1,108 +1,53 @@
-/*
-================================
-Checkout APIテスト（MSW）
-================================
-*/
-
+// Checkout の API のテスト
 import { test } from '../../fixtures/apiFixture';
-
-// テストデータ
+import { expectCheckoutBadRequest, expectCheckoutSuccess } from '../../utils/apiAssertions/checkoutAssertions';
 import { apiCheckout } from '../../data/apiCheckout';
 
-// API Logger
-import { logApiResponse } from '../../utils/apiLogger';
+// エラーの文言は、specs/api_spec.md「Checkout API」の表と同じにする
+const INVALID_PAYLOAD_MESSAGE = 'invalid payload';
 
-// Assertions
-import {
-  expectCheckoutSuccess,
-  expectCheckoutBadRequest,
-} from '../../utils/apiAssertions/checkoutAssertions';
+test.describe('Checkout API', () => {
 
-/*
-================================
-Checkout APIテスト
-================================
-*/
-test.describe('Checkout APIテスト', () => {
+  test('TC-API-CHECKOUT-001：正しい内容で購入すると、送った内容が返ること', async ({ api }) => {
 
-  /*
-  ================================
-  ① Checkout成功
-  ================================
-  */
-  test('Checkoutが成功すること', async ({ api }) => {
+    const payload = apiCheckout.validCheckout;
 
-    const response = await api.checkout.create(
-      apiCheckout.validCheckout
-    );
+    const response = await api.checkout.create(payload);
 
-    await logApiResponse(response);
-
-    await expectCheckoutSuccess(response);
+    await expectCheckoutSuccess(response, payload.cartId, payload.userId, payload.totalPrice);
   });
 
-  /*
-  ================================
-  ② cartId未指定
-  ================================
-  */
-  test('cartId未指定パターン', async ({ api }) => {
+  // 送る本文だけを切り替えて、同じ確かめ方をする（null は本文なしで送る）
+  const badRequestCases = [
+    {
+      id: 'TC-API-CHECKOUT-002',
+      title: 'cartId がないと、400 とエラーが返ること',
+      payload: apiCheckout.inputPatterns.missingCartId,
+    },
+    {
+      id: 'TC-API-CHECKOUT-003',
+      title: 'userId がないと、400 とエラーが返ること',
+      payload: apiCheckout.inputPatterns.missingUserId,
+    },
+    {
+      id: 'TC-API-CHECKOUT-004',
+      title: 'totalPrice がないと、400 とエラーが返ること',
+      payload: apiCheckout.inputPatterns.missingTotalPrice,
+    },
+    {
+      id: 'TC-API-CHECKOUT-005',
+      title: 'リクエストの本文がないと、400 とエラーが返ること',
+      payload: null,
+    },
+  ];
 
-    const response = await api.checkout.create(
-      apiCheckout.inputPatterns.missingCartId
-    );
+  for (const badRequestCase of badRequestCases) {
 
-    await logApiResponse(response);
+    test(`${badRequestCase.id}：${badRequestCase.title}`, async ({ api }) => {
 
-    await expectCheckoutBadRequest(response);
-  });
+      const response = await api.checkout.create(badRequestCase.payload);
 
-  /*
-  ================================
-  ③ userId未指定
-  ================================
-  */
-  test('userId未指定パターン', async ({ api }) => {
-
-    const response = await api.checkout.create(
-      apiCheckout.inputPatterns.missingUserId
-    );
-
-    await logApiResponse(response);
-
-    await expectCheckoutBadRequest(response);
-  });
-
-  /*
-  ================================
-  ④ totalPrice未指定
-  ================================
-  */
-  test('totalPrice未指定パターン', async ({ api }) => {
-
-    const response = await api.checkout.create(
-      apiCheckout.inputPatterns.missingTotalPrice
-    );
-
-    await logApiResponse(response);
-
-    await expectCheckoutBadRequest(response);
-  });
-
-  /*
-  ================================
-  ⑤ 空リクエスト
-  ================================
-  */
-  test('空リクエストパターン', async ({ api }) => {
-
-    const response = await api.checkout.create(
-      apiCheckout.inputPatterns.emptyRequest
-    );
-
-    await logApiResponse(response);
-
-    await expectCheckoutBadRequest(response);
-  });
-
+      await expectCheckoutBadRequest(response, INVALID_PAYLOAD_MESSAGE);
+    });
+  }
 });

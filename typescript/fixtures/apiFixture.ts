@@ -3,6 +3,8 @@ import { APIRequestContext, APIResponse, test as base } from '@playwright/test';
 import { MockServer } from '../mocks/server';
 
 import {
+  ApiPayload,
+  LogoutPayload,
   executeLoginApi,
   executeGetUserApi,
   executeAddCartApi,
@@ -24,26 +26,25 @@ type ApiFixture = {
   apiRequestContext: APIRequestContext;
 
   api: {
-    login: (payload: Record<string, unknown>) => Promise<APIResponse>;
+    login: (payload: ApiPayload) => Promise<APIResponse>;
 
     user: {
       get: (userId: number) => Promise<APIResponse>;
     };
 
     cart: {
-      add: (payload: Record<string, unknown>) => Promise<APIResponse>;
+      // 本文に null を渡すと、本文なしで送る
+      add: (payload: ApiPayload | null) => Promise<APIResponse>;
       get: () => Promise<APIResponse>;
       delete: (cartId: number) => Promise<APIResponse>;
     };
 
     checkout: {
-      create: (payload: Record<string, unknown>) => Promise<APIResponse>;
+      // 本文に null を渡すと、本文なしで送る
+      create: (payload: ApiPayload | null) => Promise<APIResponse>;
     };
 
-    logout: (payload?: {
-      body?: Record<string, unknown>;
-      token?: string;
-    }) => Promise<APIResponse>;
+    logout: (payload?: LogoutPayload) => Promise<APIResponse>;
   };
 };
 
@@ -76,43 +77,24 @@ export const test = base.extend<ApiFixture>({
 
   api: async ({ apiRequestContext }, use) => {
 
-    const apiClient = {
-      login: (payload: Record<string, unknown>) =>
-        executeLoginApi(apiRequestContext, payload),
+    await use({
+      login: (payload) => executeLoginApi(apiRequestContext, payload),
 
       user: {
-        get: (userId: number) =>
-          executeGetUserApi(apiRequestContext, userId),
+        get: (userId) => executeGetUserApi(apiRequestContext, userId),
       },
 
       cart: {
-        add: (payload: Record<string, unknown>) =>
-          executeAddCartApi(apiRequestContext, payload),
-
-        get: () =>
-          executeGetCartApi(apiRequestContext),
-
-        delete: (cartId: number) =>
-          executeDeleteCartApi(apiRequestContext, cartId),
+        add: (payload) => executeAddCartApi(apiRequestContext, payload),
+        get: () => executeGetCartApi(apiRequestContext),
+        delete: (cartId) => executeDeleteCartApi(apiRequestContext, cartId),
       },
 
       checkout: {
-        create: (payload: Record<string, unknown>) =>
-          executeCheckoutApi(apiRequestContext, payload),
+        create: (payload) => executeCheckoutApi(apiRequestContext, payload),
       },
 
-      logout: (payload?: {
-        body?: Record<string, unknown>;
-        token?: string;
-      }) =>
-        executeLogoutApi(apiRequestContext, {
-          body: payload?.body ?? {},
-          token: payload?.token,
-        }),
-    };
-
-    await use(apiClient);
+      logout: (payload) => executeLogoutApi(apiRequestContext, payload),
+    });
   },
 });
-
-export { expect } from '@playwright/test';

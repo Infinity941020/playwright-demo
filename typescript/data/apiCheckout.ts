@@ -1,57 +1,15 @@
-/*
-================================
-APIテスト用Checkoutデータ
-（JSONPlaceholder対応）
-================================
-*/
-
+// Checkout の API のテストで送る値。
+// 値は specs/api_testcases.md の操作の値と同じにする。値に 0 を使わない
+// （モックは 0 を「値がない」とみなすため。specs/api_spec.md「判断できない挙動」）
 export const apiCheckout = {
 
-  /*
-  =================================
-  正常系Checkout
-  =================================
-  */
-  validCheckout: {
-    cartId: 1,
-    userId: 1,
-    totalPrice: 5000
-  },
+  // 正しい内容で購入する値（TC-API-CHECKOUT-001）
+  validCheckout: { cartId: 1, userId: 2, totalPrice: 3000 },
 
-  /*
-  =================================
-  入力パターン検証用
-  =================================
-  */
+  // 必須項目を1つずつ省いて送る値（TC-API-CHECKOUT-002〜004）
   inputPatterns: {
-
-    /*
-    cartId未入力
-    */
-    missingCartId: {
-      userId: 1,
-      totalPrice: 5000
-    },
-
-    /*
-    userId未入力
-    */
-    missingUserId: {
-      cartId: 1,
-      totalPrice: 5000
-    },
-
-    /*
-    totalPrice未入力
-    */
-    missingTotalPrice: {
-      cartId: 1,
-      userId: 1
-    },
-
-    /*
-    空リクエスト
-    */
-    emptyRequest: {}
-  }
-};
+    missingCartId: { userId: 2, totalPrice: 3000 },
+    missingUserId: { cartId: 1, totalPrice: 3000 },
+    missingTotalPrice: { cartId: 1, userId: 2 },
+  },
+} as const;

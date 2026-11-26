@@ -1,61 +1,29 @@
-/*
-================================
-User APIテスト（ReqRes + MSW）
-================================
-*/
-
+// User の API のテスト
 import { test } from '../../fixtures/apiFixture';
+import { expectSingleUserResponse, expectUserNotFound } from '../../utils/apiAssertions/userAssertions';
 
-// API Logger
-import { logApiResponse } from '../../utils/apiLogger';
+// 値は specs/api_spec.md「User API」の表と同じにする
+const EXPECTED_USER = {
+  id: 2,
+  email: 'janet.weaver@reqres.in',
+  first_name: 'Janet',
+  last_name: 'Weaver',
+  avatar: 'https://reqres.in/img/faces/2-image.jpg',
+};
 
-/*
-================================
-User Assertions
-================================
-*/
-import {
-  expectSingleUserResponse,
-  expectUserNotFoundPattern
-} from '../../utils/apiAssertions/userAssertions';
+test.describe('User API', () => {
 
-/*
-================================
-User APIテスト
-================================
-*/
-test.describe('User APIテスト', () => {
+  test('TC-API-USER-001：存在するユーザーの情報が返ること', async ({ api }) => {
 
-  /*
-  =================================
-  正常系：ユーザー取得成功
-  =================================
-  */
-  test('単一ユーザー情報を取得できること', async ({ api }) => {
+    const response = await api.user.get(2);
 
-    const response = await api.user.get(
-      2
-    );
-
-    await logApiResponse(response);
-
-    await expectSingleUserResponse(response);
+    await expectSingleUserResponse(response, EXPECTED_USER);
   });
 
-  /*
-  =================================
-  異常系：存在しないユーザー
-  =================================
-  */
-  test('存在しないユーザーID', async ({ api }) => {
+  test('TC-API-USER-002：存在しないユーザーで 404 が返ること', async ({ api }) => {
 
-    const response = await api.user.get(
-      9999
-    );
+    const response = await api.user.get(9999);
 
-    await logApiResponse(response);
-
-    await expectUserNotFoundPattern(response);
+    await expectUserNotFound(response);
   });
-
 });

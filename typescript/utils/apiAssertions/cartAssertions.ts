@@ -1,101 +1,64 @@
-/*
-================================
-Cart API Assertions（MSW安定版）
-================================
-*/
-
 import { APIResponse, expect } from '@playwright/test';
-
-// 共通
-// HTTPステータス検証共通ロジック
 import { expectStatus } from './commonAssertions';
 
-/*
-================================
-HTTP Status
-================================
-*/
+// Cart の API の返事を確かめる
+
 const STATUS = {
   OK: 200,
   CREATED: 201,
   BAD_REQUEST: 400,
 } as const;
 
-/*
-================================
-① Cart一覧取得成功
-================================
-*/
-export async function expectGetCartListSuccess(
-  response: APIResponse
-): Promise<void> {
-
-  expectStatus(response, STATUS.OK);
-
-  const body = await response.json();
-
-  expect(body).toBeDefined();
-  expect(Array.isArray(body.items)).toBe(true);
-}
-
-/*
-================================
-② Cart追加成功
-================================
-*/
-export async function expectAddCartSuccess(
-  response: APIResponse
-): Promise<void> {
+// カートに追加できたこと（201、id が整数、productId・quantity が期待値と同じ）
+export async function expectAddCartSuccess(response: APIResponse, productId: number, quantity: number) {
 
   expectStatus(response, STATUS.CREATED);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-  expect(body.id).toBeDefined();
-  expect(body.productId).toBeDefined();
-
-  expect(typeof body.productId).toBe('number');
-
-  // MSW仕様：quantityは必ず1以上
-  expect(body.quantity).toBeGreaterThan(0);
+  expect(Number.isInteger(body.id), `id が整数であること（実際の値：${JSON.stringify(body.id)}）`).toBe(true);
+  expect(body.productId).toBe(productId);
+  expect(body.quantity).toBe(quantity);
 }
 
-/*
-================================
-③ Cart追加エラー（不正リクエスト）
-================================
-*/
-export async function expectCartBadRequest(
-  response: APIResponse
-): Promise<void> {
+// カートに追加できなかったこと（400、エラーの文言が期待値と同じ）
+export async function expectCartBadRequest(response: APIResponse, error: string) {
 
   expectStatus(response, STATUS.BAD_REQUEST);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-  expect(body.error).toBeDefined();
-
-  // errorは構造のみ保証（内容固定しない）
-  expect(typeof body.error).toBe('string');
+  expect(body.error).toBe(error);
 }
 
-/*
-================================
-④ Cart削除成功
-================================
-*/
-export async function expectDeleteCartSuccess(
-  response: APIResponse
-): Promise<void> {
+// カートの一覧を取得できたこと（200、行の数と、各行の指定した項目の値が期待値と同じ）。
+// 期待値の各行には、確かめたい項目だけを書く（例：{ productId: 1 }）。行は追加した順に並ぶ
+export async function expectGetCartListSuccess(
+  response: APIResponse,
+  expectedItems: readonly Record<string, unknown>[],
+) {
+
+  expectStatus(response, STATUS.OK);
+
+  const body = await response.json();
+  const items: Record<string, unknown>[] = body.items;
+
+  expect(items).toHaveLength(expectedItems.length);
+
+  expectedItems.forEach((expected, index) => {
+
+    const actual = Object.fromEntries(Object.keys(expected).map((key) => [key, items[index][key]]));
+
+    expect(actual).toEqual(expected);
+  });
+}
+
+// カートから削除できたこと（200、success が true）
+export async function expectDeleteCartSuccess(response: APIResponse) {
 
   expectStatus(response, STATUS.OK);
 
   const body = await response.json();
 
-  expect(body).toBeDefined();
-
-  // MSW仕様：削除は成功フラグのみ保証
   expect(body.success).toBe(true);
 }
