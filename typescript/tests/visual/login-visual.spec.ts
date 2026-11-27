@@ -1,4 +1,4 @@
-// Login画面の見た目の比較のテスト
+// Login画面の見た目を、基準画像と比べるテスト
 import { test } from '@playwright/test';
 import { LoginFlow } from '../../flows/LoginFlow';
 import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';

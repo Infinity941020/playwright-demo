@@ -1,4 +1,4 @@
-// Products画面の見た目の比較のテスト
+// Products画面の見た目を、基準画像と比べるテスト
 import { test } from '../../fixtures/loginFixture';
 import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';
 

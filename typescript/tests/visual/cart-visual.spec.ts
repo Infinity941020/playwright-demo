@@ -1,4 +1,4 @@
-// Cart画面の見た目の比較のテスト
+// Cart画面の見た目を、基準画像と比べるテスト
 import { test } from '../../fixtures/loginFixture';
 import { CartFlow } from '../../flows/CartFlow';
 import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';

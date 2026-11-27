@@ -24,19 +24,25 @@
 
 | 項目 | 内容 |
 |---|---|
-| 画面の大きさ | 1280×720（撮影前に、この大きさであることを確認する） |
+| 画面の大きさ | 1280×720（両版とも、撮影前にこの大きさであることを確認する。TS版は設定〈playwright.config.ts〉の大きさと比べる） |
 | 画素の密度（deviceScaleFactor） | 1（TS版は playwright.config.ts で指定、Python版は初期値） |
 | アニメーション | 止める（animations="disabled"） |
 | 入力欄のカーソル | 隠す（caret="hide"） |
-| 撮影前の待ち | ① 画面の表示確認（前提を作る Flow の中で行う）② フォントの読み込み完了 ③ 画面内のすべての画像の読み込み完了。固定の時間の待ちは使わない（両版とも、比べる部品〈TS版は utils/visualAssertions/、Python版は utils/visual_assertions/〉の中で待つ） |
+| 撮影前の待ち | ① 画面の表示確認（前提を作る Flow の中で行う）② フォントの読み込み完了 ③ ページの中の画像の要素の読み込み完了（背景として描く絵は含まず、画面の外にある画像の要素は含む）。固定の時間の待ちは使わない（両版とも、比べる部品〈TS版は utils/visualAssertions/、Python版は utils/visual_assertions/〉の中で待つ） |
 
 「何が終わるのを待つか」を明確にし、固定の時間の待ちは使わない。不安定になった場合は待ち方を見直す。
+TS版は、これに加えて、比べる機能（toHaveScreenshot）が、続けて撮った2枚が同じになるまで撮り直してから比べる。
 
 ---
 
-## ■ 比較の方法（Python版）
+## ■ 比較の方法
 
-TS版は toHaveScreenshot の比べ方（既定のしきい値 0.2）で、違う画素の割合の上限（maxDiffPixelRatio）に下の許容値を渡す。
+### TS版
+
+Playwright 標準の toHaveScreenshot で比べる（Playwright の既定の比較のしきい値 0.2）。違う画素の割合の上限（maxDiffPixelRatio）に、下の許容値を渡す。
+比べる処理と、失敗したときの画像の保存は、Playwright に任せる。
+
+### Python版
 
 1. 基準画像と今の画像の大きさが違う場合は、失敗とする
 2. 1画素ごとに、赤・緑・青のそれぞれの差を求め、そのうち最も大きい差が 51（255 × 0.2）を超えた画素を「違う画素」とする
@@ -61,7 +67,14 @@ TS版は toHaveScreenshot の比べ方（既定のしきい値 0.2）で、違�
 
 ## ■ 失敗したときに保存するもの
 
-python/test-results/visual/ に保存する（CI では Artifact として7日間ダウンロードできる）。
+### TS版
+
+typescript/test-results/ の下に、テストごとのフォルダを作って保存する（ファイルの名前と中身は Playwright が決める）。
+CI では Artifact（visual-artifacts）として7日間ダウンロードできる。
+
+### Python版
+
+python/test-results/visual/ に保存する（CI では Artifact〈python-visual-artifacts〉として7日間ダウンロードできる）。
 
 | 場合 | 保存するファイル |
 |---|---|
@@ -103,7 +116,9 @@ TS版：
 
 Python版は、手元（Windows など）で実行すると、基準画像（Linux で撮影）との描画の違いで失敗する場合がある。
 手元での実行は、画面の様子を調べたいときに限る。
-TS版は、手元でも、toHaveScreenshot の比べ方では基準画像との違いが許容値の中に収まるため、普段の実行に含めている。
+TS版は、手元（Windows）で確かめた範囲では許容値の中に収まったため、普段の実行に含めている。
+環境によって失敗する場合は、Python版と同じく除外を検討する。
+TS版は、基準画像がないと、手元で撮った画像がその場所に作られる。コミットしないこと。
 
 ---
 

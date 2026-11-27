@@ -652,13 +652,15 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
   手元での扱い・待ち方・前提状態の作り方は「検討」（TS版への横展開のときに判断する）
 - 決定日: 2026-11-16
 - 追記（2026-11-27）: 上の「検討」の3つを、横展開4-2 で次のように閉じた（方針は 2026-11-26 に決めたもの）。
-  ・待ち方：TS版も固定の待ち（300ミリ秒）と networkidle をやめ、Python版と同じく「Flow で画面を確かめる → フォントの読み込み → 画面内のすべての画像の読み込み」を待ってから撮る。
-    待つ処理と、撮る前の画面の大きさの確かめは、Python版の screenshot_assertions.py と1対1の確認の部品（typescript/utils/visualAssertions/screenshotAssertions.ts）にまとめた
+  ・待ち方：TS版も固定の待ち（300ミリ秒）と networkidle をやめ、Python版と同じく「前提を作る部品で画面を確かめる → フォントの読み込み →
+    ページの中の画像の要素の読み込み（背景として描く絵は含まない）」を待ってから撮る。
+    待ち方と撮る前の確かめ（画面の大きさ）を、Python版と同じ順で行う部品（typescript/utils/visualAssertions/screenshotAssertions.ts）にまとめた
+    （比べる処理と失敗したときの画像の保存は、Playwright に任せる。Playwright の比べる機能は、続けて撮った2枚が同じになるまで撮り直してから比べる）
   ・前提状態の作り方：TS版も、画面からログインせず、保存したログイン状態（ログイン済みの画面の部品）と、UI のテストと同じ近道の部品
     （CartFlow.openCartWith、CheckoutFlow.openStepOneWith・openStepTwoWith・openCompleteWith）で作る。Login は、LoginFlow に足した
     「ログイン画面を開いて表示を確かめる」部品で開く。購入者情報は両版共通のデータを使う
-  ・手元での扱い：TS版は変えず、普段の実行（npx playwright test）に含めたままにした。手元（Windows）でも、TS版の比べ方では
-    基準画像との違いが許容値の中に収まり、通るため（Python版は手元では除外したまま）
+  ・手元での扱い：TS版は変えず、普段の実行（npx playwright test）に含めたままにした。手元（Windows）で確かめた範囲では許容値の中に収まったため
+    （Python版は手元では除外したまま）。環境によって失敗する場合は、Python版と同じく除外を検討する
   基準画像は変えていない。手元で、書き直す前と後のテストが撮った画像を Python版の比べ方で比べ、6枚とも違う画素が0であることを確かめた。
   基準画像の撮り直しと両版の共通化は、横展開4-3 で Playwright の版を両版でそろえるときに行う
 

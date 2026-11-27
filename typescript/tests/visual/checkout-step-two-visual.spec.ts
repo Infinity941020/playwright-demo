@@ -1,4 +1,4 @@
-// Checkout Step Two画面の見た目の比較のテスト
+// Checkout Step Two画面の見た目を、基準画像と比べるテスト
 import { test } from '../../fixtures/loginFixture';
 import { CheckoutFlow } from '../../flows/CheckoutFlow';
 import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';
