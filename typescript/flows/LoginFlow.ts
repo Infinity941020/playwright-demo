@@ -17,6 +17,13 @@ export class LoginFlow {
     this.inventoryPage = new InventoryPage(page);
   }
 
+  // ログイン画面を開いて、表示を確かめる（ログインはしない）。ログイン画面そのものを確かめるテストの前提に使う
+  async openLoginPage() {
+
+    await this.loginPage.goto();
+    await this.loginPage.expectOnPage();
+  }
+
   async login(username: string, password: string) {
 
     await this.loginPage.goto();

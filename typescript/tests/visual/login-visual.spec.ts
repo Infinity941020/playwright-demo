@@ -1,40 +1,15 @@
-import { test, expect } from '@playwright/test';
+// Login画面の見た目の比較のテスト
+import { test } from '@playwright/test';
+import { LoginFlow } from '../../flows/LoginFlow';
+import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';
 
-/*
-========================================
-Visual Regression Test
-ログイン画面の表示崩れ検知
-========================================
-*/
+test.describe('Login画面の見た目', () => {
 
-test('visual: login page', async ({ page }) => {
+  // ログイン状態を引き継がないよう、ログイン済みの画面ではなく、ログインしていない画面を使う
+  test('TC-VIS-001：Login画面の見た目が、基準画像と一致すること', async ({ page }) => {
 
-  // ================================
-  // ■ viewport固定（Aルート統一）
-  // ================================
-  await page.setViewportSize({ width: 1280, height: 720 });
+    await new LoginFlow(page).openLoginPage();
 
-  // ================================
-  // ■ 画面表示
-  // ================================
-  await page.goto('https://www.saucedemo.com/');
-
-  // ================================
-  // ■ 画面安定待ち（重要）
-  // ================================
-  await page.waitForLoadState('networkidle');
-
-  // フォント読み込み待ち（A統一）
-  await page.evaluate(() => document.fonts?.ready);
-
-  // 念のためUI安定待ち（揺れ防止）
-  await page.waitForTimeout(300);
-
-  // ================================
-  // ■ Visual Regression検証
-  // ================================
-  await expect(page).toHaveScreenshot('login-page.png', {
-    animations: 'disabled',
-    maxDiffPixelRatio: 0.01
+    await expectScreenshotMatches(page, 'login-page.png', 0.01);
   });
 });
