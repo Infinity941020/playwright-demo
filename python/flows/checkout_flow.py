@@ -31,7 +31,7 @@ class CheckoutFlow:
     def open_step_one_with(self, products: list[dict]) -> None:
         """指定した商品がカートに入った状態で、Checkout Step One画面をURLで直接開く。
 
-        カートの中身はブラウザの保存領域への直接書き込みで作る（Products画面の不具合で、このテストまで失敗しないようにするため）。
+        カートの中身はブラウザの保存領域への直接書き込みで作る（Products画面の不具合で、Checkout画面のテストまで失敗しないようにするため）。
         Step One画面は URL で開く（Cart画面からの遷移は、Cart画面のテストで確かめているため）。
         商品は data/products.py の PRODUCTS の要素を渡す。
         """
