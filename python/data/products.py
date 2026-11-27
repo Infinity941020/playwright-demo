@@ -1,6 +1,6 @@
 """商品情報（Products画面）
 
-値は両版共通の shared/data/products.json に置いている（両版で同じ値を使うため）。
+値は両版共通の shared/data/products.json に置いている。
 """
 
 from data.shared_data import load_shared_data

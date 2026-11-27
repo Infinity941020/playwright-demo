@@ -16,7 +16,7 @@
 | 基準画像 | CI（GitHub Actions の Linux）で撮影したものだけを使う |
 | 基準画像の置き場所 | typescript/tests/visual/__snapshots__/ と python/tests/visual/__snapshots__/（ファイル名は両版で同じ。ファイルは版ごとに持つ） |
 
-比べる仕組みの違い：Python版の Playwright には toHaveScreenshot がないため、Python版だけ比べる仕組みを自分で用意する（判断の記録 python/decisions.md の「Visual Regression の方式」）。
+比べる仕組みの違い：Python 用の Playwright には toHaveScreenshot がないため、Python版だけ比べる仕組みを自分で用意する（判断の記録 python/decisions.md の「Visual Regression の方式」）。
 
 ---
 

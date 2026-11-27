@@ -1,7 +1,7 @@
 """API の呼び出し
 
 責務:
-    - API ごとにリクエストを送る（TS版 utils/apiHelper.ts の executeXxxApi に対応）
+    - API ごとにリクエストを送る（TS版の utils/apiHelper.ts に対応）
 
 接続先（ホスト・ポート）は APIRequestContext の base_url で決まる（fixtures/api_fixture.py）。
 payload に None を渡すと、本文なしで送る。

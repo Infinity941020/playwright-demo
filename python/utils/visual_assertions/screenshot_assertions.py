@@ -1,4 +1,4 @@
-"""Visual Assertions（TS版 toHaveScreenshot に対応）
+"""Visual Assertions（TS版の utils/visualAssertions/screenshotAssertions.ts に対応）
 
 責務:
     - フォントと画像の読み込みが終わるのを待ってから撮影する

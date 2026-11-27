@@ -39,7 +39,7 @@ export default defineConfig({
 
     screenshot: 'off',
 
-    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（すべて残すと、実行が遅くなるため）
+    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（すべて残すと、実行が遅くなるおそれがあるため）
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
 

@@ -120,7 +120,8 @@ python/
 │   │   ├── inventory/       # Products画面
 │   │   ├── cart/
 │   │   ├── checkout/
-│   │   └── logout/          # Logout機能（左上のメニュー）
+│   │   ├── logout/          # Logout機能（左上のメニュー）
+│   │   └── flow/            # 通しの購入（商品の追加から購入完了まで）
 │   ├── api/                 # APIテスト（API ごとに1ファイル）
 │   └── visual/              # 見た目の比較テスト（画面ごとに1ファイル）
 │       └── __snapshots__/   # 基準画像（CI で撮影したもの）
@@ -140,14 +141,14 @@ python/
 - **ログイン状態の再利用**：standard_user の storage_state をセッションごとに1回だけ生成し、logged_page fixture で各テストに渡します。ログイン状態を引き継がない確認（未ログイン時のアクセス）は、通常の page を使います（[論点1](decisions.md#論点1-storagestate機構が未配線)）
 - **goto() と expect_on_page() の使い分け**：goto() は移動のみ、画面の表示確認は expect_on_xxx() で行います（[論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け)）
 - **ロケータの定義**：`__init__` でまとめて定義し、商品ごとに変わる部品は商品名を受け取るメソッドで扱います（[論点2](decisions.md#論点2-ロケータのキャッシュ有無が不統一)）
-- **カートの前提状態**：Cart・Checkout・Logout のテストは、カートに商品が入った状態を、ブラウザの保存領域（localStorage）への直接書き込みで作ります（Cart画面の「追加した順」を確かめる TC-CART-003 を除く）。書き込み処理は1か所（CartPage.set_cart_contents）にまとめています（[論点15](decisions.md#論点15-cart画面テストの前提状態の作り方)）
+- **カートの前提状態**：Cart・Checkout・Logout のテストは、カートに商品が入った状態を、ブラウザの保存領域（localStorage）への直接書き込みで作ります（画面での追加そのものを確かめる TC-CART-003・010 と、通しの購入のテストは、画面の操作で作ります）。書き込み処理は1か所（CartPage.set_cart_contents）にまとめています（[論点15](decisions.md#論点15-cart画面テストの前提状態の作り方)）
 - **URLの一元管理**：URL は原則として utils/urls.py から参照します（[論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない)）
 - **テストデータの共通化**：ログインユーザー・商品・購入者情報・URL・エラー文言は、リポジトリ直下の shared/data/ の JSON に置き、TS版と共通で使います。data/ と utils/urls.py は JSON を読み込んで今までと同じ名前・同じ形で渡すだけなので、テスト側は変わりません。JSON の場所はファイルの場所から求めるため、実行する場所に左右されません（[論点24](decisions.md#論点24-テストデータの共通化)）
 - **Checkout の Page Object**：ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分けています（CheckoutStepOnePage／CheckoutStepTwoPage／CheckoutCompletePage）（[論点16](decisions.md#論点16-checkout画面の-page-object-の構成)）
 - **メニューの開閉の判定**：表示の有無ではなく aria-hidden 属性で判定します。URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるためです（[論点17](decisions.md#論点17-メニューの開閉の判定方法)）
 - **商品一覧画面の表示確認**：InventoryPage.expect_on_page() の1か所にまとめ、URL の完全一致と data-test で確認します。ログイン成功の確認や logged_page fixture もここを使います（[論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所)）
 - **APIテストのモック**：テストごとに 127.0.0.1 の空いているポートでモックサーバーを立ち上げ、状態がテストをまたがないようにしています。返事は TS版のモックと同じにしています（[論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所)）
-- **見た目の比較**：Python版の Playwright には TS版の toHaveScreenshot に当たる機能がないため、Pillow で比較の仕組みを自作しています。基準画像は、実行環境による描画の違いを避けるため、CI（Linux）で撮影したものだけを使います（[論点21](decisions.md#論点21-visual-regression-の方式)）
+- **見た目の比較**：Python 用の Playwright には、TS版で使っている toHaveScreenshot に当たる機能がないため、Pillow で比較の仕組みを自作しています。基準画像は、実行環境による描画の違いを避けるため、CI（Linux）で撮影したものだけを使います（[論点21](decisions.md#論点21-visual-regression-の方式)）
 
 設計判断の背景・詳細は [decisions.md](decisions.md) にまとめています。
 
@@ -156,7 +157,7 @@ python/
 ## TS版との主な違い
 
 decisions.md で「TS逆輸入候補」を「あり」「検討」とした論点です（今はすべて TS版に反映済み）。
-TS版への横展開（TS版を Python版に揃える作業）で、順に TS版にも反映しています。
+TS版への横展開（TS版を Python版に揃える作業）で、TS版にも反映しました。
 
 | 論点 | Python版での扱い | TS逆輸入候補 |
 |---|---|---|
@@ -167,7 +168,7 @@ TS版への横展開（TS版を Python版に揃える作業）で、順に TS版
 | [論点10](decisions.md#論点10-utilsurlsts-の参照が徹底されていない) URL参照が徹底されていない | 最初から utils/urls.py の参照を徹底 | 反映済み（横展開2-3・2-4） |
 | [論点12](decisions.md#論点12-products画面を独立した画面として扱う) Products画面を独立した画面として扱う | 仕様書・テストケースを独立させ、ソート・画面遷移・未ログイン時も検証 | 反映済み（横展開3） |
 | [論点13](decisions.md#論点13-goto-と-expect_on_xxx-の使い分け) goto() と expect_on_xxx() の使い分け | goto() は移動のみ、表示確認は expect_on_xxx() に統一 | 反映済み（横展開2-3・2-4） |
-| [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003 以外は localStorage への直接書き込みで作る | 反映済み（横展開3） |
+| [論点15](decisions.md#論点15-cart画面テストの前提状態の作り方) Cart画面テストの前提状態の作り方 | TC-CART-003・010 と通しの購入のテスト以外は localStorage への直接書き込みで作る | 反映済み（横展開3） |
 | [論点16](decisions.md#論点16-checkout画面の-page-object-の構成) Checkout画面の Page Object の構成 | ファイルは TS版と1対1で対応する checkout_page.py とし、クラスは画面ごとに分ける | 反映済み（横展開2-4） |
 | [論点17](decisions.md#論点17-メニューの開閉の判定方法) メニューの開閉の判定方法 | 表示の有無ではなく aria-hidden 属性で判定する | 反映済み（横展開2-4） |
 | [論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所) 商品一覧画面の表示確認の置き場所 | InventoryPage.expect_on_page() の1か所にまとめ、URL は完全一致、要素は data-test で確認する | 反映済み（横展開2-3・2-4） |

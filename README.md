@@ -21,10 +21,10 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ## テスト規模
 
-- UIテスト：234件（78件 × 3ブラウザ〈Chromium・Firefox・WebKit〉）
+- UIテスト：234件（78件 × 3ブラウザ〈Chromium・Firefox・WebKit〉。78件はテストケース77件＋補助テスト1件）
 - APIテスト：18件
 - Visual Regression：6件（UI回帰検知のためのスナップショット比較。機能検証とは異なる観点で運用）
-- 合計：258件（すべてCI上で安定実行）
+- 合計：258件（CI で実行。失敗したテストは最大2回まで再実行する）
 
 ---
 

@@ -154,7 +154,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Python 3.14 は uv で準備する（setup-python は、準備に apt での lsb_release のインストールが要り、時間がかかるため）
+      # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
         uses: astral-sh/setup-uv@v10.3.3
 
@@ -187,7 +187,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Python 3.14 は uv で準備する（setup-python は、準備に apt での lsb_release のインストールが要り、時間がかかるため）
+      # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
         uses: astral-sh/setup-uv@v10.3.3
 
@@ -220,7 +220,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Python 3.14 は uv で準備する（setup-python は、準備に apt での lsb_release のインストールが要り、時間がかかるため）
+      # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
         uses: astral-sh/setup-uv@v10.3.3
 
