@@ -8,8 +8,9 @@ import { Page, expect, test } from '@playwright/test';
 // - 比べる処理と、失敗したときの画像の保存は、Playwright の比べる機能に任せる。
 //   この機能は、続けて撮った2枚が同じになるまで撮り直してから比べる
 
-// 画像の読み込みを待つ上限。確かめの待ち時間の初期値（設定で指定していないため5秒）と同じにして、
-// 読み込みが終わらないときに、テストの時間切れより先に、画像の読み込みの待ちとして失敗させる
+// 画像の読み込みを待つ上限。Playwright の確かめの待ち時間（設定の expect.timeout）の初期値（設定で指定していないため5秒）と同じにして、
+// 読み込みが終わらないときに、テストの時間切れより先に、画像の読み込みの待ちとして失敗させる。
+// 設定で確かめの待ち時間を変えるときは、この値も見直す
 const IMAGE_LOAD_TIMEOUT_MS = 5_000;
 
 // 基準画像のファイル名（例：login-page.png）と、違う画素の割合の上限（例：0.01 = 1%）を受け取る。
@@ -18,7 +19,7 @@ export async function expectScreenshotMatches(page: Page, snapshotName: string, 
 
   await test.step(`見た目を基準画像と比べる（${snapshotName}）`, async () => {
 
-    // 大きさが違うときに、画像の比べの失敗ではなく、大きさの違いとして分かるよう、先に確かめる
+    // 大きさが違うときに、見た目の違いではなく、大きさの違いとして失敗が分かるよう、先に確かめる
     expect(page.viewportSize(), '画面の大きさが設定どおりであること').toEqual(test.info().project.use.viewport);
 
     await page.evaluate(async () => {

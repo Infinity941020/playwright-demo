@@ -24,11 +24,11 @@
 
 | 項目 | 内容 |
 |---|---|
-| 画面の大きさ | 1280×720（両版とも、撮影前にこの大きさであることを確認する。TS版は設定〈playwright.config.ts〉の大きさと比べる） |
+| 画面の大きさ | 1280×720。撮影前に大きさを確かめる（Python版はこの値と、TS版は設定〈playwright.config.ts〉の値と比べる。設定の値は 1280×720） |
 | 画素の密度（deviceScaleFactor） | 1（TS版は playwright.config.ts で指定、Python版は初期値） |
 | アニメーション | 止める（animations="disabled"） |
 | 入力欄のカーソル | 隠す（caret="hide"） |
-| 撮影前の待ち | ① 画面の表示確認（前提を作る Flow の中で行う）② フォントの読み込み完了 ③ ページの中の画像の要素の読み込み完了（背景として描く絵は含まず、画面の外にある画像の要素は含む）。固定の時間の待ちは使わない（両版とも、比べる部品〈TS版は utils/visualAssertions/、Python版は utils/visual_assertions/〉の中で待つ） |
+| 撮影前の待ち | ① 画面の表示確認（前提を作る部品の中で行う）② フォントの読み込み完了 ③ ページの中の画像の要素の読み込み完了（背景として描く絵は含まず、画面の外にある画像の要素は含む）。固定の時間の待ちは使わない（両版とも、比べる部品〈TS版は utils/visualAssertions/、Python版は utils/visual_assertions/〉の中で待つ）。画像の要素の読み込みを待つ上限は、TS版は5秒（テストの時間切れより先に、画像の待ちとして失敗させるため）、Python版は30秒（Playwright の初期値） |
 
 「何が終わるのを待つか」を明確にし、固定の時間の待ちは使わない。不安定になった場合は待ち方を見直す。
 TS版は、これに加えて、比べる機能（toHaveScreenshot）が、続けて撮った2枚が同じになるまで撮り直してから比べる。
@@ -70,6 +70,7 @@ Playwright 標準の toHaveScreenshot で比べる（Playwright の既定の比�
 ### TS版
 
 typescript/test-results/ の下に、テストごとのフォルダを作って保存する（ファイルの名前と中身は Playwright が決める）。
+基準画像がないときは、撮った画像を基準画像の場所に作る（「■ 基準画像の作り方・作り直し方」を参照）。
 CI では Artifact（visual-artifacts）として7日間ダウンロードできる。
 
 ### Python版
