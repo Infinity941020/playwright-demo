@@ -1,54 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { users } from '../../data/users';
+// Products画面の見た目を、基準画像と比べるテスト
+import { test } from '../../fixtures/loginFixture';
+import { expectScreenshotMatches } from '../../utils/visualAssertions/screenshotAssertions';
 
-/*
-========================================
-Visual Regression Test
-商品一覧画面の表示崩れ検知
-========================================
-*/
+test.describe('Products画面の見た目', () => {
 
-test('visual: inventory page', async ({ page }) => {
+  // ログイン済みの画面は、Products画面を開いて表示を確かめた状態で始まる（カートは空）
+  test('TC-VIS-002：Products画面の見た目が、基準画像と一致すること', async ({ loggedPage }) => {
 
-  // ================================
-  // ■ viewport固定（Aルート統一）
-  // ================================
-  await page.setViewportSize({ width: 1280, height: 720 });
-
-  // ================================
-  // ■ ログイン
-  // ================================
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('[data-test="username"]').fill(
-    users.standard.username
-  );
-
-  await page.locator('[data-test="password"]').fill(
-    users.standard.password
-  );
-
-  await page.locator('[data-test="login-button"]').click();
-
-  // ================================
-  // ■ 画面安定待ち（A統一）
-  // ================================
-  await page.waitForLoadState('networkidle');
-
-  // DOM安定（inventory基準）
-  await page.locator('.inventory_list').waitFor();
-
-  // フォント読み込み待ち（重要）
-  await page.evaluate(() => document.fonts?.ready);
-
-  // 微妙なレンダリング揺れ吸収
-  await page.waitForTimeout(300);
-
-  // ================================
-  // ■ Visual Regression検証
-  // ================================
-  await expect(page).toHaveScreenshot('inventory-page.png', {
-    animations: 'disabled',
-    maxDiffPixelRatio: 0.02
+    await expectScreenshotMatches(loggedPage, 'inventory-page.png', 0.02);
   });
 });
