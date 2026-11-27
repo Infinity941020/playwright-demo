@@ -28,7 +28,7 @@ class CartFlow:
     def open_cart_with(self, products: list[dict]) -> None:
         """指定した商品が、指定した順にカートに入った状態でカート画面を開く。
 
-        前提状態はブラウザの保存領域への直接書き込みで作る（decisions.md 論点15）。
+        前提状態はブラウザの保存領域への直接書き込みで作る（Products画面の不具合で、カート画面のテストまで失敗しないようにするため）。
         商品は data/products.py の PRODUCTS の要素を渡す。
         """
         self._cart_page.set_cart_contents([product["id"] for product in products])

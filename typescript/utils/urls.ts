@@ -1,5 +1,5 @@
 // テストで開く各画面の URL。
-// 値は両版共通の shared/data/urls.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す（python/decisions.md の論点24）
+// 値は両版共通の shared/data/urls.json にあり、ここでは項目名の書き方だけを TypeScript の書き方に直して渡す
 import sharedUrls from '../../shared/data/urls.json' with { type: 'json' };
 
 export const urls: {

@@ -5,8 +5,7 @@
     - ボタンを押す・入力するなど、要素1つに対する操作を提供する
     - 画面の表示や状態を検証する
 
-TS版の pages/CheckoutPage.ts と1対1で対応するファイルで、クラスは画面ごとに分ける
-（decisions.md 論点16）。
+TS版の pages/CheckoutPage.ts に対応するファイル。クラスは画面ごとに分ける（ほかの画面の Page Object と同じく、1画面1クラスにするため）。
 """
 
 import re

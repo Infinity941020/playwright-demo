@@ -1,7 +1,7 @@
 """両版共通のテストデータ（リポジトリ直下の shared/data/）の読み込み
 
 責務:
-    - shared/data/ の JSON を読み込んで、そのまま返す（decisions.md 論点24）
+    - shared/data/ の JSON を読み込んで、そのまま返す
 
 JSON の場所は、このファイルの場所から求める（pytest を実行する場所に左右されないようにするため）。
 """

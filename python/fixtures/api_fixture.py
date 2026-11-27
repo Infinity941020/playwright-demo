@@ -5,8 +5,7 @@
     - モックサーバーを接続先にした APIRequestContext をテストへ提供する
 
 TS版の fixtures/apiFixture.ts に対応する。テストごとに 127.0.0.1 の空いているポートでモックサーバーを
-新しく立ち上げるため、モックの状態（カートの中身、id の連番、Checkout の呼び出し回数）はテストをまたがない
-（python/decisions.md の論点5-a・19）。
+新しく立ち上げるため、モックの状態（カートの中身、id の連番、Checkout の呼び出し回数）はテストをまたがない。
 
 ブラウザは起動しない（pytest-playwright の playwright fixture から APIRequestContext を作る）。
 pytest-playwright（pytest-base-url）の base_url fixture と混同しないよう、

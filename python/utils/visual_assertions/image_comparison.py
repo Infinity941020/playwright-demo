@@ -4,8 +4,8 @@
     - 基準画像と今の画像を比べ、違う画素の割合を求める
     - 違う画素を目立つ色にした画像（diff）を作る
 
-Python版の Playwright には toHaveScreenshot がないため、Pillow で自作する
-（decisions.md 論点21、visual_spec.md「■ 比較の方法」）。
+Python 用の Playwright には、画面を基準画像と比べる機能（toHaveScreenshot）がないため、Pillow で自作する
+（比べ方は specs/visual_spec.md「■ 比較の方法」）。
 """
 
 from dataclasses import dataclass

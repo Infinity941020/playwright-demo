@@ -1,11 +1,11 @@
-# Checkout Step Two画面 テストケース（初版・14件）
+# Checkout Step Two画面 テストケース
 
 共通の前提：standard_user でログイン済み。各テストケースの「前提条件」に記載した商品が、
 記載した順にカートに入った状態で、Checkout Step Two画面を開いている
 （TC-CO2-014 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（判断の記録 python/decisions.md の「Cart画面テストの前提状態の作り方」）
 - Checkout Step Two画面は、Checkout Step One画面をURLで開き、購入者情報（Taro／Yamada／1000001）を入力して Continue を押して開く
   - 理由：Step One を経由せずに Step Two を直接開けることは、意図された仕様か不具合かを判断できない挙動のため（仕様書「判断できない挙動」参照）。この挙動に依存すると、SauceDemo 側で修正された場合に、全テストの前提が崩れるため
   - 受け入れるリスク：Step One の不具合で Step Two のテストもまとめて失敗する可能性がある。Step One 自体は TC-CO1 で確認しているため、失敗したときは Step One のテスト結果から原因を切り分ける

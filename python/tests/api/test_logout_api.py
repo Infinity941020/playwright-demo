@@ -9,7 +9,7 @@ from utils.api_assertions.logout_assertions import (
 )
 from utils.api_helper import execute_logout_api
 
-# Authorization ヘッダーの値を定める（TS版と同じ。モックはヘッダーの有無だけを見る）
+# Authorization ヘッダーの値を定める（モックはヘッダーの有無だけを見る）
 _TOKEN = "Bearer mock-token"
 
 

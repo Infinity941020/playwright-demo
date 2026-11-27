@@ -2,7 +2,7 @@ import { Page, Locator, expect } from '@playwright/test';
 
 // 左上のメニューの操作と、メニューの開閉・項目の確認をまとめる。
 // - URL で開いた直後は、メニューが閉じる動きが終わるまで、閉じている項目も表示されていると判定されるため、
-//   開閉はメニュー領域の aria-hidden 属性で判定する（python/decisions.md の論点17）
+//   開閉はメニュー領域の aria-hidden 属性で判定する
 // - 項目を押す操作は、メニューが開いている前提で押す（開いていないと押せない）
 export class MenuPage {
 

@@ -1,6 +1,6 @@
 """購入者情報（Checkout画面）
 
-値は両版共通の shared/data/checkout.json に置いている（decisions.md 論点24）。
+値は両版共通の shared/data/checkout.json に置いている。
 """
 
 from data.shared_data import load_shared_data

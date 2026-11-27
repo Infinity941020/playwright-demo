@@ -1,11 +1,11 @@
-# Checkout Complete画面 テストケース（初版・6件）
+# Checkout Complete画面 テストケース
 
 共通の前提：standard_user でログイン済み。各テストケースの「前提条件」に記載した商品がカートに入った状態から、
 購入を完了して Checkout Complete画面を開いている
 （TC-CO3-006 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（判断の記録 python/decisions.md の「Cart画面テストの前提状態の作り方」）
 - Checkout Complete画面は、Checkout Step One画面をURLで開き、購入者情報（Taro／Yamada／1000001）を入力して Continue を押し、
   Checkout Step Two画面で Finish を押して開く
   - 理由：購入せずに Complete画面をURLで直接開けることは、意図された仕様か不具合かを判断できない挙動のため（仕様書「判断できない挙動」参照）。

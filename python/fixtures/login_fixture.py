@@ -4,8 +4,8 @@
     - standard_user でログインした状態（storage_state）を、テストの実行全体で1回だけ作る
     - ログイン済みの Page をテストへ渡す
 
-論点1（TS版では storageState の仕組みが使われていなかった件）の決定に基づき、TS版とは異なり、
-保存したログイン状態（storage_state）を実際にテストで使う。詳細は python/decisions.md の論点1を参照。
+保存したログイン状態（storage_state）を各テストで読み込んで使う。
+テストのたびに画面からログインせずに済み、実行が速くなるため。
 """
 
 from pathlib import Path
