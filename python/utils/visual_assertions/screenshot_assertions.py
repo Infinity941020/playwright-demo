@@ -5,7 +5,7 @@
     - 基準画像と比べ、失敗したときはファイルを保存する
 
 画面の表示の確認（expect_on_page など）は、呼び出す前に Flow で済ませておくこと。
-固定の時間の待ちは使わない（decisions.md 論点21、visual_spec.md「■ 撮影の条件」）。
+固定の時間の待ちは使わない（環境によって足りなかったり無駄だったりするため。撮影の条件は specs/visual_spec.md「■ 撮影の条件」）。
 """
 
 import io
@@ -20,7 +20,7 @@ _PYTHON_ROOT = Path(__file__).resolve().parent.parent.parent
 SNAPSHOT_DIR = _PYTHON_ROOT / "tests" / "visual" / "__snapshots__"
 RESULT_DIR = _PYTHON_ROOT / "test-results" / "visual"
 
-# 撮影する画面の大きさを定める（TS版の playwright.config.ts と同じ）
+# 撮影する画面の大きさを定める（基準画像は、この大きさで撮ったもの）
 _VIEWPORT = {"width": 1280, "height": 720}
 
 
@@ -77,7 +77,7 @@ def _take_screenshot(page: Page) -> Image.Image:
 
     # フォントの読み込みが終わるのを待つ
     page.evaluate("async () => { await document.fonts.ready; }")
-    # 画面内のすべての画像の読み込みが終わるのを待つ
+    # ページの中の画像の要素（背景として描く絵は含まない）の読み込みが終わるのを待つ
     page.wait_for_function("() => Array.from(document.images).every((image) => image.complete)")
 
     screenshot = page.screenshot(animations="disabled", caret="hide")

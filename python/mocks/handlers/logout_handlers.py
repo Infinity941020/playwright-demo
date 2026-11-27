@@ -14,7 +14,7 @@ def create_logout_handlers() -> list[Handler]:
         if not request.header("Authorization"):
             return MockResponse(401, {"error": _LOGOUT["unauthorized_error"]})
 
-        # 本文が空でなければ、400 を返す（TS版と同じく、読めない本文は「本文なし」とみなす）
+        # 本文が空でなければ、400 を返す（読めない本文は「本文なし」とみなす）
         try:
             body = request.json()
         except json.JSONDecodeError:

@@ -21,12 +21,10 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 
 ## テスト規模
 
-- UIテスト：90件（30シナリオ × 3ブラウザ）
-- APIテスト：19件
+- UIテスト：234件（78件 × 3ブラウザ〈Chromium・Firefox・WebKit〉）
+- APIテスト：18件
 - Visual Regression：6件（UI回帰検知のためのスナップショット比較。機能検証とは異なる観点で運用）
-- 合計：115件（すべてCI上で安定実行）
-
-※最新の内訳は [GitHub Wiki Home](https://github.com/Infinity941020/playwright-demo/wiki) と同期しています。
+- 合計：258件（すべてCI上で安定実行）
 
 ---
 
@@ -37,7 +35,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 - Page Object Model + Flow Layer Architecture など、責務分離を軸としたアーキテクチャ
 - Fixture / storageState
 - Data-driven testing
-- テストごとに手元に立てる小さなモックのサーバー（APIテスト用）
+- テストごとに 127.0.0.1 に立てる小さなモックのサーバー（APIテスト用）
 
 ---
 
@@ -46,7 +44,7 @@ Playwright + TypeScript によるECサイト向けE2E自動テストポートフ
 **SauceDemo（テスト用デモサイト）**
 <https://www.saucedemo.com/>
 
-およびAPIテスト・状態制御検証用の、テストごとに手元に立てるモックのサーバー
+およびAPIテスト・状態制御検証用の、テストごとに 127.0.0.1 に立てるモックのサーバー
 
 ---
 
@@ -86,7 +84,7 @@ API構成・モックの設計・フォルダ構成を含む全仕様一覧は
 初めての方へ:以下の手順でインストール後、「実行方法」のコマンドをそのまま
 実行すれば動作確認できます。
 
-TS版のファイルは typescript/ にあります。テストデータ（ログインユーザー・購入者情報・URL）は、Python版と共通の shared/data/ にあります。リポジトリ直下から次のように実行します。
+TS版のファイルは typescript/ にあります。テストデータ（ログインユーザー・商品・購入者情報・URL・エラーの文言・APIテストのモックが返す値）は、Python版と共通の shared/data/ にあります。リポジトリ直下から次のように実行します。
 
 ```bash
 cd typescript
@@ -132,10 +130,10 @@ npx playwright test tests/ui/checkout/checkout-complete-display.spec.ts --report
 
 ## CI（GitHub Actions）
 
-mainブランチへのpush / Pull Request時に、TS版の3ジョブ（UI / API / Visual Regression）と
-Python版の3ジョブ（UI / API / Visual Regression）の計6ジョブを自動実行し、継続的な品質確認を行っています。
+mainブランチへのpush / Pull Request時に、TS版の4ジョブ（UI / API / Visual Regression / 型の確認）と
+Python版の3ジョブ（UI / API / Visual Regression）の計7ジョブを自動実行し、継続的な品質確認を行っています。
 
-実行結果はSlackへ自動通知されます。
+実行結果はSlackへ自動通知されます（通知も1つのジョブとして動きます）。
 
 Python版の CI の詳細は [python/README.md の「CI」](python/README.md#ci) を参照してください。
 

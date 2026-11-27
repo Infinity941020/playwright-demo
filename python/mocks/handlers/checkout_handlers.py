@@ -21,7 +21,7 @@ def create_checkout_handlers() -> list[Handler]:
 
         checkout_count += 1
 
-        # 呼び出し回数の上限を定める（TS版と同じ。意図された仕様か不具合かを判断できない挙動）
+        # 呼び出し回数の上限を定める（意図された仕様か不具合かを判断できない挙動。specs/api_spec.md）
         if checkout_count >= _CHECKOUT["call_limit"]:
             return MockResponse(
                 401,

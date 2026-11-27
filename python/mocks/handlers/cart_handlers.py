@@ -41,7 +41,7 @@ def create_cart_handlers() -> list[Handler]:
 
     def delete_cart(request: MockRequest) -> MockResponse:
         cart_id = to_number(request.params["id"])
-        # 存在しない id でも 200 を返す（TS版と同じ。意図された仕様か不具合かを判断できない挙動）
+        # 存在しない id でも 200 を返す（意図された仕様か不具合かを判断できない挙動。specs/api_spec.md）
         cart[:] = [item for item in cart if item["id"] != cart_id]
         return MockResponse(200, {"success": True})
 

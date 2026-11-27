@@ -4,7 +4,7 @@ import { TEST_TIMEOUT_MS } from './utils/timeouts';
 const isCI = !!process.env.CI;
 
 // テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、CI と手元のそれぞれについて決める。
-// 準備の部品の制限時間・制限時間を延ばさない理由・記録の残し方の判断は python/decisions.md の論点27、見た目の比較の撮影の条件は specs/visual_spec.md にある
+// 見た目の比較の撮影の条件は specs/visual_spec.md にある
 
 export default defineConfig({
 
@@ -39,7 +39,7 @@ export default defineConfig({
 
     screenshot: 'off',
 
-    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（python/decisions.md の論点27）
+    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（すべて残すと、実行が遅くなるため）
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
 

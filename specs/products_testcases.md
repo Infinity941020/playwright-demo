@@ -1,4 +1,4 @@
-# Products画面 テストケース（確定版・14件）
+# Products画面 テストケース
 
 共通の前提：standard_user でログイン済み、カートは空の状態でProducts画面を開いている
 （TC-PROD-014 のみ未ログイン状態が前提）

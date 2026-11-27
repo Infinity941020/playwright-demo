@@ -1,4 +1,4 @@
-# 見た目の比較（Visual Regression）テストケース（初版・6件）
+# 見た目の比較（Visual Regression）テストケース
 
 共通の前提：
 - 画面の大きさは 1280×720、ブラウザは Chromium
@@ -7,8 +7,8 @@
 
 前提状態の作り方（両版とも同じ）：
 - Login は、ログインしていない画面のまま、ログイン画面を開いて表示を確かめる部品で開く
-- Login 以外は、ログイン済みの状態を、保存したログイン状態を使うログイン済みの画面の部品で作る（python/decisions.md の論点1）
-- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+- Login 以外は、ログイン済みの状態を、保存したログイン状態を使うログイン済みの画面の部品で作る
+- カートの中身は、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（判断の記録 python/decisions.md の「Cart画面テストの前提状態の作り方」）
 - Checkout Step Two・Complete は、Step One から購入者情報（両版共通の shared/data/checkout.json の値）を入力して進む
   （既存の UI テストと同じ開き方。直接開くことは判断できない挙動のため）
 - カートに入れる商品は「Sauce Labs Backpack」の1件とする

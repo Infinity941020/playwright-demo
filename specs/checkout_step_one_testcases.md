@@ -1,11 +1,11 @@
-# Checkout Step One画面 テストケース（初版・13件）
+# Checkout Step One画面 テストケース
 
 共通の前提：standard_user でログイン済み。カートに「Sauce Labs Backpack」が1件入った状態で、
 Checkout Step One画面（/checkout-step-one.html）を開いている
 （TC-CO1-013 のみ未ログイン状態が前提）
 
 前提状態の作り方：
-- カートの中身は、Cart画面と同じく、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（python/decisions.md の論点15）
+- カートの中身は、Cart画面と同じく、ブラウザの保存領域（localStorage の cart-contents）への直接書き込みで作る（判断の記録 python/decisions.md の「Cart画面テストの前提状態の作り方」）
   - 書き込みが効かずに空のカートのままテストが進まないように、Checkout Step One画面を開いた後に、カートアイコンのバッジの件数が入れた件数と同じことを確かめる
     （本画面には商品の行がなく、カートが空でも先へ進めるため）
 - Checkout Step One画面は、URLで直接開く（Cart画面の Checkout ボタンからの遷移は TC-CART-007 で確認済みのため）
