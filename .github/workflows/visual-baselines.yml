@@ -6,11 +6,6 @@ name: Visual Baselines
 on:
   workflow_dispatch:
 
-  # マージの前に外す一時的な設定：手動の起動は main にこのファイルがないと使えないため、
-  # 作業中のブランチへの push でも動かして、撮った画像を確かめる
-  push:
-    branches: [ chore/playwright-1.65-shared-visual ]
-
 permissions:
   contents: read
 
