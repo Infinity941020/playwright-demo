@@ -1,4 +1,4 @@
-"""Products画面 ソートテスト"""
+"""Products画面のソートのテスト"""
 
 from typing import Callable
 
@@ -13,13 +13,13 @@ from utils.ui_assertions.inventory_assertions import (
     expect_selected_sort,
 )
 
-# 仕様書「表示商品」の表の順（No.1→No.6）に並べる
+# 仕様書「表示商品」の表の順（No.1→No.6）
 _PRODUCT_NAMES = [product["name"] for product in PRODUCTS.values()]
 _PRICES = [product["price"] for product in PRODUCTS.values()]
 
 
 def _price_value(price: str) -> float:
-    """「$29.99」形式の価格を数値に変換する（期待値を並べ替えるために使う）。"""
+    """期待する並びを作るために、「$29.99」の形の価格を数に直す。"""
     return float(price.lstrip("$"))
 
 
@@ -30,11 +30,10 @@ class TestInventorySort:
         """TC-PROD-002: 初期表示のソートが Name (A to Z) であること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # 結果を検証する
         expect_selected_sort(inventory_flow, SORT_OPTIONS["name_asc"])
         expect_product_names_in_order(inventory_flow, _PRODUCT_NAMES)
 
-    # 価格のソートは、価格の並びだけを検証する（同じ価格どうしの順番は、仕様で決めていない）
+    # 価格のソートは、価格の並びだけを確かめる（同じ価格どうしの順番は、仕様で決めていない）
     @pytest.mark.parametrize(
         ("option_label", "expect_order", "expected"),
         [
@@ -62,8 +61,6 @@ class TestInventorySort:
         """TC-PROD-003〜005: ソートを選ぶと、選択肢どおりの順に並ぶこと。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # ソートを選ぶ
         inventory_flow.sort_by(option_label)
 
-        # 結果を検証する
         expect_order(inventory_flow, expected)

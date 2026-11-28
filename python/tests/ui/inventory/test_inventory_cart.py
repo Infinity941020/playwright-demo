@@ -1,4 +1,4 @@
-"""Products画面 カート操作テスト"""
+"""Products画面でのカートへの追加と削除のテスト"""
 
 from playwright.sync_api import Page
 
@@ -19,10 +19,8 @@ class TestInventoryCart:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 商品をカートに追加する
         inventory_flow.add_to_cart(backpack)
 
-        # 結果を検証する
         expect_remove_button_shown(inventory_flow, backpack)
         expect_badge_count(inventory_flow, 1)
 
@@ -32,12 +30,10 @@ class TestInventoryCart:
         backpack = PRODUCTS["backpack"]["name"]
         bike_light = PRODUCTS["bike_light"]["name"]
 
-        # 2件を追加した後、1件を削除する
         inventory_flow.add_to_cart(backpack)
         inventory_flow.add_to_cart(bike_light)
         inventory_flow.remove_from_cart(backpack)
 
-        # 結果を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack)
         expect_remove_button_shown(inventory_flow, bike_light)
         expect_badge_count(inventory_flow, 1)
@@ -47,9 +43,7 @@ class TestInventoryCart:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 商品を追加した後、同じ商品を削除する
         inventory_flow.add_to_cart(backpack)
         inventory_flow.remove_from_cart(backpack)
 
-        # 結果を検証する
         expect_badge_count(inventory_flow, 0)

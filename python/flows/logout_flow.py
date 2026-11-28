@@ -1,9 +1,7 @@
-"""LogoutFlow
+"""左上のメニューでの操作（開閉・ログアウト・All Items）と、その結果の確認を、利用者の操作の単位でまとめる。
 
-責務:
-    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
-    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
-    - MenuPage・LoginPage・InventoryPage の呼び出しは Flow の中で行う
+- メニューの項目を押す操作は、必ずメニューを開き、開いたことを確かめてから押す
+- ログアウトする操作は、ログイン画面へ戻ったことまで確かめる。ほかの押す操作は、移った先の画面を確かめない
 """
 
 from playwright.sync_api import Page
@@ -17,13 +15,11 @@ class LogoutFlow:
     def __init__(self, page: Page) -> None:
         self._menu_page = MenuPage(page)
         self._login_page = LoginPage(page)
-        # 操作の後に移る商品一覧画面の表示を確かめるために使う
+        # All Items を押した後に移る、商品一覧画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
 
-    # 利用者の操作の単位で、画面を操作する。
-
     def open_menu(self) -> None:
-        """メニューを開き、開いたことを確認する（aria-hidden と最初の項目の表示で判定する）。"""
+        """メニューを開き、開いたことを確かめる（aria-hidden 属性と最初の項目の表示で判定する）。"""
         self._menu_page.wait_until_menu_closed()
         self._menu_page.click_menu_button()
         self._menu_page.expect_menu_opened()
@@ -37,7 +33,7 @@ class LogoutFlow:
         self._menu_page.press_escape()
 
     def logout(self) -> None:
-        """メニューを開いて Logout を押し、Login画面へ戻ったことを確認する。"""
+        """メニューを開いて Logout を押し、Login画面へ戻ったことを確かめる。"""
         self.open_menu()
         self._menu_page.click_logout()
         self._login_page.expect_on_login_page()
@@ -50,8 +46,6 @@ class LogoutFlow:
     def go_back_in_browser(self) -> None:
         """ログアウト後に、ブラウザの「戻る」を押す。"""
         self._login_page.go_back()
-
-    # 画面の状態を検証する。
 
     def expect_menu_closed(self) -> None:
         self._menu_page.expect_menu_closed()

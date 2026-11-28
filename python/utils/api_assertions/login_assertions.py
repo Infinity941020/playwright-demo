@@ -1,4 +1,4 @@
-"""Login API Assertions（TS版 utils/apiAssertions/loginAssertions.ts に対応）"""
+"""Login の API の返事を確かめる。"""
 
 from playwright.sync_api import APIResponse
 
@@ -9,12 +9,12 @@ _STATUS_BAD_REQUEST = 400
 
 
 def expect_login_success(response: APIResponse, token: str) -> None:
-    """ログインが成功したことを確かめる（200、token が期待値と一致）。"""
+    """ログインできたことを確かめる（200、トークンが期待値と同じ）。"""
     expect_status(response, _STATUS_OK)
     assert response.json()["token"] == token
 
 
 def expect_login_bad_request(response: APIResponse, error: str) -> None:
-    """ログインが失敗したことを確かめる（400、error が期待値と一致）。"""
+    """ログインできなかったことを確かめる（400、エラーの文言が期待値と同じ）。"""
     expect_status(response, _STATUS_BAD_REQUEST)
     assert response.json()["error"] == error

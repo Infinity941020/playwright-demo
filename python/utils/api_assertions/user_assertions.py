@@ -1,4 +1,4 @@
-"""User API Assertions（TS版 utils/apiAssertions/userAssertions.ts に対応）"""
+"""User の API の返事を確かめる。"""
 
 from playwright.sync_api import APIResponse
 
@@ -9,7 +9,7 @@ _STATUS_NOT_FOUND = 404
 
 
 def expect_single_user_response(response: APIResponse, user: dict) -> None:
-    """ユーザーの取得が成功したことを確かめる（200、data の項目と値が期待値と一致）。"""
+    """ユーザーの情報を取得できたことを確かめる（200、data の項目と値が期待値と同じ）。"""
     expect_status(response, _STATUS_OK)
     assert response.json()["data"] == user
 

@@ -1,11 +1,8 @@
-"""Checkout画面の Page Object
+"""Checkout の3つの画面（Step One・Step Two・Complete）の操作と、画面の表示の確認をまとめる。
 
-責務:
-    - 画面の要素（ロケータ）を定義する
-    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
-    - 画面の表示や状態を検証する
-
-TS版の pages/CheckoutPage.ts に対応するファイル。クラスは画面ごとに分ける（ほかの画面の Page Object と同じく、1画面1クラスにするため）。
+- クラスは画面ごとに分ける（ほかの画面と同じく、1画面1クラスにするため）
+- 商品ごとの部分は、商品名で商品の行を探してから、その中で探す
+- 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
 """
 
 import re
@@ -27,10 +24,7 @@ class CheckoutStepOnePage:
         self.error_message_locator: Locator = page.locator('[data-test="error"]')
         self.error_close_button: Locator = page.locator('[data-test="error-button"]')
 
-    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
-
     def goto(self) -> None:
-        """Checkout Step One画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["checkout_step_one"])
 
     def reload(self) -> None:
@@ -45,8 +39,8 @@ class CheckoutStepOnePage:
     def click_continue(self) -> None:
         """Continue を押す。
 
-        入力欄で Enter キーを押すと Continue ではなく Cancel が動くため、
-        必ずボタンのクリックで押す（checkout_step_one_spec.md「判断できない挙動」参照）。
+        入力欄で Enter キーを押すと Continue ではなく Cancel が動くため、必ずボタンを押す
+        （specs/checkout_step_one_spec.md の「実機で確認したが、意図された仕様か不具合かを判断できない挙動」）。
         """
         self.continue_button.click()
 
@@ -56,15 +50,13 @@ class CheckoutStepOnePage:
     def close_error(self) -> None:
         self.error_close_button.click()
 
-    # 画面の表示や状態を検証する。
-
     def expect_on_page(self) -> None:
         """Checkout Step One画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["checkout_step_one"])
         expect(self.continue_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・3つの入力欄（プレースホルダー）・ボタンを検証する。"""
+        """タイトル・3つの入力欄のプレースホルダー・2つのボタンを確かめる。"""
         expect(self.title).to_have_text("Checkout: Your Information")
         expect(self.first_name_input).to_be_visible()
         expect(self.first_name_input).to_have_attribute("placeholder", "First Name")
@@ -74,20 +66,18 @@ class CheckoutStepOnePage:
         expect(self.postal_code_input).to_have_attribute("placeholder", "Zip/Postal Code")
         expect(self.cancel_button).to_be_visible()
         expect(self.cancel_button).to_have_text("Cancel")
-        # Continue は input 要素のため、文言は value 属性で確認する
+        # Continue は、文言を要素の中の文字ではなく値として持つ作りのため、値で確かめる
         expect(self.continue_button).to_be_visible()
         expect(self.continue_button).to_have_value("Continue")
 
     def expect_error_message(self, message: str) -> None:
-        """エラーの文言を検証する。"""
         expect(self.error_message_locator).to_have_text(message)
 
     def expect_no_error(self) -> None:
-        """エラーが表示されていないことを確かめる。"""
+        """エラー表示の要素そのものが画面にないことを確かめる。"""
         expect(self.error_message_locator).to_have_count(0)
 
     def expect_info_values(self, first_name: str, last_name: str, postal_code: str) -> None:
-        """3つの入力欄の値を検証する。"""
         expect(self.first_name_input).to_have_value(first_name)
         expect(self.last_name_input).to_have_value(last_name)
         expect(self.postal_code_input).to_have_value(postal_code)
@@ -112,19 +102,14 @@ class CheckoutStepTwoPage:
         self.cancel_button: Locator = page.locator('[data-test="cancel"]')
         self.finish_button: Locator = page.locator('[data-test="finish"]')
 
-    # 商品ごとに変わる要素は、商品名で特定する。
-
     def _item(self, product_name: str) -> Locator:
-        """商品名に完全一致する行を返す。"""
+        """商品名が完全に一致する商品の行。"""
         name_pattern = re.compile(rf"^{re.escape(product_name)}$")
         return self.items.filter(
             has=self.page.locator('[data-test="inventory-item-name"]', has_text=name_pattern)
         )
 
-    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
-
     def goto(self) -> None:
-        """Checkout Step Two画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["checkout_step_two"])
 
     def reload(self) -> None:
@@ -139,15 +124,13 @@ class CheckoutStepTwoPage:
     def click_product_name(self, product_name: str) -> None:
         self._item(product_name).locator('[data-test="inventory-item-name"]').click()
 
-    # 画面の表示や状態を検証する。
-
     def expect_on_page(self) -> None:
         """Checkout Step Two画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["checkout_step_two"])
         expect(self.finish_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・一覧の見出し・支払い／配送情報・金額の見出し・ボタンを検証する。"""
+        """タイトル・一覧の見出し・支払いと配送の情報・金額の見出し・2つのボタンを確かめる。"""
         expect(self.title).to_have_text("Checkout: Overview")
         expect(self.quantity_label).to_have_text("QTY")
         expect(self.description_label).to_have_text("Description")
@@ -165,7 +148,7 @@ class CheckoutStepTwoPage:
         expect(self.items).to_have_count(count)
 
     def expect_all_item_elements_visible(self) -> None:
-        """全行に「数量（1）／商品名／説明／価格」が表示されていることを確かめる。"""
+        """すべての行に、数量（1）・商品名・説明・価格が表示されていることを確かめる。"""
         for item in self.items.all():
             expect(item.locator('[data-test="item-quantity"]')).to_have_text("1")
             expect(item.locator('[data-test="inventory-item-name"]')).to_be_visible()
@@ -178,14 +161,14 @@ class CheckoutStepTwoPage:
         )
 
     def expect_item_names(self, product_names: list[str]) -> None:
-        """商品名が指定した順に並んでいることを確かめる。"""
+        """商品名が、渡した順に並んでいることを確かめる。"""
         expect(self.item_names).to_have_text(product_names)
 
     def expect_item_listed(self, product_name: str) -> None:
         expect(self._item(product_name)).to_have_count(1)
 
     def expect_amounts(self, item_total: str, tax: str, total: str) -> None:
-        """小計・税・合計の表示文言を、完全一致で検証する。"""
+        """小計・税・合計の表示の文言の全体を確かめる。"""
         expect(self.item_total).to_have_text(item_total)
         expect(self.tax).to_have_text(tax)
         expect(self.total).to_have_text(total)
@@ -201,16 +184,11 @@ class CheckoutCompletePage:
         self.back_home_button: Locator = page.locator('[data-test="back-to-products"]')
         self.generate_pdf_button: Locator = page.locator('[data-test="generate-pdf-order"]')
 
-    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
-
     def goto(self) -> None:
-        """Checkout Complete画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["complete"])
 
     def click_back_home(self) -> None:
         self.back_home_button.click()
-
-    # 画面の表示や状態を検証する。
 
     def expect_on_page(self) -> None:
         """Checkout Complete画面が表示されていることを確かめる。"""
@@ -218,12 +196,11 @@ class CheckoutCompletePage:
         expect(self.back_home_button).to_be_visible()
 
     def expect_page_layout(self) -> None:
-        """タイトル・見出し・本文・画像・ボタンを検証する。
+        """タイトル・見出し・本文・画像・2つのボタンを確かめる。
 
-        画像は表示と代替テキストで確認し、読み込みの完了は確認しない
-        （checkout_complete_testcases.md「実装時の注意」参照）。
-        ただし読み込み前の画像は高さ0のため、to_be_visible が実質的に
-        読み込みを待つ（最大5秒）。
+        画像は、表示されていることと代替テキストで確かめ、読み込みが終わったかどうかは確かめない
+        （specs/checkout_complete_testcases.md の「実装時の注意」）。
+        ただし読み込み前の画像は大きさが0で見えない扱いになるため、表示の確認は、確認の待ち時間の範囲で読み込みを待つ。
         """
         expect(self.title).to_have_text("Checkout: Complete!")
         expect(self.header).to_have_text("Thank you for your order!")

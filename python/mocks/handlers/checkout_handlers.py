@@ -1,7 +1,6 @@
-"""Checkout Mock Handlers（TS版 mocks/handlers/checkoutHandlers.ts に対応）
+"""購入の API。
 
-呼び出し回数は、create_checkout_handlers() を呼ぶたびに 0 から数え直す。
-モックサーバーはテストごとに新しく立ち上げるため、回数はテストをまたがない。
+呼び出し回数は、ハンドラーを作るたびに 0 から数え直す。サーバーはテストごとに新しく立てるため、回数はテストをまたがない。
 """
 
 import time
@@ -21,7 +20,8 @@ def create_checkout_handlers() -> list[Handler]:
 
         checkout_count += 1
 
-        # 呼び出し回数の上限を定める（この挙動は、意図された仕様か不具合か判断できないため、モックではそのまま再現し、テストでは確かめない。specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
+        # 呼び出し回数の上限。意図された仕様か不具合か判断できないため、モックではそのまま再現し、テストでは確かめない
+        # （specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         if checkout_count >= _CHECKOUT["call_limit"]:
             return MockResponse(
                 401,
@@ -32,7 +32,8 @@ def create_checkout_handlers() -> list[Handler]:
         if body is None:
             return MockResponse(400, {"error": _CHECKOUT["invalid_payload_error"]})
 
-        # 必須項目がそろっているかを確かめる（0 も指定なしとみなす。specs/api_spec.md「判断できない挙動」）
+        # 必須項目がそろっているかを確かめる
+        # （0 も指定なしとみなす。specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         if (
             not isinstance(body, dict)
             or not body.get("cartId")
@@ -45,7 +46,8 @@ def create_checkout_handlers() -> list[Handler]:
             201,
             {
                 "success": True,
-                # 呼び出した時刻をミリ秒で入れる（意図された仕様か不具合かを判断できない挙動）
+                # 呼び出した時刻をミリ秒で入れる
+                # （specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
                 "checkoutId": int(time.time() * 1000),
                 "cartId": body["cartId"],
                 "userId": body["userId"],

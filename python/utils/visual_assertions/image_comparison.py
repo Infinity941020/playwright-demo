@@ -1,10 +1,7 @@
-"""画像の比較（Visual Regression）
+"""画面の画像を、基準画像と比べる。
 
-責務:
-    - 基準画像と今の画像を比べ、違う画素の割合を求める
-    - 違う画素を目立つ色にした画像（diff）を作る
-
-Python 用の Playwright には、画面を基準画像と比べる機能（toHaveScreenshot）がないため、Pillow で自作する
+違う画素の割合を求め、違う画素を目立つ色にした画像（差分の画像）を作る。
+Python 用の Playwright には、画面を基準画像と比べる機能がないため、Pillow で作る
 （比べ方は specs/visual_spec.md「■ 比較の方法」）。
 """
 
@@ -13,18 +10,18 @@ from dataclasses import dataclass
 from PIL import Image, ImageChops
 
 # 赤・緑・青の差の最大値がこの値を超えた画素を「違う画素」とする。
-# Playwright の既定の比較のしきい値（threshold 0.2）に合わせた値（255 × 0.2）。
+# Playwright の既定の比較のしきい値（0.2）に合わせた値（255 × 0.2）
 PIXEL_THRESHOLD = 51
 
-# diff 画像で、違う画素を塗る色（赤）を定める
+# 差分の画像で、違う画素を塗る色（赤）
 _DIFF_COLOR = (255, 0, 0)
 
 
 @dataclass(frozen=True)
 class ComparisonResult:
-    """比較の結果を表す。
+    """比べた結果。
 
-    sizes_match が False の場合、diff_ratio は 1.0、diff_image は None。
+    大きさが違うときは、違う画素の割合を 1.0 とし、差分の画像は作らない。
     """
 
     sizes_match: bool
@@ -33,7 +30,7 @@ class ComparisonResult:
 
 
 def compare_images(expected: Image.Image, actual: Image.Image) -> ComparisonResult:
-    """基準画像（expected）と今の画像（actual）を比べる。"""
+    """基準画像と今の画像を比べる。"""
     if expected.size != actual.size:
         return ComparisonResult(sizes_match=False, diff_ratio=1.0, diff_image=None)
 

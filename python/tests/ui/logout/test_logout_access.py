@@ -1,4 +1,7 @@
-"""Logout（メニュー） ログアウト後のアクセス制限テスト"""
+"""ログアウトした後に、ログインが必要な画面へ戻れないことのテスト。
+
+ログアウトした直後もログイン画面のため、画面の確認より先に、戻された後に出るエラーの文言を確かめる。
+"""
 
 from typing import Callable
 
@@ -13,7 +16,7 @@ from flows.logout_flow import LogoutFlow
 from utils.ui_assertions.login_assertions import expect_login_error_message, expect_on_login_page
 
 _INVENTORY_NOT_LOGGED_IN_MESSAGE = MESSAGES["login"]["not_logged_in"].format(path="/inventory.html")
-# エラーの文言には、クエリ「?id=4」は含まれない
+# エラーの文言には、商品の番号（?id=4）は含まれない
 _PRODUCT_DETAIL_NOT_LOGGED_IN_MESSAGE = MESSAGES["login"]["not_logged_in"].format(
     path="/inventory-item.html"
 )
@@ -45,11 +48,9 @@ class TestLogoutAccess:
         inventory_flow = InventoryFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # ログアウトしてから、画面の URL を直接開く
         logout_flow.logout()
         access_directly(inventory_flow)
 
-        # 結果を検証する
         expect_login_error_message(login_flow, error_message)
         expect_on_login_page(login_flow)
 
@@ -58,10 +59,8 @@ class TestLogoutAccess:
         logout_flow = LogoutFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # ログアウトしてから、ブラウザの「戻る」を押す
         logout_flow.logout()
         logout_flow.go_back_in_browser()
 
-        # 戻された後のエラーを確かめてから、URL を検証する
         expect_login_error_message(login_flow, _INVENTORY_NOT_LOGGED_IN_MESSAGE)
         expect_on_login_page(login_flow)

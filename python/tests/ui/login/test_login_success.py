@@ -1,4 +1,4 @@
-"""ログイン機能の正常系テスト（ログインの手順を、画面で最初から最後まで通すテスト）"""
+"""ログインの正常系のテスト（ログインの手順を、画面で最初から最後まで通す）"""
 
 from playwright.sync_api import Page
 
@@ -14,8 +14,6 @@ class TestLoginSuccess:
         """TC-LOGIN-001: 正しいユーザー名・パスワードでログインできること。"""
         login_flow = LoginFlow(page)
 
-        # ログインする
         login_flow.login(USERS["standard"]["username"], USERS["standard"]["password"])
 
-        # 結果を検証する
         expect_login_success(login_flow)

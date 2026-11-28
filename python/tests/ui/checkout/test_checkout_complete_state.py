@@ -1,4 +1,7 @@
-"""Checkout Complete画面 状態テスト"""
+"""Checkout Complete画面から移った後の、カートの状態のテスト。
+
+バッジがないことや行が0件であることは、移る前の Complete画面でも成り立つため、先に移った先の画面であることを確かめる。
+"""
 
 from playwright.sync_api import Page
 
@@ -25,13 +28,10 @@ class TestCheckoutCompleteState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れ、購入を完了する）
         checkout_flow.open_complete_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # Back Home を押す
         checkout_flow.back_home()
 
-        # Products画面の表示を確かめてから、バッジを検証する
         expect_on_inventory_page(checkout_flow)
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_add_to_cart_button_shown(inventory_flow, bike_light["name"])
@@ -41,15 +41,12 @@ class TestCheckoutCompleteState:
         """TC-CO3-005: カートアイコンで Cart画面へ移っても、カートが空のままであること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れ、購入を完了する）
         checkout_flow.open_complete_with(
             [PRODUCTS["backpack"], PRODUCTS["bike_light"]], CHECKOUT_DATA
         )
 
-        # カートアイコンを押す
         checkout_flow.open_cart()
 
-        # 行が0件であることは画面が移る前でも成り立つため、先に Cart画面の表示を確かめてから検証する
         expect_on_cart_page(checkout_flow)
         expect_cart_item_count(checkout_flow, 0)
         expect_badge_count(checkout_flow, 0)

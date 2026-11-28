@@ -1,4 +1,4 @@
-"""Checkout Complete画面 画面遷移テスト"""
+"""Checkout Complete画面からの画面遷移のテスト"""
 
 from typing import Callable
 
@@ -31,11 +31,8 @@ class TestCheckoutCompleteNavigation:
         """TC-CO3-002/003: Back Home・カートアイコンを押すと、それぞれの画面へ遷移すること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態を作る（Backpack をカートに入れ、購入を完了する）
         checkout_flow.open_complete_with([PRODUCTS["backpack"]], CHECKOUT_DATA)
 
-        # ボタンを押す
         press_button(checkout_flow)
 
-        # 結果を検証する
         expect_destination(checkout_flow)

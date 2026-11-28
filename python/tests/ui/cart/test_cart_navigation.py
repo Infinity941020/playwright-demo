@@ -1,4 +1,4 @@
-"""Cart画面 画面遷移テスト"""
+"""カート画面からの画面遷移のテスト"""
 
 from typing import Callable
 
@@ -34,13 +34,10 @@ class TestCartNavigation:
         """TC-CART-006/007: Continue Shopping・Checkout を押すと、それぞれの画面へ遷移すること。"""
         cart_flow = CartFlow(logged_page)
 
-        # 前提状態を作る（カートには Backpack のみを入れる）
         cart_flow.open_cart_with([PRODUCTS["backpack"]])
 
-        # ボタンを押す
         press_button(cart_flow)
 
-        # 結果を検証する
         expect_destination(cart_flow)
 
     def test_open_product_detail(self, logged_page: Page) -> None:
@@ -48,11 +45,8 @@ class TestCartNavigation:
         cart_flow = CartFlow(logged_page)
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（カートには Bike Light のみを入れる）
         cart_flow.open_cart_with([bike_light])
 
-        # 商品名を押す
         cart_flow.open_product_detail(bike_light["name"])
 
-        # 結果を検証する
         expect_on_product_detail_page(cart_flow, bike_light["id"])

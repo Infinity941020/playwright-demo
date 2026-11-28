@@ -1,4 +1,4 @@
-"""Checkout Step Two画面 状態テスト"""
+"""Checkout Step Two画面で Finish・Cancel・再読み込みをした後の状態のテスト"""
 
 from playwright.sync_api import Page
 
@@ -30,21 +30,17 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # Finish を押す
         checkout_flow.complete_purchase()
         expect_on_checkout_complete_page(checkout_flow)
 
-        # バッジが表示されないことを検証する
         expect_badge_count(checkout_flow, 0)
 
-        # Products画面を URL で開く（Complete画面での操作は、Complete画面の仕様で扱う）
+        # Complete画面での操作は Complete画面の仕様で扱うため、ここでは使わずに、Products画面を URL で開く
         inventory_flow.access_inventory_directly()
         expect_on_inventory_page(checkout_flow)
 
-        # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_add_to_cart_button_shown(inventory_flow, bike_light["name"])
 
@@ -55,14 +51,11 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # Cancel を押す
         checkout_flow.cancel_from_step_two()
         expect_on_inventory_page(checkout_flow)
 
-        # Products画面のボタンの表示とバッジを検証する
         expect_remove_button_shown(inventory_flow, backpack["name"])
         expect_remove_button_shown(inventory_flow, bike_light["name"])
         expect_badge_count(checkout_flow, 2)
@@ -73,13 +66,11 @@ class TestCheckoutStepTwoState:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
-        # 画面を再読み込みする
         checkout_flow.reload_step_two()
 
-        # 結果を検証する（並び順は TC-CO2-003 で確かめるため、ここでは問わない）
+        # 並び順は TC-CO2-003 で確かめるため、ここでは問わない
         expect_step_two_item_count(checkout_flow, 2)
         expect_step_two_item_listed(checkout_flow, backpack["name"])
         expect_step_two_item_listed(checkout_flow, bike_light["name"])

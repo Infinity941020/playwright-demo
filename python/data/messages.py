@@ -1,10 +1,7 @@
-"""画面に表示されるエラー文言
+"""画面に表示されるエラーの文言。
 
-値は両版共通の shared/data/messages.json に置いている。
-文言は、各画面の testcases.md の期待結果と同じにする。
-
-login の not_logged_in は、画面のパスを {path} に差し込んで使う
-（例：MESSAGES["login"]["not_logged_in"].format(path="/cart.html")）。
+値は両版共通の shared/data/messages.json にある。文言は、各画面のテストケースの期待結果と同じにする。
+ログインせずに画面を開いたときの文言は、{path} の部分に、開いた画面のパス（例：/cart.html）を入れて使う。
 """
 
 from data.shared_data import load_shared_data

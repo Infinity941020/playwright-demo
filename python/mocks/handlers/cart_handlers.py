@@ -1,7 +1,6 @@
-"""Cart Mock Handlers（TS版 mocks/handlers/cartHandlers.ts に対応）
+"""カートの API（一覧・追加・削除）。
 
-カートの中身と id の連番は、create_cart_handlers() を呼ぶたびに新しく作られる。
-モックサーバーはテストごとに新しく立ち上げるため、状態はテストをまたがない。
+カートの中身と id の連番は、ハンドラーを作るたびに新しく作る。サーバーはテストごとに新しく立てるため、状態はテストをまたがない。
 """
 
 from mocks.handler_types import Handler, MockRequest, MockResponse, to_number
@@ -25,7 +24,8 @@ def create_cart_handlers() -> list[Handler]:
         if body is None:
             return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
-        # productId が指定されていないときは 400 を返す（0 も指定なしとみなす。specs/api_spec.md「判断できない挙動」）
+        # productId が指定されていないときは 400 を返す
+        # （0 も指定なしとみなす。specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         if not isinstance(body, dict) or not body.get("productId"):
             return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 
@@ -41,7 +41,8 @@ def create_cart_handlers() -> list[Handler]:
 
     def delete_cart(request: MockRequest) -> MockResponse:
         cart_id = to_number(request.params["id"])
-        # 存在しない id でも 200 を返す（この挙動は、意図された仕様か不具合か判断できないため、モックではそのまま再現し、テストでは確かめない。specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
+        # 存在しない id でも 200 を返す。意図された仕様か不具合か判断できないため、モックではそのまま再現し、テストでは確かめない
+        # （specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         cart[:] = [item for item in cart if item["id"] != cart_id]
         return MockResponse(200, {"success": True})
 

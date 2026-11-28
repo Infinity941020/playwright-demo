@@ -1,9 +1,6 @@
-"""InventoryFlow
+"""商品一覧画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 
-責務:
-    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
-    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
-    - InventoryPage・HeaderComponent・CartPage の呼び出しは Flow の中で行う
+テストから画面の細かい操作を直接扱わずに済むようにする。
 """
 
 from typing import Literal
@@ -22,18 +19,16 @@ class InventoryFlow:
         # 操作の後に移るカート画面の表示を確かめるために使う
         self._cart_page = CartPage(page)
 
-    # 利用者の操作の単位で、画面を操作する。
-
     def access_inventory_directly(self) -> None:
-        """商品一覧画面のURLを開く（表示は確かめない）。"""
+        """商品一覧画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）。"""
         self._inventory_page.goto()
 
     def access_product_detail_directly(self, product_id: int) -> None:
-        """商品詳細画面のURLを開く（表示は確かめない）。"""
+        """商品詳細画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）。"""
         self._inventory_page.goto_product_detail(product_id)
 
     def reload_inventory(self) -> None:
-        """商品一覧画面を再読み込みする。"""
+        """再読み込みして、商品一覧画面のままであることを確かめる。"""
         self._inventory_page.reload()
         self._inventory_page.expect_on_page()
 
@@ -47,7 +42,7 @@ class InventoryFlow:
         self._inventory_page.remove_from_cart(product_name)
 
     def open_product_detail(self, product_name: str, via: Literal["name", "image"]) -> None:
-        """商品名または商品画像から商品詳細画面を開く。"""
+        """商品名または商品画像から、商品詳細画面を開く。"""
         if via == "name":
             self._inventory_page.click_product_name(product_name)
         else:
@@ -57,10 +52,8 @@ class InventoryFlow:
         """カートアイコンからカート画面を開く。"""
         self._header.click_cart_icon()
 
-    # 画面の状態を検証する。
-
     def expect_products_displayed(self, products: list[dict]) -> None:
-        """商品一覧の表示を検証する（件数、各商品の表示項目、商品名と価格の組み合わせ）。"""
+        """商品一覧の表示を確かめる（件数、各商品の表示項目、商品名と価格の組み合わせ）。"""
         self._inventory_page.expect_product_count(len(products))
         self._inventory_page.expect_all_product_elements_visible()
         for product in products:
@@ -76,11 +69,11 @@ class InventoryFlow:
         self._inventory_page.expect_selected_sort(option_label)
 
     def expect_remove_button_shown(self, product_name: str) -> None:
-        """指定した商品のボタンが Remove と表示されていることを確かめる（カートに追加済みの状態）。"""
+        """渡した商品のボタンが Remove と表示されていることを確かめる（カートに追加済みの状態）。"""
         self._inventory_page.expect_remove_button(product_name)
 
     def expect_add_to_cart_button_shown(self, product_name: str) -> None:
-        """指定した商品のボタンが Add to cart と表示されていることを確かめる（カートに追加していない状態）。"""
+        """渡した商品のボタンが Add to cart と表示されていることを確かめる（カートに追加していない状態）。"""
         self._inventory_page.expect_add_to_cart_button(product_name)
 
     def expect_badge_count(self, count: int) -> None:

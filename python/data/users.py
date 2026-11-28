@@ -1,13 +1,10 @@
-"""ログインユーザー情報
+"""ログインに使うユーザー名とパスワード。
 
-値は両版共通の shared/data/users.json に置いている。
+値は両版共通の shared/data/users.json にある。
 """
 
 from data.shared_data import load_shared_data
 
-# 次のユーザーを定義している
-#   standard：ログインに成功するユーザー
-#   locked：ロックされていて、ログインできないユーザー
-#   wrong_username_only：異常系のテストに使う（ユーザー名だけが誤り）
-#   wrong_password_only：異常系のテストに使う（パスワードだけが誤り）
+# ログインに成功するユーザー、ロックされていてログインできないユーザー、
+# ユーザー名だけが誤っている組、パスワードだけが誤っている組を持つ
 USERS = load_shared_data("users.json")

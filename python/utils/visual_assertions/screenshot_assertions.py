@@ -1,11 +1,10 @@
-"""Visual Assertions（TS版の utils/visualAssertions/screenshotAssertions.ts に対応）
+"""画面の見た目を、基準画像と比べて確かめる。
 
-責務:
-    - フォントと画像の読み込みが終わるのを待ってから撮影する
-    - 基準画像と比べ、失敗したときはファイルを保存する
-
-画面の表示の確認（expect_on_page など）は、呼び出す前に Flow で済ませておくこと。
-固定の時間の待ちは使わない（環境によって足りなかったり無駄だったりするため。撮影の条件は specs/visual_spec.md「■ 撮影の条件」）。
+- 画面の表示の確認は、呼び出す側（前提を作る部品）で済ませておく
+- 撮る前に、フォントと、ページの中の画像の要素（背景として描く絵は含まない）の読み込みが終わるのを待つ。
+  画面によっては、見出しが出た後も画像の読み込みが続くため
+- 固定の時間の待ちは使わない（環境によって足りなかったり無駄だったりするため）。撮る条件は specs/visual_spec.md「■ 撮影の条件」
+- 失敗したときは、比べた画像をファイルに保存する（保存するものは specs/visual_spec.md「■ 失敗したときに保存するもの」）
 """
 
 import io
@@ -20,15 +19,14 @@ _PYTHON_ROOT = Path(__file__).resolve().parent.parent.parent
 SNAPSHOT_DIR = _PYTHON_ROOT / "tests" / "visual" / "__snapshots__"
 RESULT_DIR = _PYTHON_ROOT / "test-results" / "visual"
 
-# 撮影する画面の大きさを定める（基準画像は、この大きさで撮ったもの）
+# 撮る画面の大きさ（基準画像は、この大きさで撮ったもの）
 _VIEWPORT = {"width": 1280, "height": 720}
 
 
 def expect_screenshot_matches(page: Page, snapshot_name: str, max_diff_ratio: float) -> None:
-    """表示中の範囲を撮影し、基準画像との違う画素の割合が許容値以下であること。
+    """表示している範囲を撮り、基準画像と違う画素の割合が上限以下であることを確かめる。
 
-    snapshot_name は基準画像のファイル名（例：login-page.png）。
-    max_diff_ratio は違う画素の割合の上限（例：0.01 = 1%）。
+    基準画像のファイル名（例：login-page.png）と、違う画素の割合の上限（例：0.01 = 1%）を受け取る。
     """
     name = Path(snapshot_name).stem
     actual = _take_screenshot(page)
@@ -68,16 +66,14 @@ def expect_screenshot_matches(page: Page, snapshot_name: str, max_diff_ratio: fl
 
 
 def _take_screenshot(page: Page) -> Image.Image:
-    """撮影前の待ちを行ってから、表示中の範囲を撮影する。"""
+    """撮る前の待ちをしてから、表示している範囲を撮る。"""
     if page.viewport_size != _VIEWPORT:
         raise AssertionError(
             f"画面の大きさが {_VIEWPORT['width']}×{_VIEWPORT['height']} ではない: "
             f"{page.viewport_size}"
         )
 
-    # フォントの読み込みが終わるのを待つ
     page.evaluate("async () => { await document.fonts.ready; }")
-    # ページの中の画像の要素（背景として描く絵は含まない）の読み込みが終わるのを待つ
     page.wait_for_function("() => Array.from(document.images).every((image) => image.complete)")
 
     screenshot = page.screenshot(animations="disabled", caret="hide")

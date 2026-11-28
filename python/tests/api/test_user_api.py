@@ -1,11 +1,11 @@
-"""User APIテスト"""
+"""User の API のテスト"""
 
 from playwright.sync_api import APIRequestContext
 
 from utils.api_assertions.user_assertions import expect_single_user_response, expect_user_not_found
 from utils.api_helper import execute_get_user_api
 
-# 値は api_spec.md「User API」の表と同じにする
+# 値は specs/api_spec.md「User API」の表と同じにする
 _EXPECTED_USER = {
     "id": 2,
     "email": "janet.weaver@reqres.in",
@@ -20,16 +20,12 @@ class TestUserApi:
 
     def test_get_existing_user(self, api_request_context: APIRequestContext) -> None:
         """TC-API-USER-001: 存在するユーザーの情報が返ること。"""
-        # API を呼び出す
         response = execute_get_user_api(api_request_context, 2)
 
-        # 結果を検証する
         expect_single_user_response(response, _EXPECTED_USER)
 
     def test_get_missing_user(self, api_request_context: APIRequestContext) -> None:
         """TC-API-USER-002: 存在しないユーザーで 404 が返ること。"""
-        # API を呼び出す
         response = execute_get_user_api(api_request_context, 9999)
 
-        # 結果を検証する
         expect_user_not_found(response)

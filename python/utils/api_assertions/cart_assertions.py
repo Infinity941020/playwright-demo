@@ -1,4 +1,4 @@
-"""Cart API Assertions（TS版 utils/apiAssertions/cartAssertions.ts に対応）"""
+"""Cart の API の返事を確かめる。"""
 
 from playwright.sync_api import APIResponse
 
@@ -10,7 +10,7 @@ _STATUS_BAD_REQUEST = 400
 
 
 def expect_add_cart_success(response: APIResponse, product_id: int, quantity: int) -> None:
-    """カートへの追加が成功したことを確かめる（201、id が数値、productId・quantity が期待値と一致）。"""
+    """カートに追加できたことを確かめる（201、id が整数、productId・quantity が期待値と同じ）。"""
     expect_status(response, _STATUS_CREATED)
     body = response.json()
     assert isinstance(body["id"], int) and not isinstance(body["id"], bool)
@@ -19,16 +19,15 @@ def expect_add_cart_success(response: APIResponse, product_id: int, quantity: in
 
 
 def expect_cart_bad_request(response: APIResponse, error: str) -> None:
-    """カートへの追加がエラーになったことを確かめる（400、error が期待値と一致）。"""
+    """カートに追加できなかったことを確かめる（400、エラーの文言が期待値と同じ）。"""
     expect_status(response, _STATUS_BAD_REQUEST)
     assert response.json()["error"] == error
 
 
 def expect_get_cart_list_success(response: APIResponse, expected_items: list[dict]) -> None:
-    """カートの一覧の取得が成功したことを確かめる（200、items の件数と、各行の指定した項目の値が期待値と一致）。
+    """カートの一覧を取得できたことを確かめる（200、行の数と、各行の指定した項目の値が期待値と同じ）。
 
-    expected_items の各要素には、確かめたい項目だけを書く（例：{"productId": 1}）。
-    行は追加した順に並ぶ。
+    期待値の各行には、確かめたい項目だけを書く（例：{"productId": 1}）。行は追加した順に並ぶ。
     """
     expect_status(response, _STATUS_OK)
     items = response.json()["items"]
@@ -38,6 +37,6 @@ def expect_get_cart_list_success(response: APIResponse, expected_items: list[dic
 
 
 def expect_delete_cart_success(response: APIResponse) -> None:
-    """カートからの削除が成功したことを確かめる（200、success が true）。"""
+    """カートから削除できたことを確かめる（200、success が true）。"""
     expect_status(response, _STATUS_OK)
     assert response.json()["success"] is True

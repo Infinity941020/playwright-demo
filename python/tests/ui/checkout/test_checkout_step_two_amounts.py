@@ -1,4 +1,7 @@
-"""Checkout Step Two画面 金額テスト"""
+"""Checkout Step Two画面の小計・税・合計のテスト。
+
+期待する金額は、計算で作らず、テストケース（実機で確認した値）と同じ値を書く。
+"""
 
 import pytest
 from playwright.sync_api import Page
@@ -32,8 +35,6 @@ class TestCheckoutStepTwoAmounts:
         """TC-CO2-004/005/006: 小計・税・合計が、実機で確認した値どおりに表示されること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態を作る（カートに1件・2件・全6件のいずれかを入れる）
         checkout_flow.open_step_two_with(products, CHECKOUT_DATA)
 
-        # 結果を検証する
         expect_step_two_amounts(checkout_flow, item_total, tax, total)

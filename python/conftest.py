@@ -1,15 +1,13 @@
-"""python/ 直下の conftest（pytest がテストの前に読み込む設定）
+"""テストの前に pytest が読み込む設定。
 
-責務:
-    - fixture を定義したモジュールを登録する
-    - APIの確認関数（utils/api_assertions/）の assert を、失敗時に値が表示される形にする
+- テストの準備の部品（ログイン済みの画面、API のモックのサーバー）を登録する
+- API の返事の確認が失敗したときに、比べた値が表示されるようにする
 """
 
 import pytest
 
-# utils/api_assertions/ は assert で値を直接確かめる。
-# テストファイル以外の assert は pytest の書き換えの対象外で、失敗時に値が表示されないため、
-# import される前に書き換えの対象として登録する。
+# API の返事の確認（utils/api_assertions/）は、値を直接比べて確かめる。
+# pytest は、失敗したときに比べた値を表示する仕組みを、テストのファイルにしか入れないため、読み込まれる前に対象に加える
 pytest.register_assert_rewrite("utils.api_assertions")
 
 pytest_plugins = ["fixtures.login_fixture", "fixtures.api_fixture"]

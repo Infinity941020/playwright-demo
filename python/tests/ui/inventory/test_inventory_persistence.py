@@ -1,4 +1,4 @@
-"""Products画面 状態保持テスト"""
+"""Products画面を再読み込みした後も、状態が保たれることのテスト"""
 
 from playwright.sync_api import Page
 
@@ -20,11 +20,9 @@ class TestInventoryPersistence:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]["name"]
 
-        # 商品をカートに追加してから、再読み込みする
         inventory_flow.add_to_cart(backpack)
         inventory_flow.reload_inventory()
 
-        # 結果を検証する
         expect_remove_button_shown(inventory_flow, backpack)
         expect_badge_count(inventory_flow, 1)
 
@@ -32,12 +30,10 @@ class TestInventoryPersistence:
         """TC-PROD-013: 再読み込み後、ソートが Name (A to Z) に戻ること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # ソートを変えてから、再読み込みする
         inventory_flow.sort_by(SORT_OPTIONS["price_desc"])
         expect_selected_sort(inventory_flow, SORT_OPTIONS["price_desc"])
         inventory_flow.reload_inventory()
 
-        # 結果を検証する
         expect_selected_sort(inventory_flow, SORT_OPTIONS["name_asc"])
         expect_product_names_in_order(
             inventory_flow, [product["name"] for product in PRODUCTS.values()]

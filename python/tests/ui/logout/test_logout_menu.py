@@ -1,4 +1,7 @@
-"""Logout（メニュー） メニューの表示・開閉テスト"""
+"""左上のメニューの表示と開閉のテスト。
+
+ログイン済みの画面は、Products画面を開いた状態で始まる。
+"""
 
 from typing import Callable
 
@@ -18,10 +21,8 @@ class TestLogoutMenu:
         """TC-LOGOUT-001: メニューを開くと、5つの項目が仕様どおりの並び順で表示されること。"""
         logout_flow = LogoutFlow(logged_page)
 
-        # メニューを開く（logged_page は Products画面を開いた状態で始まる）
         logout_flow.open_menu()
 
-        # 結果を検証する
         expect_menu_items(logout_flow, _MENU_ITEMS)
 
     @pytest.mark.parametrize(
@@ -35,9 +36,7 @@ class TestLogoutMenu:
         """TC-LOGOUT-002/003: ×ボタン・Esc キーを押すと、メニューが閉じること。"""
         logout_flow = LogoutFlow(logged_page)
 
-        # メニューを開いてから閉じる
         logout_flow.open_menu()
         close_menu(logout_flow)
 
-        # 結果を検証する
         expect_menu_closed(logout_flow)

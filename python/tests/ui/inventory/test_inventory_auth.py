@@ -1,4 +1,7 @@
-"""Products画面 認証テスト"""
+"""Products画面を、ログインせずに開いたときのテスト。
+
+ログインした状態を引き継がないように、ログイン済みの画面を用意する部品は使わない。
+"""
 
 from playwright.sync_api import Page
 
@@ -14,16 +17,11 @@ class TestInventoryAuth:
     """未ログイン時のアクセスを確かめる。"""
 
     def test_redirect_to_login_when_not_logged_in(self, page: Page) -> None:
-        """TC-PROD-014: 未ログインで直接アクセスすると、Login画面へ戻されること。
-
-        ログイン状態を引き継がないよう、logged_pageではなく通常のpageを使用する。
-        """
+        """TC-PROD-014: 未ログインで直接アクセスすると、Login画面へ戻されること。"""
         inventory_flow = InventoryFlow(page)
         login_flow = LoginFlow(page)
 
-        # ログインせずに、画面の URL を直接開く
         inventory_flow.access_inventory_directly()
 
-        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _NOT_LOGGED_IN_MESSAGE)
