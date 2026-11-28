@@ -164,6 +164,16 @@ CIの詳細設定（retry / worker制御 / キャッシュ戦略等）は
    失敗したときは、両版の画像が違います。ジョブの要約と、Artifact の visual-baselines-comparison の差分の画像で確かめます
 3. プルリクエストで出し、GitHub の画像の差分の表示で、変わった所を確かめます
 
+### 両版の画像が合わなかったとき
+
+Artifact の visual-baselines-comparison の差分の画像（違う画素を赤で塗ったもの）と、両版の画像を見て、次のように進めます。
+
+- 文字の縁のぼかしの違いだけなら、撮影用の実行をもう一度動かします
+- 文字の形・アイコン・配置など、縁のぼかし以外の違いがあれば、もう一度動かさずに原因を調べます
+
+文字の縁のぼかしは、ブラウザを起動するたびに、まれに少し変わることがあるためです。
+この違いは、普段のテストの許容値の中に十分収まります。
+
 両版とも、手元でも撮れます（TS版：`npx playwright test --project=chromium-visual --update-snapshots=all`、
 Python版：`pytest tests/visual -m visual --update-snapshots`）。ただし描画が CI と違うため、手元で撮った画像は基準画像にしません。
 詳しくは [visual_spec.md](specs/visual_spec.md) の「基準画像の作り方・作り直し方」を参照してください。
