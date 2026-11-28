@@ -10,13 +10,13 @@ from playwright.sync_api import Locator, Page, expect
 class MenuPage:
     def __init__(self, page: Page) -> None:
         self.page: Page = page
-        # 開くボタンと閉じるボタンにはテスト用の属性がないため、要素の id で探す
+        # 開くボタンと閉じるボタンには data-test 属性がないため、id 属性で探す
         self.menu_button: Locator = page.locator("#react-burger-menu-btn")
         self.close_button: Locator = page.locator("#react-burger-cross-btn")
-        # メニュー領域には id もテスト用の属性もないため、見た目の指定に使う名前で探す
+        # メニュー領域には id 属性も data-test 属性もないため、class 属性の値で探す
         self.menu_area: Locator = page.locator(".bm-menu-wrap")
         # Dynamic Catalog を開くと出る子の項目を含めないように、
-        # テスト用の属性の値が「-sidebar-link」で終わる項目だけを探す
+        # data-test 属性の値が「-sidebar-link」で終わる項目だけを探す
         self.menu_items: Locator = page.locator('[data-test$="-sidebar-link"]')
         self.all_items_link: Locator = page.locator('[data-test="inventory-sidebar-link"]')
         self.logout_link: Locator = page.locator('[data-test="logout-sidebar-link"]')
@@ -44,7 +44,11 @@ class MenuPage:
         self.logout_link.click()
 
     def expect_menu_opened(self) -> None:
-        """メニューが開いていることを、aria-hidden 属性と最初の項目の表示の両方で確かめる。"""
+        """メニューが開いていることを、aria-hidden 属性と最初の項目の表示の両方で確かめる。
+
+        開いた扱い（aria-hidden 属性が false）でも、項目が隠れたままのことがあるため
+        （specs/logout_spec.md の「実機で確認したが、意図された仕様か不具合かを判断できない挙動」）。
+        """
         expect(self.menu_area).to_have_attribute("aria-hidden", "false")
         expect(
             self.menu_items.first,

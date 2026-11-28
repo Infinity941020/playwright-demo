@@ -61,7 +61,7 @@ class TestCartApi:
             execute_add_cart_api(api_request_context, item)
         response = execute_get_cart_api(api_request_context)
 
-        # ほかのテストで追加した行が含まれないことも、行の数で確かめる
+        # 追加していない行が一覧に混ざらないことも、行の数で確かめる
         expect_get_cart_list_success(response, items)
 
     def test_delete_cart(self, api_request_context: APIRequestContext) -> None:

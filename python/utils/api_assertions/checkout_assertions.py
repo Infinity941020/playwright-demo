@@ -15,6 +15,7 @@ def expect_checkout_success(
     expect_status(response, _STATUS_CREATED)
     body = response.json()
     assert body["success"] is True
+    # Python では真偽値も整数として扱われるため、真偽値は除く
     assert isinstance(body["checkoutId"], int) and not isinstance(body["checkoutId"], bool)
     assert body["cartId"] == cart_id
     assert body["userId"] == user_id

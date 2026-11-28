@@ -5,6 +5,9 @@
 
 from data.shared_data import load_shared_data
 
-# ログインに成功するユーザー、ロックされていてログインできないユーザー、
-# ユーザー名だけが誤っている組、パスワードだけが誤っている組を持つ
+# 次の4つの組を持つ
+# - ログインに成功するユーザー（standard_user）
+# - ロックされていて、ログインできないユーザー（locked_out_user）
+# - ユーザー名だけが誤っている組（存在しないユーザー名と、正しいパスワード）
+# - パスワードだけが誤っている組（standard_user と、誤ったパスワード）
 USERS = load_shared_data("users.json")

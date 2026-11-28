@@ -7,7 +7,7 @@ from data.shared_data import load_shared_data
 
 _PRODUCTS_DATA = load_shared_data("products.json")
 
-# 仕様書「表示商品」の表の順（初期表示の Name (A to Z) の並び）。
+# specs/products_spec.md の「■ 表示商品（初期表示順）」の表の順（初期表示の Name (A to Z) の並び）。
 # 各商品の番号は、商品詳細画面の URL（inventory-item.html?id=）に付く番号
 PRODUCTS = _PRODUCTS_DATA["products"]
 

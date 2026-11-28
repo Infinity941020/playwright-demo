@@ -5,7 +5,7 @@ from playwright.sync_api import APIRequestContext
 from utils.api_assertions.user_assertions import expect_single_user_response, expect_user_not_found
 from utils.api_helper import execute_get_user_api
 
-# 値は specs/api_spec.md「User API」の表と同じにする
+# 値は、specs/api_spec.md「User API」の表と同じ値を書く
 _EXPECTED_USER = {
     "id": 2,
     "email": "janet.weaver@reqres.in",

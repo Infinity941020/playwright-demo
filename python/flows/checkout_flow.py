@@ -1,6 +1,6 @@
 """Checkout の画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 
-- ボタンやアイコンを押す操作は、移った先の画面を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
+- ボタンやアイコンを押す操作は、移った先の画面までは見ない。移った先は、呼び出す側で別に確かめる
 - 前提の状態を作る操作は、開いた画面が表示されたことまで確かめる
 """
 
@@ -20,7 +20,7 @@ class CheckoutFlow:
         self._header = HeaderComponent(page)
         # 前提の状態を作るためと、操作の後に移るカート画面の表示を確かめるために使う
         self._cart_page = CartPage(page)
-        # 操作の後に移る商品一覧画面・商品詳細画面の表示を確かめるために使う
+        # 操作の後に移る Products画面・商品詳細画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
 
     def open_step_one_with(self, products: list[dict]) -> None:
@@ -28,8 +28,10 @@ class CheckoutFlow:
 
         カートの中身は、ブラウザの保存領域への直接書き込みで作る
         （Products画面の不具合で、Checkout画面のテストまで失敗しないようにするため）。
-        Step One画面は URL で開く（Cart画面からの遷移は、Cart画面のテストで確かめているため）。
-        商品は、data/products.py の商品の値を渡す。
+        Step One画面は URL で開く（カート画面からの遷移は、カート画面のテストで確かめているため）。
+        開いた後に、バッジの件数が入れた件数と同じことを確かめる
+        （この画面には商品の行がなく、カートが空でも先へ進めるため、書き込みが効いたことをバッジで見る）。
+        商品は、data/products.py にある商品（1商品分のまとまり）を渡す。
         """
         self._cart_page.set_cart_contents([product["id"] for product in products])
         self._step_one_page.goto()
@@ -39,7 +41,7 @@ class CheckoutFlow:
     def access_step_one_directly(self) -> None:
         """Checkout Step One画面の URL を開く。
 
-        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
         """
         self._step_one_page.goto()
 
@@ -78,8 +80,7 @@ class CheckoutFlow:
         self._step_one_page.expect_info_values(first_name, last_name, postal_code)
 
     def open_step_two_with(self, products: list[dict], checkout_info: dict) -> None:
-        """渡した商品がカートに入った状態で、Step One で購入者情報を入れて Continue を押し、
-        Checkout Step Two画面を開く。
+        """渡した商品がカートに入った状態で、購入者情報を入れて Continue を押し、Checkout Step Two画面を開く。
 
         Step Two の URL を直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
         前提の状態を作るときには使わない（specs/checkout_step_two_testcases.md の「前提状態の作り方」）。
@@ -95,7 +96,7 @@ class CheckoutFlow:
     def access_step_two_directly(self) -> None:
         """Checkout Step Two画面の URL を開く。
 
-        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
         """
         self._step_two_page.goto()
 
@@ -155,7 +156,7 @@ class CheckoutFlow:
     def access_complete_directly(self) -> None:
         """Checkout Complete画面の URL を開く。
 
-        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
         """
         self._complete_page.goto()
 

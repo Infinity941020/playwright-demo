@@ -19,7 +19,11 @@ class LogoutFlow:
         self._inventory_page = InventoryPage(page)
 
     def open_menu(self) -> None:
-        """メニューを開き、開いたことを確かめる（aria-hidden 属性と最初の項目の表示で判定する）。"""
+        """メニューを開き、開いたことを、aria-hidden 属性と最初の項目の表示の両方で確かめる。
+
+        開いた扱い（aria-hidden 属性が false）でも、項目が隠れたままのことがあるため
+        （specs/logout_spec.md の「実機で確認したが、意図された仕様か不具合かを判断できない挙動」）。
+        """
         self._menu_page.wait_until_menu_closed()
         self._menu_page.click_menu_button()
         self._menu_page.expect_menu_opened()
@@ -33,7 +37,7 @@ class LogoutFlow:
         self._menu_page.press_escape()
 
     def logout(self) -> None:
-        """メニューを開いて Logout を押し、Login画面へ戻ったことを確かめる。"""
+        """メニューを開いて Logout を押し、ログイン画面へ戻ったことを確かめる。"""
         self.open_menu()
         self._menu_page.click_logout()
         self._login_page.expect_on_login_page()

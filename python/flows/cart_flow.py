@@ -15,7 +15,7 @@ class CartFlow:
     def __init__(self, page: Page) -> None:
         self._cart_page = CartPage(page)
         self._header = HeaderComponent(page)
-        # 操作の後に移る商品一覧画面・商品詳細画面の表示を確かめるために使う
+        # 操作の後に移る Products画面・商品詳細画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
         # 操作の後に移る Checkout Step One画面の表示を確かめるために使う
         self._checkout_step_one_page = CheckoutStepOnePage(page)
@@ -25,7 +25,9 @@ class CartFlow:
 
         前提の状態は、ブラウザの保存領域への直接書き込みで作る
         （Products画面の不具合で、カート画面のテストまで失敗しないようにするため）。
-        商品は、data/products.py の商品の値を渡す。
+        開いた後に、行の数が入れた件数と同じことを確かめる
+        （書き込みが効かずに、空のカートのままテストが進まないように）。
+        商品は、data/products.py にある商品（1商品分のまとまり）を渡す。
         """
         self._cart_page.set_cart_contents([product["id"] for product in products])
         self._cart_page.goto()
@@ -33,7 +35,10 @@ class CartFlow:
         self._cart_page.expect_item_count(len(products))
 
     def access_cart_directly(self) -> None:
-        """カート画面の URL を開く（ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない）。"""
+        """カート画面の URL を開く。
+
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        """
         self._cart_page.goto()
 
     def reload_cart(self) -> None:

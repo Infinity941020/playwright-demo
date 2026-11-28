@@ -14,7 +14,6 @@ def execute_login_api(request: APIRequestContext, payload: dict) -> APIResponse:
     return request.post(f"{_BASE_PATH}/login", data=payload)
 
 
-# ユーザーの情報を取得するだけで、変更はしない
 def execute_get_user_api(request: APIRequestContext, user_id: int) -> APIResponse:
     return request.get(f"{_BASE_PATH}/users/{user_id}")
 

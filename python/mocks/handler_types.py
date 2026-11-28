@@ -39,7 +39,7 @@ class MockResponse:
 @dataclass
 class Handler:
     method: str
-    # 例：/api/cart/{id}（{名前} の部分は、リクエストの params に入る）
+    # 例：/api/cart/{id}（{名前} の部分に当てはまった値は、名前ごとにリクエストへ渡す）
     path: str
     resolver: Callable[[MockRequest], MockResponse]
 

@@ -1,7 +1,9 @@
 """カート画面の操作と、画面の表示の確認をまとめる。
 
 - 商品ごとの部分（ボタン・価格など）は、商品名でカートの行を探してから、その中で探す
-- 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
+  （並び順や位置に頼らずに商品を決めるため）
+- 画面を開く操作は、表示までは見ない（ログインしていないときに開くと、その画面ではなく Login画面が出るため）。
+  表示は、呼び出す側で別に確かめる
 """
 
 import json
@@ -20,7 +22,8 @@ class CartPage:
         self.description_label: Locator = page.locator('[data-test="cart-desc-label"]')
         self.continue_shopping_button: Locator = page.locator('[data-test="continue-shopping"]')
         self.checkout_button: Locator = page.locator('[data-test="checkout"]')
-        # 削除した行は、見えない要素として画面に残るため、テスト用の属性で商品の行と決められている要素だけを数える
+        # 削除した行は、見えない要素として画面に残るため、
+        # data-test 属性が inventory-item の要素だけを、商品の行として数える
         self.cart_items: Locator = page.locator('[data-test="inventory-item"]')
         self.item_names: Locator = self.cart_items.locator('[data-test="inventory-item-name"]')
 

@@ -1,6 +1,6 @@
 """左上のメニューの表示と開閉のテスト。
 
-ログイン済みの画面は、Products画面を開いた状態で始まる。
+ログイン済みの画面は Products画面を開いた状態で始まるため、どのテストも Products画面でメニューを開く。
 """
 
 from typing import Callable

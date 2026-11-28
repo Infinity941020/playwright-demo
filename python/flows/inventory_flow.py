@@ -20,11 +20,18 @@ class InventoryFlow:
         self._cart_page = CartPage(page)
 
     def access_inventory_directly(self) -> None:
-        """商品一覧画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）。"""
+        """商品一覧画面の URL を開く。
+
+        ログインしていないときやログアウトした後の確認と、購入した後に商品一覧画面を開くときに使う。
+        ログインしていないと Login画面が出るため、表示は見ない（表示は、呼び出す側で別に確かめる）。
+        """
         self._inventory_page.goto()
 
     def access_product_detail_directly(self, product_id: int) -> None:
-        """商品詳細画面の URL を開く（表示は確かめないので、確かめるときは続けて表示を確かめる処理も呼ぶ）。"""
+        """商品詳細画面の URL を開く。
+
+        ログアウトした後の確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        """
         self._inventory_page.goto_product_detail(product_id)
 
     def reload_inventory(self) -> None:

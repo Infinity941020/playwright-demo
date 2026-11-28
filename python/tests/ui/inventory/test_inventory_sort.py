@@ -13,7 +13,7 @@ from utils.ui_assertions.inventory_assertions import (
     expect_selected_sort,
 )
 
-# 仕様書「表示商品」の表の順（No.1→No.6）
+# specs/products_spec.md の「■ 表示商品（初期表示順）」の表の順（No.1→No.6）
 _PRODUCT_NAMES = [product["name"] for product in PRODUCTS.values()]
 _PRICES = [product["price"] for product in PRODUCTS.values()]
 

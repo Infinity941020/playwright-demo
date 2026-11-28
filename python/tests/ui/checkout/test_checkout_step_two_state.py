@@ -33,6 +33,7 @@ class TestCheckoutStepTwoState:
         checkout_flow.open_step_two_with([backpack, bike_light], CHECKOUT_DATA)
 
         checkout_flow.complete_purchase()
+        # バッジがないことは、バッジのないほかの画面でも成り立つため、先に Complete画面であることを確かめる
         expect_on_checkout_complete_page(checkout_flow)
 
         expect_badge_count(checkout_flow, 0)

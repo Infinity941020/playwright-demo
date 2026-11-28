@@ -29,6 +29,7 @@ class TestCheckoutStepOnePersistence:
         checkout_flow.fill_checkout_info(first_name, last_name, "")
         checkout_flow.proceed_to_overview_step()
 
+        # 入力欄の値は Continue を押す前から同じため、先にエラーの文言で、先へ進めなかったことを確かめる
         expect_checkout_error_message(checkout_flow, _POSTAL_CODE_REQUIRED_MESSAGE)
         expect_checkout_info_values(checkout_flow, first_name, last_name, "")
 

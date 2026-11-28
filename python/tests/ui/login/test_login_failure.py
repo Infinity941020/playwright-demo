@@ -12,7 +12,7 @@ from utils.ui_assertions.login_assertions import (
     expect_username_retained,
 )
 
-# エラーの文言（shared/data/messages.json）は、specs/login_testcases.md の期待結果と同じにしている
+# エラーの文言は shared/data/messages.json から読む。そこには、specs/login_testcases.md の期待結果と同じ値を書く
 _USERNAME_REQUIRED_MESSAGE = MESSAGES["login"]["username_required"]
 _PASSWORD_REQUIRED_MESSAGE = MESSAGES["login"]["password_required"]
 _CREDENTIALS_MISMATCH_MESSAGE = MESSAGES["login"]["credentials_mismatch"]
@@ -79,5 +79,6 @@ class TestLoginFailure:
 
         login_flow.login(username, "")
 
+        # 入力欄の値はボタンを押す前から同じため、先にエラーの文言で、ログインに失敗したことを確かめる
         expect_login_error_message(login_flow, _PASSWORD_REQUIRED_MESSAGE)
         expect_username_retained(login_flow, username)

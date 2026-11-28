@@ -13,6 +13,7 @@ def expect_add_cart_success(response: APIResponse, product_id: int, quantity: in
     """カートに追加できたことを確かめる（201、id が整数、productId・quantity が期待値と同じ）。"""
     expect_status(response, _STATUS_CREATED)
     body = response.json()
+    # Python では真偽値も整数として扱われるため、真偽値は除く
     assert isinstance(body["id"], int) and not isinstance(body["id"], bool)
     assert body["productId"] == product_id
     assert body["quantity"] == quantity

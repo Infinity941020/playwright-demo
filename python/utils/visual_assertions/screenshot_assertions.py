@@ -33,6 +33,7 @@ def expect_screenshot_matches(page: Page, snapshot_name: str, max_diff_ratio: fl
     actual = _take_screenshot(page)
 
     expected_path = SNAPSHOT_DIR / snapshot_name
+    # 基準画像がないのに成功にすると、比べ忘れに気づけないため、今の画像を保存して失敗させる
     if not expected_path.exists():
         _save(actual, f"{name}-actual.png")
         raise AssertionError(

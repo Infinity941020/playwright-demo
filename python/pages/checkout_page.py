@@ -1,8 +1,9 @@
 """Checkout の3つの画面（Step One・Step Two・Complete）の操作と、画面の表示の確認をまとめる。
 
 - クラスは画面ごとに分ける（ほかの画面と同じく、1画面1クラスにするため）
-- 商品ごとの部分は、商品名で商品の行を探してから、その中で探す
-- 画面を開く操作は表示を確かめないので、確かめるときは呼び出す側で表示を確かめる処理も呼ぶ
+- 商品ごとの部分は、商品名で商品の行を探してから、その中で探す（並び順や位置に頼らずに商品を決めるため）
+- 画面を開く操作は、表示までは見ない（ログインしていないときに開くと、その画面ではなく Login画面が出るため）。
+  表示は、呼び出す側で別に確かめる
 """
 
 import re
@@ -31,7 +32,7 @@ class CheckoutStepOnePage:
         self.page.reload()
 
     def fill_info(self, first_name: str, last_name: str, postal_code: str) -> None:
-        """購入者情報を入力する（空文字を渡すと、その欄は空欄になる）。"""
+        """購入者情報を入力する（空文字を渡すと、その欄は空になる）。"""
         self.first_name_input.fill(first_name)
         self.last_name_input.fill(last_name)
         self.postal_code_input.fill(postal_code)
@@ -66,7 +67,7 @@ class CheckoutStepOnePage:
         expect(self.postal_code_input).to_have_attribute("placeholder", "Zip/Postal Code")
         expect(self.cancel_button).to_be_visible()
         expect(self.cancel_button).to_have_text("Cancel")
-        # Continue は、文言を要素の中の文字ではなく値として持つ作りのため、値で確かめる
+        # Continue は、文言を value 属性で持つ作りのため、value 属性で確かめる
         expect(self.continue_button).to_be_visible()
         expect(self.continue_button).to_have_value("Continue")
 
@@ -168,7 +169,7 @@ class CheckoutStepTwoPage:
         expect(self._item(product_name)).to_have_count(1)
 
     def expect_amounts(self, item_total: str, tax: str, total: str) -> None:
-        """小計・税・合計の表示の文言の全体を確かめる。"""
+        """小計・税・合計が、それぞれ渡した文言どおりに表示されていることを確かめる。"""
         expect(self.item_total).to_have_text(item_total)
         expect(self.tax).to_have_text(tax)
         expect(self.total).to_have_text(total)
@@ -200,7 +201,8 @@ class CheckoutCompletePage:
 
         画像は、表示されていることと代替テキストで確かめ、読み込みが終わったかどうかは確かめない
         （specs/checkout_complete_testcases.md の「実装時の注意」）。
-        ただし読み込み前の画像は大きさが0で見えない扱いになるため、表示の確認は、確認の待ち時間の範囲で読み込みを待つ。
+        ただし読み込み前の画像は大きさが0で見えない扱いになるため、
+        表示の確認は、確認の待ち時間（初期値の5秒）の範囲で読み込みを待つ。
         """
         expect(self.title).to_have_text("Checkout: Complete!")
         expect(self.header).to_have_text("Thank you for your order!")

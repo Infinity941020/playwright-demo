@@ -7,7 +7,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-# このファイルから2つ上のフォルダ（リポジトリ直下）にある shared/data/
 _SHARED_DATA_DIR = Path(__file__).resolve().parents[2] / "shared" / "data"
 
 

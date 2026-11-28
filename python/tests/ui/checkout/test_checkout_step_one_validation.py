@@ -13,7 +13,8 @@ from utils.ui_assertions.checkout_assertions import (
     expect_on_checkout_step_two_page,
 )
 
-# エラーの文言（shared/data/messages.json）は、specs/checkout_step_one_testcases.md の期待結果と同じにしている
+# エラーの文言は shared/data/messages.json から読む。
+# そこには、specs/checkout_step_one_testcases.md の期待結果と同じ値を書く
 _FIRST_NAME_REQUIRED_MESSAGE = MESSAGES["checkout"]["first_name_required"]
 _LAST_NAME_REQUIRED_MESSAGE = MESSAGES["checkout"]["last_name_required"]
 _POSTAL_CODE_REQUIRED_MESSAGE = MESSAGES["checkout"]["postal_code_required"]
@@ -82,7 +83,7 @@ class TestCheckoutStepOneValidation:
 
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 3項目とも空欄のときのエラーは、このテストでは確かめない
+        # 3項目とも空欄のときのエラーは、このテストでは確かめない（TC-CO1-002 で確かめるため）
         checkout_flow.proceed_to_overview_step()
 
         checkout_flow.fill_checkout_info(CHECKOUT_DATA["first_name"], "", "")

@@ -1,4 +1,4 @@
-"""カート画面での削除が、Products画面の表示に反映されることのテスト"""
+"""Cart画面での削除が、Products画面の表示に反映されることのテスト"""
 
 from playwright.sync_api import Page
 
