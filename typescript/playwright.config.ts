@@ -3,7 +3,8 @@ import { TEST_TIMEOUT_MS } from './utils/timeouts';
 
 const isCI = !!process.env.CI;
 
-// テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、CI と手元のそれぞれについて決める。
+// テストの実行のしかた（テストの種類ごとのブラウザ、並列の数、再実行、制限時間、記録の残し方）を、
+// CI と手元のそれぞれについて決める。
 // 見た目の比較の撮影の条件は specs/visual_spec.md にある
 
 export default defineConfig({
@@ -17,9 +18,14 @@ export default defineConfig({
   timeout: TEST_TIMEOUT_MS,
 
 
-  // 基準画像を CI で撮った1組だけにして、どの環境でもそれと比べるため、ファイル名に OS やブラウザの名前を付けない
+  // 基準画像は、両版で共通の1組（リポジトリ直下の shared/visual/）だけを使い、どの環境でもそれと比べる。
+  // そのため、ファイル名に OS やブラウザの名前を付けない
   snapshotPathTemplate:
-    '{testDir}/{testFileDir}/__snapshots__/{arg}.png',
+    '{testDir}/../../shared/visual/{arg}{ext}',
+
+  // CI では基準画像を書き換えない（基準画像がないときも、書かずに失敗する）。
+  // 基準画像は、撮影用の実行で撮り、プルリクエストで入れるため。手元では、ないときだけ書いて失敗する（初期値の動き）
+  updateSnapshots: isCI ? 'none' : 'default',
 
 
   use: {
@@ -39,7 +45,8 @@ export default defineConfig({
 
     screenshot: 'off',
 
-    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない（すべて残すと、実行が遅くなるおそれがあるため）
+    // 失敗したテストの記録（トレース）と録画だけを残し、成功したテストの分は残さない
+    // （すべて残すと、実行が遅くなるおそれがあるため）
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
 

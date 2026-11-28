@@ -1,0 +1,111 @@
+name: Visual Baselines
+
+# 見た目の比較の基準画像を、両版で撮って比べる（手動で動かす）。
+# 両版の画像が大きさと全画素まで同じときだけ成功にし、コミットに使う6枚を成果物として出す。
+# 基準画像のコミットは、人がプルリクエストで行う（この実行はリポジトリに書き込まない）
+on:
+  workflow_dispatch:
+
+  # マージの前に外す一時的な設定：手動の起動は main にこのファイルがないと使えないため、
+  # 作業中のブランチへの push でも動かして、撮った画像を確かめる
+  push:
+    branches: [ chore/playwright-1.65-shared-visual ]
+
+permissions:
+  contents: read
+
+jobs:
+
+  capture-ts:
+    name: Capture (TS)
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Install dependencies
+        working-directory: typescript
+        run: npm ci
+
+      # 比べずに撮り、shared/visual/ に書く
+      - name: Capture baselines (TS)
+        working-directory: typescript
+        run: npx playwright test --project=chromium-visual --update-snapshots=all
+
+      - name: Upload TS baselines
+        uses: actions/upload-artifact@v7
+        with:
+          name: ts-visual-baselines
+          path: shared/visual
+          retention-days: 7
+          if-no-files-found: error
+
+  capture-python-and-compare:
+    name: Capture (Python) and Compare
+    needs: capture-ts
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.65.2-noble
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、
+      # setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
+
+      - name: Install dependencies
+        working-directory: python
+        run: |
+          uv venv --python 3.14 .venv
+          uv pip install --python .venv/bin/python -r requirements.txt
+
+      # 比べずに撮り、shared/visual/ に書く
+      - name: Capture baselines (Python)
+        working-directory: python
+        run: .venv/bin/python -m pytest tests/visual -m visual --update-snapshots
+
+      - name: Download TS baselines
+        uses: actions/download-artifact@v8
+        with:
+          name: ts-visual-baselines
+          path: visual-compare/ts
+
+      - name: Compare baselines (TS vs Python)
+        run: |
+          mkdir -p visual-compare/python
+          cp shared/visual/*.png visual-compare/python/
+          python/.venv/bin/python .github/scripts/compare_visual_baselines.py \
+            visual-compare/ts visual-compare/python visual-compare/diff
+
+      # 成功でも失敗でも、両版の画像と、あれば差分の画像を出す
+      - name: Upload comparison
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines-comparison
+          path: visual-compare
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # 両版が同じときだけ、コミットに使う6枚を出す
+      - name: Upload baselines for commit
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines
+          path: shared/visual
+          retention-days: 7
+          if-no-files-found: error

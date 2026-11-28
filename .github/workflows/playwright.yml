@@ -16,7 +16,7 @@ jobs:
     name: UI Tests (TS)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
       options: --user 1001
 
     steps:
@@ -52,7 +52,7 @@ jobs:
     name: API Tests (TS)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
       options: --user 1001
 
     steps:
@@ -88,7 +88,7 @@ jobs:
     name: Visual Tests (TS)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
       options: --user 1001
 
     steps:
@@ -118,7 +118,6 @@ jobs:
           path: |
             typescript/playwright-report
             typescript/test-results
-            typescript/tests/visual/__snapshots__
           retention-days: 7
 
   ts-typecheck:
@@ -148,7 +147,7 @@ jobs:
     name: UI Tests (Python)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
+      image: mcr.microsoft.com/playwright/python:v1.65.2-noble
 
     steps:
       - name: Checkout repository
@@ -181,7 +180,7 @@ jobs:
     name: API Tests (Python)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
+      image: mcr.microsoft.com/playwright/python:v1.65.2-noble
 
     steps:
       - name: Checkout repository
@@ -214,7 +213,7 @@ jobs:
     name: Visual Tests (Python)
     runs-on: ubuntu-24.04
     container:
-      image: mcr.microsoft.com/playwright/python:v1.63.0-noble
+      image: mcr.microsoft.com/playwright/python:v1.65.2-noble
 
     steps:
       - name: Checkout repository

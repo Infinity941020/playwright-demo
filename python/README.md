@@ -123,8 +123,7 @@ python/
 │   │   ├── logout/          # Logout機能（左上のメニュー）
 │   │   └── flow/            # 通しの購入（商品の追加から購入完了まで）
 │   ├── api/                 # APIテスト（API ごとに1ファイル）
-│   └── visual/              # 見た目の比較テスト（画面ごとに1ファイル）
-│       └── __snapshots__/   # 基準画像（CI で撮影したもの）
+│   └── visual/              # 見た目の比較テスト（画面ごとに1ファイル。基準画像はリポジトリ直下の shared/visual/）
 ├── README.md                # 本ファイル
 ├── UPDATELOG.md             # Python版の作業履歴（2026-11-16 まで。以降はリポジトリ直下の UPDATELOG.md）
 └── decisions.md             # TS版との設計差異に関する意思決定の記録
@@ -148,7 +147,7 @@ python/
 - **メニューの開閉の判定**：表示の有無ではなく aria-hidden 属性で判定します。URL で開いた直後は、閉じているメニューの項目も「表示されている」と判定されるためです（[論点17](decisions.md#論点17-メニューの開閉の判定方法)）
 - **商品一覧画面の表示確認**：InventoryPage.expect_on_page() の1か所にまとめ、URL の完全一致と data-test で確認します。ログイン成功の確認や logged_page fixture もここを使います（[論点18](decisions.md#論点18-商品一覧画面の表示確認の置き場所)）
 - **APIテストのモック**：テストごとに 127.0.0.1 の空いているポートでモックサーバーを立ち上げ、状態がテストをまたがないようにしています。返事は TS版のモックと同じにしています（[論点19](decisions.md#論点19-apiテストのモックの方式とファイルの置き場所)）
-- **見た目の比較**：Python 用の Playwright には、TS版で使っている toHaveScreenshot に当たる機能がないため、Pillow で比較の仕組みを自作しています。基準画像は、実行環境による描画の違いを避けるため、CI（Linux）で撮影したものだけを使います（[論点21](decisions.md#論点21-visual-regression-の方式)）
+- **見た目の比較**：Python 用の Playwright には、TS版で使っている toHaveScreenshot に当たる機能がないため、Pillow で比較の仕組みを自作しています。基準画像は、実行環境による描画の違いを避けるため、CI（Linux）で撮影したものだけを使い、TS版と共通の1組をリポジトリ直下の shared/visual/ に置いています（[論点21](decisions.md#論点21-visual-regression-の方式)）
 
 設計判断の背景・詳細は [decisions.md](decisions.md) にまとめています。
 
@@ -180,7 +179,7 @@ TS版への横展開（TS版を Python版に揃える作業）で、TS版にも�
 ## 動作環境
 
 - Python（動作確認環境：Python 3.14.4 / Windows）
-- 依存パッケージ：pillow 13.0.0、playwright 1.63.0、pytest 9.1.1、pytest-playwright 0.9.0（[requirements.txt](requirements.txt) でバージョンを固定）
+- 依存パッケージ：pillow 13.0.0、playwright 1.65.2、pytest 9.1.1、pytest-playwright 0.10.0（[requirements.txt](requirements.txt) でバージョンを固定）
 
 ---
 
@@ -236,7 +235,10 @@ pytest tests/api -v
 pytest tests/visual -m visual
 ```
 
-基準画像は CI（Linux）で撮影したものです。手元（Windows など）では描画の違いで失敗する場合があります。
+基準画像（shared/visual/）は CI（Linux）で撮影したものです。手元（Windows など）では描画の違いで失敗する場合があります。
+
+--update-snapshots を付けると、比べずに撮って shared/visual/ に書きます。手元で撮った画像は描画が CI と違うため、基準画像にはしません
+（基準画像の撮り直しは、リポジトリ直下の [README.md](../README.md#基準画像の撮り直し) の「基準画像の撮り直し」を参照）。
 
 ### 失敗時のトレースを残して実行
 

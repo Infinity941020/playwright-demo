@@ -143,6 +143,33 @@ CIの詳細設定（retry / worker制御 / キャッシュ戦略等）は
 
 ---
 
+## 基準画像の撮り直し
+
+見た目の比較（Visual Regression）の基準画像は、両版で共通の1組を、リポジトリ直下の shared/visual/ に置いています。
+実行する環境によって描画が少しずつ違うため、基準画像には CI（Linux）で撮ったものだけを使います。
+画面の下の帯の著作権の文（年を含む）は、年が変わるたびに画像が変わるのを避けるため、塗りつぶして撮ります。
+
+### 撮り直すとき
+
+- 画面が変わって、見た目の比較のテストが落ちたとき：失敗したときの差分の画像を見て、意図した変更か、
+  テストの対象のサイト（SauceDemo）の側の変更だけなら撮り直します。表示崩れのときは撮り直しません
+- Playwright の版を上げたとき
+- 年が変わったとき（年の初めの見直し）
+
+### 手順
+
+1. GitHub の Actions の画面で、Visual Baselines（[.github/workflows/visual-baselines.yml](.github/workflows/visual-baselines.yml)）を手動で動かします。
+   両版で撮り、2組が大きさと全画素まで同じかを比べます
+2. 成功したら、Artifact の visual-baselines（6枚）をダウンロードし、shared/visual/ に置きます。
+   失敗したときは、両版の画像が違います。ジョブの要約と、Artifact の visual-baselines-comparison の差分の画像で確かめます
+3. プルリクエストで出し、GitHub の画像の差分の表示で、変わった所を確かめます
+
+両版とも、手元でも撮れます（TS版：`npx playwright test --project=chromium-visual --update-snapshots=all`、
+Python版：`pytest tests/visual -m visual --update-snapshots`）。ただし描画が CI と違うため、手元で撮った画像は基準画像にしません。
+詳しくは [visual_spec.md](specs/visual_spec.md) の「基準画像の作り方・作り直し方」を参照してください。
+
+---
+
 ## 作成者
 
 テスト自動化の学習を通じて、実務に近い設計・運用を意識しながら作成した
