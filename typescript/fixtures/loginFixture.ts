@@ -77,8 +77,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 
   // テストごとに、ログインした状態のファイルが新しいことを確かめてから（古ければ作り直してから）、そのファイルを使う。
   // 閲覧環境を自分で作ると、録画などの設定が効かないため、Playwright が作るテスト用の閲覧環境に、このファイルの保存内容を読み込ませる
-  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）。
-  // 範囲の指定（テストごと）は、Playwright にもともとある部品を上書きするときに、型の定義で必要になる
+  // 作り直しの時間をテストの制限時間に数えないように、別の制限時間にする
   storageState: [async ({ browser, workerStorageStatePath }, use) => {
 
     await ensureFreshStorageState(browser, workerStorageStatePath);
@@ -86,12 +85,11 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     await use(workerStorageStatePath);
   }, { scope: 'test', timeout: TEST_TIMEOUT_MS }],
 
-  // 画面を開く時間をテストの制限時間に数えないように、別の制限時間にする（遅すぎるときは、この部品の名前つきで失敗する）
+  // 画面を開く時間をテストの制限時間に数えないように、別の制限時間にする
   loggedPage: [async ({ page }, use) => {
 
     const inventoryFlow = new InventoryFlow(page);
 
-    // 保存したファイルからは、ログインした状態だけが戻り、開いていた画面は戻らないため、商品一覧画面を開く
     await inventoryFlow.accessInventoryDirectly();
     await inventoryFlow.expectOnInventoryPage();
 

@@ -356,6 +356,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: python/requirements.txt
 - TS逆輸入候補: なし
 - 決定日: 2026-10-07
+- 追記（2026-11-28）: playwright を 1.65.2、pytest-playwright を 0.10.0 に上げた。
+  pytest-playwright 0.10.0 で必要なものから外れた pytest-base-url は、入れない（requirements.txt にも足さない）
 
 ## 論点15: Cart画面テストの前提状態の作り方
 
@@ -668,6 +670,22 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
     （Python版は手元では除外したまま）。環境によって失敗する場合は、Python版と同じく除外を検討する
   基準画像は変えていない。手元で、書き直す前と後のテストが撮った画像を Python版の比べ方で比べ、6枚とも違う画素が0であることを確かめた。
   基準画像の撮り直しと両版の共通化は、横展開4-3 で Playwright の版を両版でそろえるときに行う
+- 追記（2026-11-28）: 両版の Playwright の版をそろえ（TS版 1.65.1、Python版 1.65.2。中のブラウザは同じ Chromium 159.0.8154.6）、
+  基準画像を両版で共通の1組にした。
+  ・置き場所：リポジトリ直下の shared/visual/（6枚。ファイル名は今までと同じ）。TS版は snapshotPathTemplate、Python版は
+    utils/visual_assertions/screenshot_assertions.py で指す。typescript/tests/visual/__snapshots__/ と python/tests/visual/__snapshots__/ は消した。
+    理由：2組を別々に持つと、片方だけ撮り直したときに中身がずれる（実際に、Cart・Complete の画面の下の帯のアイコンが、
+    TS版は古い鳥の絵、Python版は今の X の絵のままずれていた）。1組にすれば、撮り直しも確かめも1回で済む
+  ・画面の下の帯の著作権の文（data-test="footer-copy"）を、両版とも mask で塗りつぶして撮る（色は初期値のピンク #FF00FF で両版同じ）。
+    理由：年はブラウザの時計（new Date().getFullYear()）で決まり、年が変わると画像が変わるため。年だけの要素はないため、文の全体を隠す。
+    この文が撮る範囲に入るのは Cart と Complete だけ（ほかの画面では何も塗られない）
+  ・撮影用の実行（.github/workflows/visual-baselines.yml、手動で動かす）を足した。普段の Visual のジョブと同じ環境で両版が撮り、
+    6枚が大きさと全画素まで同じときだけ成功にして、コミットに使う6枚を Artifact に出す。コミットは人がプルリクエストで行う。
+    比べる処理（.github/scripts/compare_visual_baselines.py）は、両版を対等に比べるため、どちらの版のテストのコードも使わない
+  ・Python版に、撮るためのオプション（pytest の --update-snapshots）を足した。付けたときは比べずに撮り、shared/visual/ に書いて成功にする
+  ・TS版は、CI では updateSnapshots を 'none' にした（普段の CI で基準画像を書き換えないため）。手元では初期値（'default'。ないときだけ書いて失敗する）
+  上の判断の 2.「自動で作り直す仕組み（--update-snapshots など）は用意しない」は、普段の CI では今も同じ（基準画像は書き換えない）。
+  撮るための仕組みは、撮影用の実行と手元に限って用意した
 
 ## 論点22: CI の OS を固定する
 

@@ -5,10 +5,14 @@ import { Page, expect, test } from '@playwright/test';
 // - 撮る前に、フォントと、ページの中の画像の要素（背景として描く絵は含まない）の読み込みが終わるのを待つ。
 //   画面によっては、見出しが出た後も画像の読み込みが続くため
 // - 固定の時間の待ちは使わない（環境によって足りなかったり無駄だったりするため）
-// - 比べる処理と、失敗したときの画像の保存は、Playwright の比べる機能に任せる。
-//   この機能は、続けて撮った2枚が同じになるまで撮り直してから比べる
+// - 比べる処理と、失敗したときの画像の保存は、Playwright の比べる機能に任せる
 
-// 画像の読み込みを待つ上限。Playwright の確かめの待ち時間（設定の expect.timeout）の初期値（設定で指定していないため5秒）と同じにして、
+// 画面の下の帯の著作権の文（「© 2026 Sauce Labs. …」）を、塗りつぶして撮る。
+// 年はブラウザの時計で決まり、年が変わると画像が変わるため。年だけの要素はないので、文の全体を隠す
+const FOOTER_COPY_SELECTOR = '[data-test="footer-copy"]';
+
+// 画像の読み込みを待つ上限。Playwright の確かめの待ち時間（設定の expect.timeout）の初期値
+// （設定で指定していないため5秒）と同じにして、
 // 読み込みが終わらないときに、テストの時間切れより先に、画像の読み込みの待ちとして失敗させる。
 // 設定で確かめの待ち時間を変えるときは、この値も見直す
 const IMAGE_LOAD_TIMEOUT_MS = 5_000;
@@ -35,6 +39,7 @@ export async function expectScreenshotMatches(page: Page, snapshotName: string, 
     await expect(page).toHaveScreenshot(snapshotName, {
       animations: 'disabled',
       caret: 'hide',
+      mask: [page.locator(FOOTER_COPY_SELECTOR)],
       maxDiffPixelRatio,
     });
   }, { box: true });

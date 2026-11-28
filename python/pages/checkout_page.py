@@ -67,7 +67,6 @@ class CheckoutStepOnePage:
         expect(self.postal_code_input).to_have_attribute("placeholder", "Zip/Postal Code")
         expect(self.cancel_button).to_be_visible()
         expect(self.cancel_button).to_have_text("Cancel")
-        # Continue は、文言を value 属性で持つ作りのため、value 属性で確かめる
         expect(self.continue_button).to_be_visible()
         expect(self.continue_button).to_have_value("Continue")
 

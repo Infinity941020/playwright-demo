@@ -5,7 +5,7 @@
 対象は両版とも同じ6画面とする。
 
 対応するテスト：TS版は `typescript/tests/visual/*-visual.spec.ts`、Python版は `python/tests/visual/test_*_visual.py`
-対応する設定：TS版の playwright.config.ts（snapshotPathTemplate、viewport、deviceScaleFactor）
+対応する設定：TS版の playwright.config.ts（snapshotPathTemplate、updateSnapshots、viewport、deviceScaleFactor）
 
 | 項目 | 内容 |
 |---|---|
@@ -13,8 +13,8 @@
 | 撮影の範囲 | 表示中の範囲（1280×720）。スクロールしないと見えない部分は撮らない |
 | ブラウザ | Chromium |
 | 比較の方法 | TS版は Playwright 標準の toHaveScreenshot。Python版は、Python の画像ライブラリ Pillow で自作する（下の「■ 比較の方法」参照） |
-| 基準画像 | CI（GitHub Actions の Linux）で撮影したものだけを使う |
-| 基準画像の置き場所 | typescript/tests/visual/__snapshots__/ と python/tests/visual/__snapshots__/（ファイル名は両版で同じ。ファイルは版ごとに持つ） |
+| 基準画像 | CI（GitHub Actions の Linux）の撮影用の実行で撮ったものだけを使う（下の「■ 基準画像の作り方・作り直し方」） |
+| 基準画像の置き場所 | リポジトリ直下の shared/visual/（両版で共通の1組。TS版は playwright.config.ts の snapshotPathTemplate、Python版は utils/visual_assertions/screenshot_assertions.py で指す） |
 
 比べる仕組みの違い：Python 用の Playwright には toHaveScreenshot がないため、Python版だけ比べる仕組みを自分で用意する（判断の記録 python/decisions.md の「Visual Regression の方式」）。
 
@@ -28,6 +28,7 @@
 | 画素の密度（deviceScaleFactor） | 1（TS版は playwright.config.ts で指定、Python版は初期値） |
 | アニメーション | 止める（animations="disabled"） |
 | 入力欄のカーソル | 隠す（caret="hide"） |
+| 塗りつぶす部分 | 画面の下の帯の著作権の文（data-test="footer-copy"。「© 2026 Sauce Labs. All Rights Reserved. …」）を、Playwright の mask で塗りつぶして撮る（色は初期値のピンク #FF00FF。両版とも同じ）。年はブラウザの時計で決まり、年が変わると画像が変わるため。年だけの要素はないので、文の全体を隠す。この文が撮る範囲に入るのは Cart と Checkout Complete だけで、ほかの画面では何も塗られない |
 | 撮影前の待ち | ① 画面の表示確認（前提を作る部品の中で行う）② フォントの読み込み完了 ③ ページの中の画像の要素の読み込み完了（背景として描く絵は含まず、画面の外にある画像の要素は含む）。固定の時間の待ちは使わない（両版とも、比べる部品〈TS版は utils/visualAssertions/、Python版は utils/visual_assertions/〉の中で待つ）。画像の要素の読み込みを待つ上限は、TS版は5秒（テストの時間切れより先に、画像の待ちとして失敗させるため）、Python版は30秒（Playwright の初期値） |
 
 「何が終わるのを待つか」を明確にし、固定の時間の待ちは使わない。不安定になった場合は待ち方を見直す。
@@ -70,7 +71,7 @@ Playwright 標準の toHaveScreenshot で比べる（Playwright の既定の比�
 ### TS版
 
 typescript/test-results/ の下に、テストごとのフォルダを作って保存する（ファイルの名前と中身は Playwright が決める）。
-基準画像がないときは、撮った画像を基準画像の場所に作る（「■ 基準画像の作り方・作り直し方」を参照）。
+基準画像がないときは、CI では作らずに失敗する（設定の updateSnapshots を CI では 'none' にしている）。手元では、撮った画像を基準画像の場所に作って失敗する。
 CI では Artifact（visual-artifacts）として7日間ダウンロードできる。
 
 ### Python版
@@ -88,21 +89,28 @@ python/test-results/visual/ に保存する（CI では Artifact〈python-visual
 
 ## ■ 基準画像の作り方・作り直し方
 
-基準画像は、実行する環境（OS やフォント）によって描画が少しずつ違うため、CI で撮影したものだけを使う（両版とも）。
+基準画像は、実行する環境（OS やフォント）によって描画が少しずつ違うため、CI で撮ったものだけを使う。
+両版は同じ1組を使うため、撮影用の実行で両版が撮った画像が、大きさと全画素まで同じことを確かめてから入れる。
 
-Python版：
-1. 基準画像がない状態で CI を実行すると、Visual のテストは失敗し、今の画像が Artifact に保存される（基準画像がないのに成功扱いにはしない）
-2. Artifact をダウンロードし、〈名前〉-actual.png を〈名前〉.png に名前を変えて、python/tests/visual/__snapshots__/ に置く
-3. もう一度 CI を実行し、成功することを確認する
+撮影用の実行（.github/workflows/visual-baselines.yml。GitHub の Actions の画面から手動で動かす）：
+1. Capture (TS)：普段の Visual Tests (TS) と同じ環境で、npx playwright test --project=chromium-visual --update-snapshots=all で撮る
+2. Capture (Python) and Compare：普段の Visual Tests (Python) と同じ環境で、pytest tests/visual -m visual --update-snapshots で撮り、
+   両版の6枚を、大きさと全画素で比べる（.github/scripts/compare_visual_baselines.py）
+3. 6枚とも同じなら成功にし、コミットに使う6枚を Artifact（visual-baselines）に出す。
+   違えば、違う画素の数と範囲をジョブの要約に書き、両版の画像と差分の画像を Artifact（visual-baselines-comparison）に出して失敗にする。
+   両版の画像と差分の画像は、成功したときも visual-baselines-comparison に出す（7日間ダウンロードできる）
 
-TS版：
-1. 基準画像がない状態で CI を実行すると、Visual のテストは失敗する。CI は、撮った画像が入る typescript/test-results と
-   typescript/tests/visual/__snapshots__ を、Artifact（visual-artifacts）に保存する
-2. Artifact をダウンロードし、撮った画像を〈名前〉.png の名前で typescript/tests/visual/__snapshots__/ に置く
-3. もう一度 CI を実行し、成功することを確認する
+この実行は、リポジトリに書き込まない。撮った6枚は、人が shared/visual/ に置き、プルリクエストで入れる。
 
-作り直すとき（画面のデザインが変わったときなど）は、該当する基準画像を削除して、上の手順を行う。
-基準画像を自動で作り直す仕組み（--update-snapshots など）は用意しない。
+両版の画像が合わなかったときは、差分の画像と両版の画像を見て、次のように進める。
+- 文字の縁のぼかしの違いだけなら、撮影用の実行をもう一度動かす
+- 文字の形・アイコン・配置など、縁のぼかし以外の違いがあれば、もう一度動かさずに原因を調べる
+
+文字の縁のぼかしは、ブラウザを起動するたびに、まれに少し変わることがあるため。この違いは、普段のテストの許容値の中に十分収まる。
+撮り直すときと手順は、README.md の「基準画像の撮り直し」を参照。
+
+普段の CI では、基準画像を書き換えない（TS版は、CI では updateSnapshots を 'none' にしている。Python版は、--update-snapshots を付けない限り書かない）。
+両版とも、手元でも --update-snapshots で撮れるが、描画が CI と違うため、手元で撮った画像は基準画像にしない。
 
 ---
 
@@ -114,12 +122,13 @@ TS版：
 | Python版：pytest tests/visual -m visual | 実行する |
 | TS版：npx playwright test（普段の実行） | 実行する（chromium-visual のプロジェクト） |
 | CI | 専用のジョブ（Visual Tests (TS)・Visual Tests (Python)）で実行する |
+| 撮影用の実行（手動） | 両版で撮って比べる（基準画像は書き換えない。上の「■ 基準画像の作り方・作り直し方」） |
 
 Python版は、手元（Windows など）で実行すると、基準画像（Linux で撮影）との描画の違いで失敗する場合がある。
 手元での実行は、画面の様子を調べたいときに限る。
 TS版は、手元（Windows）で確かめた範囲では許容値の中に収まったため、普段の実行に含めている。
 環境によって失敗する場合は、普段の実行から外すことを検討する。
-TS版は、基準画像がないと、手元で撮った画像がその場所に作られる。コミットしないこと。
+TS版は、手元で基準画像がないと、撮った画像がその場所（shared/visual/）に作られる。コミットしないこと。
 
 ---
 
@@ -127,7 +136,7 @@ TS版は、基準画像がないと、手元で撮った画像がその場所に
 
 | 項目 | 理由 |
 |---|---|
-| フッターの年（「© 2026 Sauce Labs」）の変化 | 年が変わると画像が変わり、基準画像の撮り直しが要る（両版とも）。年の部分を比べる対象から外す仕組みは、今は入れていない |
+| 画面の下の帯の著作権の文（年を含む）の中身 | 年が変わるたびに画像が変わるのを避けるため、塗りつぶして撮る（「■ 撮影の条件」）。文の中身は比べない |
 | スクロールしないと見えない部分 | 両版とも、表示中の範囲だけを比べる |
 | Chromium 以外のブラウザ | 両版とも、Visual は Chromium のみ |
 | 特殊ユーザー（visual_user など） | 今後の拡張候補 |
