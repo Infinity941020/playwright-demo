@@ -37,7 +37,10 @@ class CheckoutFlow:
         self._header.expect_badge_count(len(products))
 
     def access_step_one_directly(self) -> None:
-        """Checkout Step One画面の URL を開く（ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない）。"""
+        """Checkout Step One画面の URL を開く。
+
+        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        """
         self._step_one_page.goto()
 
     def reload_step_one(self) -> None:
@@ -75,7 +78,8 @@ class CheckoutFlow:
         self._step_one_page.expect_info_values(first_name, last_name, postal_code)
 
     def open_step_two_with(self, products: list[dict], checkout_info: dict) -> None:
-        """渡した商品がカートに入った状態で、Step One で購入者情報を入れて Continue を押し、Checkout Step Two画面を開く。
+        """渡した商品がカートに入った状態で、Step One で購入者情報を入れて Continue を押し、
+        Checkout Step Two画面を開く。
 
         Step Two の URL を直接開けることは、意図された仕様か不具合かを判断できない挙動のため、
         前提の状態を作るときには使わない（specs/checkout_step_two_testcases.md の「前提状態の作り方」）。
@@ -89,7 +93,10 @@ class CheckoutFlow:
         self._step_two_page.expect_on_page()
 
     def access_step_two_directly(self) -> None:
-        """Checkout Step Two画面の URL を開く（ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない）。"""
+        """Checkout Step Two画面の URL を開く。
+
+        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        """
         self._step_two_page.goto()
 
     def reload_step_two(self) -> None:
@@ -146,7 +153,10 @@ class CheckoutFlow:
         self._complete_page.expect_on_page()
 
     def access_complete_directly(self) -> None:
-        """Checkout Complete画面の URL を開く（ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない）。"""
+        """Checkout Complete画面の URL を開く。
+
+        ログインしていない状態で開こうとしたときの確認に使うため、表示は確かめない。
+        """
         self._complete_page.goto()
 
     def back_home(self) -> None:

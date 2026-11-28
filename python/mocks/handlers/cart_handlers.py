@@ -1,6 +1,7 @@
 """カートの API（一覧・追加・削除）。
 
-カートの中身と id の連番は、ハンドラーを作るたびに新しく作る。サーバーはテストごとに新しく立てるため、状態はテストをまたがない。
+カートの中身と id の連番は、ハンドラーを作るたびに新しく作る。
+サーバーはテストごとに新しく立てるため、状態はテストをまたがない。
 """
 
 from mocks.handler_types import Handler, MockRequest, MockResponse, to_number
@@ -41,7 +42,8 @@ def create_cart_handlers() -> list[Handler]:
 
     def delete_cart(request: MockRequest) -> MockResponse:
         cart_id = to_number(request.params["id"])
-        # 存在しない id でも 200 を返す。意図された仕様か不具合か判断できないため、モックではそのまま再現し、テストでは確かめない
+        # 存在しない id でも 200 を返す。意図された仕様か不具合か判断できないため、
+        # モックではそのまま再現し、テストでは確かめない
         # （specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         cart[:] = [item for item in cart if item["id"] != cart_id]
         return MockResponse(200, {"success": True})

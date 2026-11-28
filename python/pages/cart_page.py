@@ -43,7 +43,8 @@ class CartPage:
     def set_cart_contents(self, product_ids: list[int]) -> None:
         """カートの中身を、ブラウザの保存領域に直接書き込む（テストの前提の状態を作るために使う）。
 
-        SauceDemo が中で使っている保存名（cart-contents）と形（商品の番号の配列）に頼るため、書き込む処理はここだけに置く。
+        SauceDemo が中で使っている保存名（cart-contents）と形（商品の番号の配列）に頼るため、
+        書き込む処理はここだけに置く。
         保存領域はサイトごとに分かれるため、SauceDemo の画面を開いた状態で呼ぶ
         （ログイン済みの画面は、商品一覧画面を開いた状態で始まる）。
         """

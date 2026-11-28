@@ -15,7 +15,8 @@ class MenuPage:
         self.close_button: Locator = page.locator("#react-burger-cross-btn")
         # メニュー領域には id もテスト用の属性もないため、見た目の指定に使う名前で探す
         self.menu_area: Locator = page.locator(".bm-menu-wrap")
-        # Dynamic Catalog を開くと出る子の項目を含めないように、テスト用の属性の値が「-sidebar-link」で終わる項目だけを探す
+        # Dynamic Catalog を開くと出る子の項目を含めないように、
+        # テスト用の属性の値が「-sidebar-link」で終わる項目だけを探す
         self.menu_items: Locator = page.locator('[data-test$="-sidebar-link"]')
         self.all_items_link: Locator = page.locator('[data-test="inventory-sidebar-link"]')
         self.logout_link: Locator = page.locator('[data-test="logout-sidebar-link"]')
@@ -45,7 +46,10 @@ class MenuPage:
     def expect_menu_opened(self) -> None:
         """メニューが開いていることを、aria-hidden 属性と最初の項目の表示の両方で確かめる。"""
         expect(self.menu_area).to_have_attribute("aria-hidden", "false")
-        expect(self.menu_items.first, "メニューは開いた扱いだが項目が表示されない（logout_spec.md の判断できない挙動）").to_be_visible()
+        expect(
+            self.menu_items.first,
+            "メニューは開いた扱いだが項目が表示されない（logout_spec.md の判断できない挙動）",
+        ).to_be_visible()
 
     def expect_menu_closed(self) -> None:
         expect(self.menu_area).to_have_attribute("aria-hidden", "true")
