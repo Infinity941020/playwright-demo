@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload UI Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ui-artifacts
           path: |
@@ -57,10 +57,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload API Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-artifacts
           path: |
@@ -93,10 +93,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -112,7 +112,7 @@ jobs:
 
       - name: Upload Visual Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: visual-artifacts
           path: |
@@ -127,10 +127,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -152,7 +152,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
@@ -170,7 +170,7 @@ jobs:
 
       - name: Upload UI Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-ui-artifacts
           path: python/test-results
@@ -185,7 +185,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
@@ -203,7 +203,7 @@ jobs:
 
       - name: Upload API Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-api-artifacts
           path: python/test-results
@@ -218,7 +218,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Python 3.14 は uv で準備する（このコンテナのイメージには lsb_release が入っておらず、setup-python を使うと apt でのインストールが要り、時間がかかることがあるため）
       - name: Setup uv
@@ -236,7 +236,7 @@ jobs:
 
       - name: Upload Visual Artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-visual-artifacts
           path: python/test-results
