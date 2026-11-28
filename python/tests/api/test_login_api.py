@@ -1,4 +1,4 @@
-"""Login APIテスト"""
+"""Login の API のテスト"""
 
 from playwright.sync_api import APIRequestContext
 
@@ -8,20 +8,16 @@ from utils.api_helper import execute_login_api
 
 
 class TestLoginApi:
-    """Login API を確かめる。"""
+    """Login の API を確かめる。"""
 
     def test_login_success(self, api_request_context: APIRequestContext) -> None:
         """TC-API-LOGIN-001: 正しい認証情報でログインすると、トークンが返ること。"""
-        # API を呼び出す
         response = execute_login_api(api_request_context, API_USERS["valid_user"])
 
-        # 結果を検証する
         expect_login_success(response, "mock-token")
 
     def test_login_failure(self, api_request_context: APIRequestContext) -> None:
         """TC-API-LOGIN-002: 誤った認証情報でログインすると、400 とエラーが返ること。"""
-        # API を呼び出す
         response = execute_login_api(api_request_context, API_USERS["invalid_user"])
 
-        # 結果を検証する
         expect_login_bad_request(response, "user not found")

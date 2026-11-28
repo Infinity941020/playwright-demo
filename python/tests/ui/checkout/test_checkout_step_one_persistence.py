@@ -1,4 +1,4 @@
-"""Checkout Step One画面 入力値の保持テスト"""
+"""Checkout Step One画面で、入力値が保たれること・消えることのテスト"""
 
 from playwright.sync_api import Page
 
@@ -24,21 +24,17 @@ class TestCheckoutStepOnePersistence:
         first_name = CHECKOUT_DATA["first_name"]
         last_name = CHECKOUT_DATA["last_name"]
 
-        # 前提状態を作る（カートには Backpack のみを入れる）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 名と姓だけを入力して Continue を押す
         checkout_flow.fill_checkout_info(first_name, last_name, "")
         checkout_flow.proceed_to_overview_step()
 
-        # エラーが表示されている間の入力値を検証する
+        # 入力欄の値は Continue を押す前から同じため、先にエラーの文言で、先へ進めなかったことを確かめる
         expect_checkout_error_message(checkout_flow, _POSTAL_CODE_REQUIRED_MESSAGE)
         expect_checkout_info_values(checkout_flow, first_name, last_name, "")
 
-        # エラー表示を閉じる
         checkout_flow.close_error()
 
-        # エラー表示を閉じた後の入力値を検証する
         expect_no_checkout_error(checkout_flow)
         expect_checkout_info_values(checkout_flow, first_name, last_name, "")
 
@@ -46,10 +42,8 @@ class TestCheckoutStepOnePersistence:
         """TC-CO1-011: 再読み込みすると、入力値が空に戻ること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態を作る（カートには Backpack のみを入れる）
         checkout_flow.open_step_one_with([PRODUCTS["backpack"]])
 
-        # 3項目を入力してから、再読み込みする
         checkout_flow.fill_checkout_info(
             CHECKOUT_DATA["first_name"], CHECKOUT_DATA["last_name"], CHECKOUT_DATA["postal_code"]
         )
@@ -61,5 +55,4 @@ class TestCheckoutStepOnePersistence:
         )
         checkout_flow.reload_step_one()
 
-        # 結果を検証する
         expect_checkout_info_values(checkout_flow, "", "", "")

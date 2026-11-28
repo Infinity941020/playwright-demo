@@ -1,4 +1,4 @@
-"""Products画面 画面遷移テスト"""
+"""Products画面からの画面遷移のテスト"""
 
 from typing import Literal
 
@@ -22,18 +22,14 @@ class TestInventoryNavigation:
         inventory_flow = InventoryFlow(logged_page)
         backpack = PRODUCTS["backpack"]
 
-        # 商品詳細画面を開く
         inventory_flow.open_product_detail(backpack["name"], via)
 
-        # 結果を検証する
         expect_on_product_detail_page(inventory_flow, backpack["id"])
 
     def test_cart_icon_opens_cart(self, logged_page: Page) -> None:
         """TC-PROD-011: カートアイコンを押すと、Cart画面へ遷移すること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # カート画面を開く
         inventory_flow.open_cart()
 
-        # 結果を検証する
         expect_on_cart_page(inventory_flow)

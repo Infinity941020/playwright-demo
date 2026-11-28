@@ -1,8 +1,6 @@
-"""Cart UI Assertions
+"""カート画面の表示や状態を確かめる関数。
 
-責務:
-    - Cart（カート）画面の表示や状態を検証する関数を提供する
-    - 検証は Flow を通して行う（テストから Page Object を直接呼ばない）
+テストからは画面の部品を直接呼ばず、カート画面の操作の単位を通して確かめる。
 """
 
 from flows.cart_flow import CartFlow

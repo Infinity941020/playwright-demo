@@ -1,4 +1,4 @@
-"""通しの購入のテスト
+"""商品の追加から購入完了までを、1本で通すテスト。
 
 画面ごとのテストは前提の状態をブラウザの保存領域への書き込みや URL での直接表示で作り、
 画面と画面のつなぎ目の不具合を見つけられないため、ログイン済みの画面を用意した後は、すべて画面の操作でつなぐ。
@@ -62,8 +62,8 @@ class TestPurchaseFlow:
         expect_on_checkout_step_two_page(checkout_flow)
         expect_step_two_item_names_in_order(checkout_flow, added_order)
 
-        # 期待する金額は、画面の計算と同じ誤りを持たないように、計算で作らず、
-        # 画面で確かめた値（テストケースと同じ値）を書く
+        # 期待する金額は、計算で作らず、テストケースと同じ値を書く
+        # （テストの計算が画面と同じ誤りをしても気づけるように）
         expect_step_two_amounts(checkout_flow, "Item total: $47.97", "Tax: $3.84", "Total: $51.81")
 
         checkout_flow.complete_purchase()

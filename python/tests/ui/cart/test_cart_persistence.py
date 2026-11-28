@@ -1,4 +1,8 @@
-"""Cart画面 状態保持テスト"""
+"""カート画面を再読み込みした後も、カートの内容が保たれることのテスト。
+
+画面で追加した内容が保存されない不具合も見つけられるように、前提の状態はブラウザの保存領域への書き込みではなく、
+商品一覧画面での操作で作る。
+"""
 
 from playwright.sync_api import Page
 
@@ -23,17 +27,15 @@ class TestCartPersistence:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         inventory_flow.add_to_cart(backpack["name"])
         inventory_flow.add_to_cart(bike_light["name"])
         inventory_flow.open_cart()
         expect_on_cart_page(inventory_flow)
         expect_cart_item_count(cart_flow, 2)
 
-        # 画面を再読み込みする
         cart_flow.reload_cart()
 
-        # 結果を検証する（並び順は TC-CART-003 で確かめるため、ここでは問わない）
+        # 並び順は TC-CART-003 で確かめるため、ここでは問わない
         expect_cart_item_count(cart_flow, 2)
         expect_in_cart(cart_flow, backpack["name"])
         expect_in_cart(cart_flow, bike_light["name"])

@@ -1,4 +1,8 @@
-"""Logout（メニュー） All Items テスト"""
+"""左上のメニューの All Items のテスト。
+
+メニューが閉じたことを確かめる前に、開いたことを確かめる
+（開かなかったときにも、閉じていると判定されて成功してしまうため）。
+"""
 
 from playwright.sync_api import Page
 
@@ -21,13 +25,10 @@ class TestLogoutAllItems:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light])
 
-        # メニューを開いて All Items を押す
         logout_flow.open_all_items()
 
-        # 結果を検証する
         expect_on_inventory_page(logout_flow)
         expect_menu_closed(logout_flow)
         expect_badge_count(inventory_flow, 2)

@@ -1,4 +1,7 @@
-"""Cart画面 認証テスト"""
+"""カート画面を、ログインせずに開いたときのテスト。
+
+ログインした状態を引き継がないように、ログイン済みの画面を用意する部品は使わない。
+"""
 
 from playwright.sync_api import Page
 
@@ -14,16 +17,11 @@ class TestCartAuth:
     """未ログイン時のアクセスを確かめる。"""
 
     def test_redirect_to_login_when_not_logged_in(self, page: Page) -> None:
-        """TC-CART-011: 未ログインで直接アクセスすると、Login画面へ戻されること。
-
-        ログイン状態を引き継がないよう、logged_pageではなく通常のpageを使用する。
-        """
+        """TC-CART-011: 未ログインで直接アクセスすると、Login画面へ戻されること。"""
         cart_flow = CartFlow(page)
         login_flow = LoginFlow(page)
 
-        # ログインせずに、画面の URL を直接開く
         cart_flow.access_cart_directly()
 
-        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_error_message(login_flow, _NOT_LOGGED_IN_MESSAGE)

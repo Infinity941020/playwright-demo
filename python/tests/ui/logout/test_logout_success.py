@@ -1,4 +1,4 @@
-"""Logout（メニュー） ログアウトテスト"""
+"""各画面からログアウトしたときのテスト"""
 
 from typing import Callable
 
@@ -19,7 +19,7 @@ from utils.ui_assertions.login_assertions import (
 
 
 def _stay_on_products_page(page: Page) -> None:
-    """何もせず、Products画面のままにする（logged_page は Products画面を開いた状態で始まる）。"""
+    """何もしない（ログイン済みの画面は、Products画面を開いた状態で始まる）。"""
 
 
 def _open_cart_page(page: Page) -> None:
@@ -45,13 +45,10 @@ class TestLogoutSuccess:
         logout_flow = LogoutFlow(logged_page)
         login_flow = LoginFlow(logged_page)
 
-        # 前提状態を作る（Products・Cart・Complete のいずれかの画面を開く）
         open_start_page(logged_page)
 
-        # メニューから Logout を押す
         logout_flow.logout()
 
-        # 結果を検証する
         expect_on_login_page(login_flow)
         expect_login_inputs_empty(login_flow)
         expect_no_login_error(login_flow)

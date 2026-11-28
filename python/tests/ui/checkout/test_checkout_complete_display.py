@@ -1,4 +1,4 @@
-"""Checkout Complete画面 表示テスト"""
+"""Checkout Complete画面の表示のテスト"""
 
 from playwright.sync_api import Page
 
@@ -18,11 +18,9 @@ class TestCheckoutCompleteDisplay:
         """TC-CO3-001: 購入直後に、画面が仕様どおりに表示されること。"""
         checkout_flow = CheckoutFlow(logged_page)
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れ、購入を完了する）
         checkout_flow.open_complete_with(
             [PRODUCTS["backpack"], PRODUCTS["bike_light"]], CHECKOUT_DATA
         )
 
-        # 結果を検証する
         expect_checkout_complete_page_layout(checkout_flow)
         expect_badge_count(checkout_flow, 0)

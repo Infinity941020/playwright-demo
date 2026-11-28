@@ -1,4 +1,4 @@
-"""Cart画面 Products画面との連動テスト"""
+"""Cart画面での削除が、Products画面の表示に反映されることのテスト"""
 
 from playwright.sync_api import Page
 
@@ -22,14 +22,11 @@ class TestCartSync:
         backpack = PRODUCTS["backpack"]
         bike_light = PRODUCTS["bike_light"]
 
-        # 前提状態を作る（Backpack → Bike Light の順にカートに入れる）
         cart_flow.open_cart_with([backpack, bike_light])
 
-        # Backpack を削除し、Products画面へ戻る
         cart_flow.remove_from_cart(backpack["name"])
         cart_flow.continue_shopping()
         expect_on_inventory_page(inventory_flow)
 
-        # Products画面のボタンの表示を検証する
         expect_add_to_cart_button_shown(inventory_flow, backpack["name"])
         expect_remove_button_shown(inventory_flow, bike_light["name"])

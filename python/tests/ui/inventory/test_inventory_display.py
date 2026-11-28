@@ -1,4 +1,4 @@
-"""Products画面 表示テスト"""
+"""Products画面の表示のテスト"""
 
 from playwright.sync_api import Page
 
@@ -14,5 +14,4 @@ class TestInventoryDisplay:
         """TC-PROD-001: 商品一覧が仕様どおりに表示されること。"""
         inventory_flow = InventoryFlow(logged_page)
 
-        # 結果を検証する
         expect_products_displayed(inventory_flow, list(PRODUCTS.values()))

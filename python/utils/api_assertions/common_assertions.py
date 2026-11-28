@@ -1,10 +1,8 @@
-"""Common API Assertions（TS版 utils/apiAssertions/commonAssertions.ts に対応）
+"""複数の API で共通に使う確認。
 
-責務:
-    - 複数の API で共通に使う確認（HTTPステータス）を提供する
-
-返事の形をチェックする道具（pydantic 等）は使わず、テストケースの期待結果にある項目を値で確かめる
-（値を決められない id などは、整数であることだけを確かめる）。
+返事の形を確かめる道具は使わず、テストケースの期待結果にある項目を値で確かめる（値が一致すれば、形も一致するため）。
+ただし Python の比べ方では、True と 1、4.0 と 4 を同じとみなすため、その違いは見分けない。
+値を決められない id などは、整数であることだけを確かめる（真偽値は除く）。
 """
 
 from playwright.sync_api import APIResponse

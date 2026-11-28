@@ -1,4 +1,4 @@
-"""Logout Mock Handlers（TS版 mocks/handlers/logoutHandlers.ts に対応）"""
+"""ログアウトの API。トークンがあり、本文が空のときだけ成功する（JSON として読めない本文も、本文なしとみなす）。"""
 
 import json
 
@@ -10,11 +10,10 @@ _LOGOUT = MOCK_DATA["logout"]
 
 def create_logout_handlers() -> list[Handler]:
     def logout(request: MockRequest) -> MockResponse:
-        # Authorization ヘッダーがなければ、401 を返す
         if not request.header("Authorization"):
             return MockResponse(401, {"error": _LOGOUT["unauthorized_error"]})
 
-        # 本文が空でなければ、400 を返す（読めない本文は「本文なし」とみなす）
+        # JSON として読めない本文は、本文なしとみなす
         try:
             body = request.json()
         except json.JSONDecodeError:

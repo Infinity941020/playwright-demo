@@ -1,9 +1,7 @@
-"""ログイン画面の Page Object
+"""ログイン画面の入力欄・ボタンへの操作と、画面の表示の確認をまとめる。
 
-責務:
-    - 画面の要素（ロケータ）を定義する
-    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
-    - 画面の表示や状態を検証する
+- 画面を開く操作は、ほかの画面の開く操作とそろえて、表示までは確かめない。表示の確認は、呼び出す側で別に行う
+- ログアウトした後のブラウザの「戻る」も、ここで押す
 """
 
 from playwright.sync_api import Locator, Page, expect
@@ -20,11 +18,9 @@ class LoginPage:
         self.error_message_locator: Locator = page.locator('[data-test="error"]')
 
     def goto(self) -> None:
-        """ログイン画面へ遷移する（表示の確認は、呼び出す側で expect_on_login_page() を呼んで行う）。"""
         self.page.goto(URLS["login"])
 
     def go_back(self) -> None:
-        """ブラウザの「戻る」を押す。"""
         self.page.go_back()
 
     def enter_username(self, username: str) -> None:
@@ -37,21 +33,19 @@ class LoginPage:
         self.login_button.click()
 
     def login(self, username: str, password: str) -> None:
-        """ユーザー名とパスワードを入力し、ログインボタンを押す。"""
+        """ユーザー名とパスワードを入力して、ログインボタンを押す（空文字を渡すと、その欄は空になる）。"""
         self.enter_username(username)
         self.enter_password(password)
         self.click_login()
 
     def expect_error_message(self, message: str) -> None:
-        """エラーの文言を検証する。"""
         expect(self.error_message_locator).to_have_text(message)
 
     def expect_no_error(self) -> None:
-        """エラーが表示されていないことを確かめる。"""
+        """エラー表示の要素そのものが画面にないことを確かめる。"""
         expect(self.error_message_locator).to_have_count(0)
 
     def expect_username_value(self, username: str) -> None:
-        """ユーザー名の入力欄の値を検証する。"""
         expect(self.username_input).to_have_value(username)
 
     def expect_inputs_empty(self) -> None:

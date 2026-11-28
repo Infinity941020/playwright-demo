@@ -1,11 +1,7 @@
-"""ログイン状態を用意する fixture
+"""ログイン済みの画面（商品一覧画面を開いた状態）をテストに渡す。
 
-責務:
-    - standard_user でログインした状態（storage_state）を、テストの実行全体で1回だけ作る
-    - ログイン済みの Page をテストへ渡す
-
-保存したログイン状態（storage_state）を各テストで読み込んで使う。
-テストのたびに画面からログインせずに済み、実行が速くなるため。
+standard_user でログインした状態（Cookie などの保存内容）を、テストの実行全体で1回だけ作ってファイルに保存し、
+各テストで読み込む。テストのたびに画面からログインすると遅くなるため。
 """
 
 from pathlib import Path
@@ -24,7 +20,7 @@ _STORAGE_STATE_PATH = Path(__file__).resolve().parent.parent / ".auth" / "standa
 
 @pytest.fixture(scope="session")
 def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
-    """standard_user でログインした状態（storage_state）を、テストの実行全体で1回だけ作る。"""
+    """standard_user でログインした状態を、テストの実行全体で1回だけ作って保存し、そのファイルの場所を渡す。"""
     _STORAGE_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     context = browser.new_context()
@@ -46,14 +42,12 @@ def standard_user_storage_state(browser: Browser) -> Iterator[Path]:
 def logged_page(
     new_context: CreateContextCallback, standard_user_storage_state: Path
 ) -> Iterator[Page]:
-    """standard_user でログイン済みの Page を返す。
+    """standard_user でログイン済みの画面を渡す。
 
-    pytest-playwrightのnew_context fixture経由で生成するため、
-    --screenshot / --tracing / --video 等の設定が適用される。
-    contextのクローズもnew_context fixture側で行われる。
-
-    storage_stateはCookie/localStorageのみを復元し、遷移先URLまでは
-    復元しないため、生成直後に商品一覧ページへ明示的に遷移させる。
+    閲覧環境は、pytest-playwright が用意する作り方で作る。
+    実行のときに指定した、画面の保存・記録（トレース）・録画の設定を、このテストにも効かせるため。
+    閉じるのも、pytest-playwright が行う。
+    保存したファイルからは、ログインした状態だけが戻り、開いていた画面は戻らないため、商品一覧画面を開く。
     """
     context = new_context(storage_state=str(standard_user_storage_state))
     page = context.new_page()

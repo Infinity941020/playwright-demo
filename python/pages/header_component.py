@@ -1,10 +1,4 @@
-"""各画面に共通のヘッダーの部品（Component）
-
-責務:
-    - カートアイコンとカートのバッジの要素（ロケータ）を定義する
-    - カートアイコンを押す操作を提供する
-    - バッジの件数を検証する
-"""
+"""各画面に共通のヘッダーにある、カートアイコンへの操作と、カートのバッジの確認をまとめる。"""
 
 from playwright.sync_api import Locator, Page, expect
 
@@ -19,7 +13,7 @@ class HeaderComponent:
         self.cart_link.click()
 
     def expect_badge_count(self, count: int) -> None:
-        """カートのバッジの件数を検証する（0件のときは、バッジが表示されていないことを確かめる）。"""
+        """カートのバッジの件数を確かめる（0件のときは、バッジの要素そのものが画面にないことを確かめる）。"""
         if count == 0:
             expect(self.cart_badge).to_have_count(0)
         else:

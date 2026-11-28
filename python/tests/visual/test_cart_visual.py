@@ -1,4 +1,4 @@
-"""Cart画面 見た目の比較テスト（TS版 cart-visual.spec.ts に対応）"""
+"""Cart画面の見た目を、基準画像と比べるテスト"""
 
 import pytest
 from playwright.sync_api import Page
@@ -17,8 +17,6 @@ class TestCartVisual:
         """TC-VIS-003: Cart画面の見た目が、基準画像と一致すること。"""
         cart_flow = CartFlow(logged_page)
 
-        # 前提状態を作る（Backpack をカートに入れ、Cart画面を開く）
         cart_flow.open_cart_with([PRODUCTS["backpack"]])
 
-        # 見た目を基準画像と比べて検証する
         expect_screenshot_matches(logged_page, "cart-page.png", max_diff_ratio=0.01)

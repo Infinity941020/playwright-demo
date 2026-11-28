@@ -1,9 +1,6 @@
-"""CartFlow
+"""カート画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 
-責務:
-    - 「ログインする」「カートに入れる」など、利用者の操作の単位でまとめた処理だけを提供する
-    - テストから画面の細かい操作（ロケータなど）を直接扱わずに済むようにする
-    - CartPage・HeaderComponent・InventoryPage・CheckoutStepOnePage の呼び出しは Flow の中で行う
+テストから画面の細かい操作を直接扱わずに済むようにする。
 """
 
 from playwright.sync_api import Page
@@ -18,18 +15,19 @@ class CartFlow:
     def __init__(self, page: Page) -> None:
         self._cart_page = CartPage(page)
         self._header = HeaderComponent(page)
-        # 操作の後に移る商品一覧画面・商品詳細画面の表示を確かめるために使う
+        # 操作の後に移る Products画面・商品詳細画面の表示を確かめるために使う
         self._inventory_page = InventoryPage(page)
         # 操作の後に移る Checkout Step One画面の表示を確かめるために使う
         self._checkout_step_one_page = CheckoutStepOnePage(page)
 
-    # 利用者の操作の単位で、画面を操作する。
-
     def open_cart_with(self, products: list[dict]) -> None:
-        """指定した商品が、指定した順にカートに入った状態でカート画面を開く。
+        """渡した商品が、渡した順にカートに入った状態で、カート画面を開く。
 
-        前提状態はブラウザの保存領域への直接書き込みで作る（Products画面の不具合で、カート画面のテストまで失敗しないようにするため）。
-        商品は data/products.py の PRODUCTS の要素を渡す。
+        前提の状態は、ブラウザの保存領域への直接書き込みで作る
+        （Products画面の不具合で、カート画面のテストまで失敗しないようにするため）。
+        開いた後に、行の数が入れた件数と同じことを確かめる
+        （書き込みが効かずに、空のカートのままテストが進まないように）。
+        商品は、data/products.py にある商品（1商品分のまとまり）を渡す。
         """
         self._cart_page.set_cart_contents([product["id"] for product in products])
         self._cart_page.goto()
@@ -37,11 +35,14 @@ class CartFlow:
         self._cart_page.expect_item_count(len(products))
 
     def access_cart_directly(self) -> None:
-        """カート画面のURLへ直接アクセスする（表示は確かめない。未ログイン時の検証に使う）。"""
+        """カート画面の URL を開く。
+
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
+        """
         self._cart_page.goto()
 
     def reload_cart(self) -> None:
-        """カート画面を再読み込みする。"""
+        """再読み込みして、カート画面のままであることを確かめる。"""
         self._cart_page.reload()
         self._cart_page.expect_on_page()
 
@@ -57,8 +58,6 @@ class CartFlow:
     def open_product_detail(self, product_name: str) -> None:
         self._cart_page.click_product_name(product_name)
 
-    # 画面の状態を検証する。
-
     def expect_cart_page_layout(self) -> None:
         """タイトル・一覧の見出し・Continue Shopping・Checkout が表示されていることを確かめる。"""
         self._cart_page.expect_page_layout()
@@ -67,7 +66,7 @@ class CartFlow:
         self._cart_page.expect_item_count(count)
 
     def expect_items_displayed(self, products: list[dict]) -> None:
-        """カート内の表示を検証する（行数、各行の表示項目、商品名と価格の組み合わせ）。"""
+        """カートの表示を確かめる（行数、各行の表示項目、商品名と価格の組み合わせ）。"""
         self._cart_page.expect_item_count(len(products))
         self._cart_page.expect_all_item_elements_visible()
         for product in products:
@@ -77,7 +76,7 @@ class CartFlow:
         self._cart_page.expect_item_names(product_names)
 
     def expect_in_cart(self, product_name: str) -> None:
-        """カート内に指定した商品の行があることを確かめる（並び順は問わない）。"""
+        """カートに、渡した商品の行があることを確かめる（並び順は問わない）。"""
         self._cart_page.expect_item_listed(product_name)
 
     def expect_badge_count(self, count: int) -> None:

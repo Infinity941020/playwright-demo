@@ -1,9 +1,9 @@
-"""商品一覧画面の Page Object
+"""商品一覧画面の操作と、画面の表示の確認をまとめる。
 
-責務:
-    - 画面の要素（ロケータ）を定義する
-    - ボタンを押す・入力するなど、要素1つに対する操作を提供する
-    - 画面の表示や状態を検証する
+- 商品ごとの部分（ボタン・価格など）は、商品名で商品のカードを探してから、その中で探す
+  （並び順や位置に頼らずに商品を決めるため）
+- 画面を開く操作は、表示までは確かめない（ログインしていないときに開くと、その画面ではなく Login画面が出るため）。
+  表示の確認は、呼び出す側で別に行う
 """
 
 import re
@@ -23,10 +23,8 @@ class InventoryPage:
         self.sort_select: Locator = page.locator('[data-test="product-sort-container"]')
         self.active_sort_option: Locator = page.locator('[data-test="active-option"]')
 
-    # 商品ごとに変わる要素は、商品名で特定する。
-
     def _item(self, product_name: str) -> Locator:
-        """商品名に完全一致する商品カードを返す。"""
+        """商品名が完全に一致する商品のカード。"""
         name_pattern = re.compile(rf"^{re.escape(product_name)}$")
         return self.inventory_items.filter(
             has=self.page.locator('[data-test="inventory-item-name"]', has_text=name_pattern)
@@ -38,14 +36,10 @@ class InventoryPage:
     def _remove_button(self, product_name: str) -> Locator:
         return self._item(product_name).get_by_role("button", name="Remove", exact=True)
 
-    # 画面の要素1つに対する操作（押す・入力するなど）を行う。
-
     def goto(self) -> None:
-        """商品一覧画面へ遷移する（表示の確認は、呼び出す側で expect_on_page() を呼んで行う）。"""
         self.page.goto(URLS["inventory"])
 
     def goto_product_detail(self, product_id: int) -> None:
-        """商品詳細画面へURLで遷移する（表示の確認は、呼び出す側で行う）。"""
         self.page.goto(f"{URLS['inventory_item']}?id={product_id}")
 
     def reload(self) -> None:
@@ -66,8 +60,6 @@ class InventoryPage:
     def click_product_image(self, product_name: str) -> None:
         self._item(product_name).locator('a[data-test$="-img-link"]').click()
 
-    # 画面の表示や状態を検証する。
-
     def expect_on_page(self) -> None:
         """商品一覧画面が表示されていることを確かめる。"""
         expect(self.page).to_have_url(URLS["inventory"])
@@ -77,7 +69,7 @@ class InventoryPage:
         expect(self.inventory_items).to_have_count(count)
 
     def expect_all_product_elements_visible(self) -> None:
-        """全商品に「画像／商品名／説明／価格／Add to cartボタン」が表示されていることを確かめる。"""
+        """すべての商品に、画像・商品名・説明・価格・Add to cart ボタンが表示されていることを確かめる。"""
         expect(self.inventory_items.first).to_be_visible()
         for item in self.inventory_items.all():
             expect(item.locator('img[data-test$="-img"]')).to_be_visible()
@@ -92,11 +84,11 @@ class InventoryPage:
         )
 
     def expect_product_names(self, product_names: list[str]) -> None:
-        """商品名が指定した順に並んでいることを確かめる。"""
+        """商品名が、渡した順に並んでいることを確かめる。"""
         expect(self.item_names).to_have_text(product_names)
 
     def expect_product_prices(self, prices: list[str]) -> None:
-        """価格が指定した順に並んでいることを確かめる。"""
+        """価格が、渡した順に並んでいることを確かめる。"""
         expect(self.item_prices).to_have_text(prices)
 
     def expect_selected_sort(self, option_label: str) -> None:

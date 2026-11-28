@@ -1,11 +1,8 @@
-"""モックAPIサーバー（TS版 mocks/server.ts に対応）
+"""API のテストが通信する、モックのサーバー。
 
-責務:
-    - handlers/ 配下の各 API のハンドラーをまとめて登録する
-    - 127.0.0.1 の空いているポートでサーバーを別スレッドで起動・停止する
-
-API のテストの通信は、テストごとに 127.0.0.1 の空いているポートで立てるこのサーバーが受ける。
-テストの準備の部品（fixtures/api_fixture.py）が、テストごとに新しく作る。作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない。
+- 127.0.0.1 の空いているポートで、別のスレッドで動かす
+- テストの準備の部品（fixtures/api_fixture.py）が、このサーバーをテストごとに新しく作る。
+  作るたびにハンドラーも新しい状態で作るため、状態がテストをまたがない
 """
 
 import json
@@ -23,7 +20,7 @@ from mocks.mock_data import MOCK_DATA
 
 class MockServer:
     def __init__(self) -> None:
-        # 各 API のハンドラーをまとめて登録する（インスタンスごとに新しい状態で作る）
+        # 各 API のハンドラー（サーバーを作るたびに、新しい状態で作る）
         self._handlers: list[Handler] = [
             *create_login_handlers(),
             *create_user_handlers(),
@@ -36,15 +33,15 @@ class MockServer:
 
     @property
     def base_url(self) -> str:
-        """接続先（例：http://127.0.0.1:50123）を返す。start() の後に使う。"""
+        """接続先（例：http://127.0.0.1:50123）。起動した後に使う。"""
         if self._server is None:
             raise RuntimeError("MockServer is not started")
         host, port = self._server.server_address[:2]
         return f"http://{host}:{port}"
 
     def start(self) -> None:
-        """ポート0を指定し、空いているポートを自動で割り当てて起動する。"""
-        # 1リクエストずつ順に処理する HTTPServer を使う（状態の読み書きが重ならない）
+        """ポートに 0 を指定して、空いているポートを割り当ててもらって起動する。"""
+        # リクエストを1つずつ順に処理するサーバーを使う（状態の読み書きが重ならないようにするため）
         self._server = HTTPServer(("127.0.0.1", 0), self._create_request_handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
         self._thread.start()
@@ -66,9 +63,9 @@ class MockServer:
                 try:
                     return handler.resolver(request)
                 except Exception as error:
-                    # ハンドラー内の例外（JSON として読めない本文など）は 500 を返す
+                    # ハンドラーの中で起きた例外（JSON として読めない本文など）は、500 を返す
                     return MockResponse(500, {"error": f"{type(error).__name__}: {error}"})
-        # 登録されていないメソッド・パスには、404 を返す
+        # 登録されていないメソッド・パスには、404 を返す（外の通信には流さない）
         return MockResponse(404, {"error": MOCK_DATA["server"]["no_handler_error"]})
 
     def _create_request_handler(self) -> type[BaseHTTPRequestHandler]:
@@ -108,7 +105,7 @@ class MockServer:
 
 
 def _match_path(pattern: str, path: str) -> dict[str, str] | None:
-    """パスがパターン（例：/api/cart/{id}）に当てはまれば、{名前} の値を返す。"""
+    """パスがパターン（例：/api/cart/{id}）に当てはまれば、{名前} の部分の値を返す。当てはまらなければ None を返す。"""
     pattern_parts = pattern.strip("/").split("/")
     path_parts = path.strip("/").split("/")
     if len(pattern_parts) != len(path_parts):
