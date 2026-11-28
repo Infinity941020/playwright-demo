@@ -82,7 +82,6 @@ export class CheckoutStepOnePage {
     await expect(this.cancelButton).toBeVisible();
     await expect(this.cancelButton).toHaveText('Cancel');
 
-    // Continue は、文言を要素の中の文字ではなく値として持つ作りのため、値で確かめる
     await expect(this.continueButton).toBeVisible();
     await expect(this.continueButton).toHaveValue('Continue');
   }

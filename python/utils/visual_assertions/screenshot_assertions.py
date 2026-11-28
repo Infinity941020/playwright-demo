@@ -27,8 +27,7 @@ RESULT_DIR = _PYTHON_ROOT / "test-results" / "visual"
 _VIEWPORT = {"width": 1280, "height": 720}
 
 # 画面の下の帯の著作権の文（「© 2026 Sauce Labs. …」）を、塗りつぶして撮る。
-# 年はブラウザの時計で決まり、年が変わると画像が変わるため。年だけの要素はないので、文の全体を隠す。
-# 帯がない画面や、帯が撮る範囲の外にある画面では、何も塗られない
+# 年はブラウザの時計で決まり、年が変わると画像が変わるため。年だけの要素はないので、文の全体を隠す
 _FOOTER_COPY_SELECTOR = '[data-test="footer-copy"]'
 
 _update_snapshots = False

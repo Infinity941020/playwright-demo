@@ -23,8 +23,7 @@ export default defineConfig({
   snapshotPathTemplate:
     '{testDir}/../../shared/visual/{arg}{ext}',
 
-  // CI では基準画像を書き換えない（基準画像がないときも、書かずに失敗する）。
-  // 基準画像は、撮影用の実行で撮り、プルリクエストで入れるため。手元では、ないときだけ書いて失敗する（初期値の動き）
+  // CI では基準画像を書き換えない（基準画像は、撮影用の実行で撮り、プルリクエストで入れるため）
   updateSnapshots: isCI ? 'none' : 'default',
 
 

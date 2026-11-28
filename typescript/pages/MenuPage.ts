@@ -32,7 +32,7 @@ export class MenuPage {
   }
 
   // 画面を開いた直後の、メニューが閉じる動きの間に開くと、開いた扱いなのに項目が隠れたままになるため、閉じたメニューの項目が見えなくなるまで待つ。
-  // メニューが閉じている前提で呼ぶ（開いたままだと、待ちが時間切れになる）
+  // メニューが閉じている前提で呼ぶ
   async waitUntilMenuClosed() {
     await expect(this.menuItems.first()).toBeHidden();
   }

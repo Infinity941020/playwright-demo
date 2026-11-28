@@ -1,6 +1,5 @@
 // Checkout Step One画面の入力チェックのテスト。
-// 入力が足りないときは、エラーの文言の全体と、Checkout Step One画面のままであることを、この順に確かめる
-// （ボタンを押した直後は画面がまだ反応していないことがあるため、画面のままであることは、エラーの文言が出てから確かめる）
+// 入力が足りないときは、エラーの文言の全体と、Checkout Step One画面のままであることを確かめる
 import { test } from '../../../fixtures/loginFixture';
 import { CheckoutFlow } from '../../../flows/CheckoutFlow';
 import {

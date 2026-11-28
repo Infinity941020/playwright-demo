@@ -46,8 +46,6 @@ def logged_page(
 
     閲覧環境は、pytest-playwright が用意する作り方で作る。
     実行のときに指定した、画面の保存・記録（トレース）・録画の設定を、このテストにも効かせるため。
-    閉じるのも、pytest-playwright が行う。
-    保存したファイルからは、ログインした状態だけが戻り、開いていた画面は戻らないため、商品一覧画面を開く。
     """
     context = new_context(storage_state=str(standard_user_storage_state))
     page = context.new_page()

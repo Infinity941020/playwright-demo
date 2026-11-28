@@ -356,6 +356,8 @@ TS版に不統一・不備がある箇所についてPython版で「既存踏襲
 - 影響範囲: python/requirements.txt
 - TS逆輸入候補: なし
 - 決定日: 2026-10-07
+- 追記（2026-11-28）: playwright を 1.65.2、pytest-playwright を 0.10.0 に上げた。
+  pytest-playwright 0.10.0 で必要なものから外れた pytest-base-url は、入れない（requirements.txt にも足さない）
 
 ## 論点15: Cart画面テストの前提状態の作り方
 
