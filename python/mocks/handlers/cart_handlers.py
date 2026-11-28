@@ -21,7 +21,6 @@ def create_cart_handlers() -> list[Handler]:
         nonlocal next_id
         body = request.json()
 
-        # 本文がないときは、値がないとして 400 を返す
         if body is None:
             return MockResponse(400, {"error": _INVALID_PAYLOAD_ERROR})
 

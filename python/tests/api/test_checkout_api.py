@@ -10,12 +10,12 @@ from utils.api_assertions.checkout_assertions import (
 )
 from utils.api_helper import execute_checkout_api
 
-# エラーの文言は、specs/api_spec.md「Checkout API」の表と同じ値を書く
+# エラーの文言は、specs/api_spec.md の「Checkout API」の表と同じ値を書く
 _INVALID_PAYLOAD_MESSAGE = "invalid payload"
 
 
 class TestCheckoutApi:
-    """Checkout API を確かめる。"""
+    """Checkout の API を確かめる。"""
 
     def test_checkout_success(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CHECKOUT-001: 正しい内容で購入すると、送った内容が返ること。"""

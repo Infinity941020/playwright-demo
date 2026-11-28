@@ -38,7 +38,7 @@ class TestCheckoutStepTwoState:
 
         expect_badge_count(checkout_flow, 0)
 
-        # Complete画面での操作は Complete画面の仕様で扱うため、ここでは使わずに、Products画面を URL で開く
+        # Complete画面での操作は specs/checkout_complete_spec.md で扱うため、ここでは使わずに、Products画面を URL で開く
         inventory_flow.access_inventory_directly()
         expect_on_inventory_page(checkout_flow)
 

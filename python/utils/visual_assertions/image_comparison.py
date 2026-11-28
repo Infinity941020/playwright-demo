@@ -2,7 +2,7 @@
 
 違う画素の割合を求め、違う画素を目立つ色にした画像（差分の画像）を作る。
 Python 用の Playwright には、画面を基準画像と比べる機能がないため、Pillow で作る
-（比べ方は specs/visual_spec.md「■ 比較の方法」）。
+（比べ方は specs/visual_spec.md の「比較の方法」）。
 """
 
 from dataclasses import dataclass

@@ -8,7 +8,7 @@ from utils.api_helper import execute_login_api
 
 
 class TestLoginApi:
-    """Login API を確かめる。"""
+    """Login の API を確かめる。"""
 
     def test_login_success(self, api_request_context: APIRequestContext) -> None:
         """TC-API-LOGIN-001: 正しい認証情報でログインすると、トークンが返ること。"""

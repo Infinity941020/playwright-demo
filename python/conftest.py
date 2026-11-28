@@ -7,8 +7,8 @@
 import pytest
 
 # API の返事の確認（utils/api_assertions/）は、値を直接比べて確かめる。
-# pytest は、失敗したときに比べた値を表示する仕組みを、テストのファイルとして集めたもの以外には入れないため、
-# 読み込まれる前に対象に加える
+# pytest は、失敗したときに比べた値を表示する仕組みを、テストのファイルや conftest など、
+# pytest が自分で読み込むものにしか入れないため、読み込まれる前に対象に加える
 pytest.register_assert_rewrite("utils.api_assertions")
 
 pytest_plugins = ["fixtures.login_fixture", "fixtures.api_fixture"]

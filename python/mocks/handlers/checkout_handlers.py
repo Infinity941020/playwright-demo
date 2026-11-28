@@ -29,12 +29,10 @@ def create_checkout_handlers() -> list[Handler]:
                 {"error": _CHECKOUT["call_limit_error"], "message": _CHECKOUT["call_limit_message"]},
             )
 
-        # 本文がないときは、値がないとして 400 を返す
         if body is None:
             return MockResponse(400, {"error": _CHECKOUT["invalid_payload_error"]})
 
-        # 必須項目がそろっているかを確かめる
-        # （0 も指定なしとみなす。specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
+        # 0 も指定なしとみなす（specs/api_spec.md の「モックにある、意図された仕様か判断できない挙動」）
         if (
             not isinstance(body, dict)
             or not body.get("cartId")

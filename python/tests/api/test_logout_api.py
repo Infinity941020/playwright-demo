@@ -9,12 +9,12 @@ from utils.api_assertions.logout_assertions import (
 )
 from utils.api_helper import execute_logout_api
 
-# Authorization ヘッダーに付ける値（モックはヘッダーの有無だけを見る）
+# Authorization ヘッダーに付ける値（モックは、ヘッダーがあるかどうかだけで判断する）
 _TOKEN = "Bearer mock-token"
 
 
 class TestLogoutApi:
-    """Logout API を確かめる。"""
+    """Logout の API を確かめる。"""
 
     def test_logout_success(self, api_request_context: APIRequestContext) -> None:
         """TC-API-LOGOUT-001: トークンがあり本文が空なら、ログアウトできること。"""

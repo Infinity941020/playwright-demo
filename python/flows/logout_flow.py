@@ -1,7 +1,8 @@
 """左上のメニューでの操作（開閉・ログアウト・All Items）と、その結果の確認を、利用者の操作の単位でまとめる。
 
 - メニューの項目を押す操作は、必ずメニューを開き、開いたことを確かめてから押す
-- ログアウトする操作は、ログイン画面へ戻ったことまで確かめる。ほかの押す操作は、移った先の画面を確かめない
+- ログアウトする操作は、ログイン画面へ戻ったことまで確かめる。ほかの押す操作は、移った先の画面までは確かめない
+  （移った先の確認は、呼び出す側で別に行う）
 """
 
 from playwright.sync_api import Page
@@ -19,11 +20,7 @@ class LogoutFlow:
         self._inventory_page = InventoryPage(page)
 
     def open_menu(self) -> None:
-        """メニューを開き、開いたことを、aria-hidden 属性と最初の項目の表示の両方で確かめる。
-
-        開いた扱い（aria-hidden 属性が false）でも、項目が隠れたままのことがあるため
-        （specs/logout_spec.md の「実機で確認したが、意図された仕様か不具合かを判断できない挙動」）。
-        """
+        """メニューを開き、開いたことを確かめる。"""
         self._menu_page.wait_until_menu_closed()
         self._menu_page.click_menu_button()
         self._menu_page.expect_menu_opened()

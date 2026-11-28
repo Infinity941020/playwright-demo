@@ -65,7 +65,7 @@ class MockServer:
                 except Exception as error:
                     # ハンドラーの中で起きた例外（JSON として読めない本文など）は、500 を返す
                     return MockResponse(500, {"error": f"{type(error).__name__}: {error}"})
-        # 登録されていないメソッド・パスには、404 を返す
+        # 登録されていないメソッド・パスには、404 を返す（外の通信には流さない）
         return MockResponse(404, {"error": MOCK_DATA["server"]["no_handler_error"]})
 
     def _create_request_handler(self) -> type[BaseHTTPRequestHandler]:

@@ -62,8 +62,8 @@ class TestPurchaseFlow:
         expect_on_checkout_step_two_page(checkout_flow)
         expect_step_two_item_names_in_order(checkout_flow, added_order)
 
-        # 期待する金額は、画面の計算と同じ誤りを持たないように、計算で作らず、
-        # 画面で確かめた値（テストケースと同じ値）を書く
+        # 期待する金額は、計算で作らず、テストケースと同じ値を書く
+        # （テストの計算が画面と同じ誤りをしても気づけるように）
         expect_step_two_amounts(checkout_flow, "Item total: $47.97", "Tax: $3.84", "Total: $51.81")
 
         checkout_flow.complete_purchase()

@@ -21,7 +21,7 @@ _INVALID_PAYLOAD_MESSAGE = "invalid payload"
 
 
 class TestCartApi:
-    """Cart API を確かめる。"""
+    """Cart の API を確かめる。"""
 
     def test_add_cart(self, api_request_context: APIRequestContext) -> None:
         """TC-API-CART-001: カートに追加すると、送った内容で行が作られること。"""

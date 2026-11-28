@@ -1,6 +1,6 @@
 """Checkout の画面での操作と、その結果の確認を、利用者の操作の単位でまとめる。
 
-- ボタンやアイコンを押す操作は、移った先の画面までは見ない。移った先は、呼び出す側で別に確かめる
+- ボタンやアイコンを押す操作は、移った先の画面までは確かめない。移った先の確認は、呼び出す側で別に行う
 - 前提の状態を作る操作は、開いた画面が表示されたことまで確かめる
 """
 
@@ -30,7 +30,7 @@ class CheckoutFlow:
         （Products画面の不具合で、Checkout画面のテストまで失敗しないようにするため）。
         Step One画面は URL で開く（カート画面からの遷移は、カート画面のテストで確かめているため）。
         開いた後に、バッジの件数が入れた件数と同じことを確かめる
-        （この画面には商品の行がなく、カートが空でも先へ進めるため、書き込みが効いたことをバッジで見る）。
+        （この画面には商品の行がなく、カートが空でも先へ進めるため）。
         商品は、data/products.py にある商品（1商品分のまとまり）を渡す。
         """
         self._cart_page.set_cart_contents([product["id"] for product in products])
@@ -41,7 +41,7 @@ class CheckoutFlow:
     def access_step_one_directly(self) -> None:
         """Checkout Step One画面の URL を開く。
 
-        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
         """
         self._step_one_page.goto()
 
@@ -96,7 +96,7 @@ class CheckoutFlow:
     def access_step_two_directly(self) -> None:
         """Checkout Step Two画面の URL を開く。
 
-        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
         """
         self._step_two_page.goto()
 
@@ -156,7 +156,7 @@ class CheckoutFlow:
     def access_complete_directly(self) -> None:
         """Checkout Complete画面の URL を開く。
 
-        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
         """
         self._complete_page.goto()
 

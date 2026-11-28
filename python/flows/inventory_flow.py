@@ -23,14 +23,14 @@ class InventoryFlow:
         """商品一覧画面の URL を開く。
 
         ログインしていないときやログアウトした後の確認と、購入した後に商品一覧画面を開くときに使う。
-        ログインしていないと Login画面が出るため、表示は見ない（表示は、呼び出す側で別に確かめる）。
+        ログインしていないと Login画面が出るため、表示は確かめない（表示の確認は、呼び出す側で別に行う）。
         """
         self._inventory_page.goto()
 
     def access_product_detail_directly(self, product_id: int) -> None:
         """商品詳細画面の URL を開く。
 
-        ログアウトした後の確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        ログアウトした後の確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
         """
         self._inventory_page.goto_product_detail(product_id)
 

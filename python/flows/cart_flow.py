@@ -37,7 +37,7 @@ class CartFlow:
     def access_cart_directly(self) -> None:
         """カート画面の URL を開く。
 
-        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は見ない。
+        ログインしていないときの確認に使う。ログインしていないと Login画面が出るため、表示は確かめない。
         """
         self._cart_page.goto()
 
